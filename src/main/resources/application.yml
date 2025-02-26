@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mariadb://dev.triphos.co.kr:23306/lg_checklist?allowMultiQueries=true
+    username: lg_checklist
+    password: tri0605
+  jpa:
+    show-sql: true # 콘솔로그로 출력하려면
+    properties:
+      hibernate:
+        format_sql: true # SQL 포맷팅
+        highlight_sql: true # ANSI 코드에 색을 나타낸다
+        use_sql_comments: true # SQL 내부에 /* */ 주석 추가
+  logging:
+    level:
+      org.hibernate.SQL: debug # logger에 출력하려면
+      org.hibernate.type.descriptor.sql: trace # 파라미터 값 출력
