@@ -2,12 +2,21 @@ server:
   port: 8080
 
 spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
   datasource:
-    url: jdbc:mariadb://dev.triphos.co.kr:23306/lg_checklist?allowMultiQueries=true
-    username: lg_checklist
-    password: tri0605
+    url: jdbc:mariadb://127.0.0.1:3306/development_standard?allowMultiQueries=true
+    username: root
+    password: blackmusicnote14
+  devtools:
+    restart:
+      enabled: false
   jpa:
-    show-sql: true # 콘솔로그로 출력하려면
+    show-sql: true # jpa 쿼리출력여부
     properties:
       hibernate:
         format_sql: true # SQL 포맷팅
@@ -15,5 +24,6 @@ spring:
         use_sql_comments: true # SQL 내부에 /* */ 주석 추가
   logging:
     level:
-      org.hibernate.SQL: debug # logger에 출력하려면
-      org.hibernate.type.descriptor.sql: trace # 파라미터 값 출력
+      org.hibernate.SQL: DEBUG
+      org.hibernate.type: trace
+

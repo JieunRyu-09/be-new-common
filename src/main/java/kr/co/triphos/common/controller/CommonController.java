@@ -10,7 +10,7 @@ import java.util.Date;
 @RequestMapping("/common")
 @RequiredArgsConstructor
 @Log4j2
-public class common {
+public class CommonController {
 
 	@GetMapping("/test")
 	public String getTest(@RequestParam String inputText){
