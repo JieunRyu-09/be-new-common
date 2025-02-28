@@ -1,15 +1,12 @@
 package kr.co.triphos.config;
 
-import kr.co.triphos.member.CustomUserDetailsService;
-import kr.co.triphos.member.MemberService;
+import kr.co.triphos.member.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,7 +25,7 @@ public class SecurityConfiguration {
 			.csrf().disable()
 			.sessionManagement(session -> session
 					.maximumSessions(-1) // 세션 무제한
-					.maximumSessions(1).maxSessionsPreventsLogin(true) // 새로운 로그인 차단 (기존 세션 유지)
+					//.maximumSessions(1).maxSessionsPreventsLogin(true) // 새로운 로그인 차단 (기존 세션 유지)
 			)
 			.authorizeHttpRequests(auth -> auth
 					.antMatchers("/test/**").permitAll()  // test 경로는 인증 불필요

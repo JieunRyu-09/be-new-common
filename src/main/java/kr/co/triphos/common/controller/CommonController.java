@@ -12,9 +12,4 @@ import java.util.Date;
 @Log4j2
 public class CommonController {
 
-	@GetMapping("/test")
-	public String getTest(@RequestParam String inputText){
-		Date nowdate = new Date();
-		return nowdate + ": " + inputText;
-	}
 }
