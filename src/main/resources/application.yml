@@ -26,4 +26,12 @@ spring:
     level:
       org.hibernate.SQL: DEBUG
       org.hibernate.type: trace
+springfox:
+  documentation:
+    swagger:
+      v2:
+        path: /api-docs  # Swagger JSON 경로
+    ui:
+      base-url: / # Swagger UI 경로
+      enabled: true  # Swagger UI 사용 여부
 

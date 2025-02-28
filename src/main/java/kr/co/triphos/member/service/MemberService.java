@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
 import java.lang.reflect.Field;
 import static java.lang.reflect.Modifier.*;
 
@@ -28,7 +26,6 @@ public class MemberService {
 		return memberRepository.findByMemberIdAndMemberPw(memberId, memberPw);
 	}
 
-	@Transactional
 	public boolean createMember(Member member) throws Exception{
 		String memberId = member.getMemberId();
 		String memberPw = member.getMemberPw();
@@ -42,12 +39,11 @@ public class MemberService {
 		return true;
 	}
 
-	@Transactional
 	public boolean updateMemberPw(MemberDTO memberDTO) throws Exception{
 		String memberId 	= memberDTO.getMemberId();
 		String memberPw 	= memberDTO.getMemberPw();
 		String newMemberPw 	= memberDTO.getNewMemberPw();
-		Member existMember = memberRepository.findByMemberId(memberId).orElseThrow(() -> new Exception("회원 정보가 존재하지 않습니다."));
+		Member existMember 	= memberRepository.findByMemberId(memberId).orElseThrow(() -> new Exception("회원 정보가 존재하지 않습니다."));
 
 		if (!passwordEncoder.matches(memberPw, existMember.getMemberPw())) {throw new Exception("잘못된 기존 비밀번호입니다.");}
 
@@ -58,8 +54,8 @@ public class MemberService {
 				// static, final 필드는 제외
 				if ((field.getModifiers() & (STATIC | FINAL)) != 0) continue;
 
-				Object newValue = field.get(memberDTO);
-				boolean fieldExist = fieldExists(existMember, field.getName());
+				Object newValue 	= field.get(memberDTO);
+				boolean fieldExist 	= fieldExists(existMember, field.getName());
 				// 사용자가 값을 입력했고, memberEntity 에 해당 field 가 있으며, fieldName 이 memberPw가 아닌 경우
 				if (newValue != null && fieldExist && !field.getName().equals("memberPw")) {
 					Field targetField = existMember.getClass().getDeclaredField(field.getName());
@@ -85,7 +81,8 @@ public class MemberService {
 		try {
 			obj.getClass().getDeclaredField(fieldName);
 			return true; // 필드가 존재하면 true 반환
-		} catch (NoSuchFieldException e) {
+		}
+		catch (NoSuchFieldException e) {
 			return false; // 필드가 없으면 false 반환
 		}
 	}

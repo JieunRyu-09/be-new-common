@@ -28,9 +28,10 @@ public class SecurityConfiguration {
 					//.maximumSessions(1).maxSessionsPreventsLogin(true) // 새로운 로그인 차단 (기존 세션 유지)
 			)
 			.authorizeHttpRequests(auth -> auth
-					.antMatchers("/test/**").permitAll()  // test 경로는 인증 불필요
-					.antMatchers("/member/all/**").permitAll()  // test 경로는 인증 불필요
-					.anyRequest().authenticated() 			// 나머지 요청은 인증 필요
+					.antMatchers("/swagger-ui/**").permitAll()
+					.antMatchers("/test/**").permitAll()  		// test 경로는 인증 불필요
+					.antMatchers("/member/all/**").permitAll()  	// member/all 경로는 인증 불필요(비로그인시 사용)
+					.anyRequest().authenticated() 					// 나머지 요청은 인증 필요
 			)
 			.formLogin(login -> login
 					//.loginPage("/member/all/loginPage").permitAll() // 로그인 페이지 별도 설정 시 필요
