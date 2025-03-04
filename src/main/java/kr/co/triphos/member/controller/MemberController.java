@@ -7,16 +7,13 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @RestController
-@RequestMapping("/member/auth")
+@RequestMapping("/member")
 @RequiredArgsConstructor
 @Log4j2
-@EnableWebMvc
-public class MemberAuthController {
+public class MemberController {
 	private final MemberService memberService;
-
 	@GetMapping("/loginSuccess")
 	public ModelAndView loginSuccessPage(Model model) {
 		return new ModelAndView("main");

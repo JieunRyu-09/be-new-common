@@ -1,0 +1,12 @@
+server:
+  port: 8081
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://127.0.0.1:3306/development_standard?allowMultiQueries=true
+    username: root
+    password: blackmusicnote14
+
