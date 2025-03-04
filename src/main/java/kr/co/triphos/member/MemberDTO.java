@@ -9,13 +9,18 @@ import lombok.extern.log4j.Log4j2;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Log4j2
+@Builder
 public class MemberDTO {
+
+	@NotBlank(message = "아이디를 입력하세요.")
 	private String 	memberId;
+
 	private String 	memberPw;
 	private String 	newMemberPw;
 	private String 	authority;

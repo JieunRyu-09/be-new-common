@@ -26,16 +26,16 @@ public class MemberService {
 		return memberRepository.findByMemberIdAndMemberPw(memberId, memberPw);
 	}
 
-	public boolean createMember(Member member) throws Exception{
-		String memberId = member.getMemberId();
-		String memberPw = member.getMemberPw();
-		Member existMember = memberRepository.findByMemberId(memberId).orElse(null);
+	public boolean createMember(MemberDTO memberDTO) throws Exception{
+		String memberId = memberDTO.getMemberId();
+		String memberPw = memberDTO.getMemberPw();
+		Member existMember = memberRepository.findByMemberId(memberId).orElse(new Member());
 
-		if (existMember != null) {throw new Exception("이미 등록된 사용자입니다.");}
+		if (existMember.getMemberId() != null) {throw new Exception("이미 등록된 사용자입니다.");}
 
-		String encodedPassword = passwordEncoder.encode(member.getMemberPw());
-		member.setMemberPw(encodedPassword);
-		memberRepository.save(member);
+		Member newMember = new Member(memberDTO);
+		newMember.setMemberPw(passwordEncoder.encode(memberDTO.getMemberPw()));
+		memberRepository.save(newMember);
 		return true;
 	}
 
@@ -48,25 +48,7 @@ public class MemberService {
 		if (!passwordEncoder.matches(memberPw, existMember.getMemberPw())) {throw new Exception("잘못된 기존 비밀번호입니다.");}
 
 		// 사용자가 입력한 정보만 업데이트
-		for (Field field: MemberDTO.class.getDeclaredFields()) {
-			field.setAccessible(true);
-			try {
-				// static, final 필드는 제외
-				if ((field.getModifiers() & (STATIC | FINAL)) != 0) continue;
-
-				Object newValue 	= field.get(memberDTO);
-				boolean fieldExist 	= fieldExists(existMember, field.getName());
-				// 사용자가 값을 입력했고, memberEntity 에 해당 field 가 있으며, fieldName 이 memberPw가 아닌 경우
-				if (newValue != null && fieldExist && !field.getName().equals("memberPw")) {
-					Field targetField = existMember.getClass().getDeclaredField(field.getName());
-					targetField.setAccessible(true);
-					targetField.set(existMember, newValue);
-				}
-			} catch (IllegalAccessException e) {
-				throw new Exception(e.toString());
-			}
-		}
-
+		existMember.updateMember(memberDTO);
 		// 비밀번호 업데이트
 		if (newMemberPw != null) {
 			newMemberPw = passwordEncoder.encode(newMemberPw);
@@ -75,16 +57,4 @@ public class MemberService {
 		memberRepository.save(existMember);
 		return true;
 	}
-
-	// 엔티티에 해당 필드가 있는지 확인하는 메서드
-	private boolean fieldExists(Object obj, String fieldName) {
-		try {
-			obj.getClass().getDeclaredField(fieldName);
-			return true; // 필드가 존재하면 true 반환
-		}
-		catch (NoSuchFieldException e) {
-			return false; // 필드가 없으면 false 반환
-		}
-	}
-
 }
