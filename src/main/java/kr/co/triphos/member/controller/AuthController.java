@@ -1,5 +1,6 @@
 package kr.co.triphos.member.controller;
 
+import kr.co.triphos.common.service.ResponseDTO;
 import kr.co.triphos.member.MemberDTO;
 import kr.co.triphos.member.service.AuthService;
 import kr.co.triphos.member.service.MemberService;
@@ -29,24 +30,26 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestParam String id, @RequestParam String password) {
-		Map<String, Object> response = new HashMap<>();
-		response.put("res", false);
+		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
 			String accessToken = authService.login(id, password);
 
-			response.put("res", true);
-			response.put("accessToken", accessToken);
-			response.put("refreshToken", authService.getRefreshToken(accessToken));
+			responseDTO.setSuccess(true);
+			responseDTO.addData("accessToken", accessToken);
+			responseDTO.addData("refreshToken", authService.getRefreshToken(accessToken));
+			responseDTO.setMsg("로그인에 성공하였습니다");
 
 			return ResponseEntity.ok()
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-				.body(response);
+				.body(responseDTO);
 		}
 		catch (RuntimeException re) {
-			return ResponseEntity.status(401).body(re.getMessage());
+			responseDTO.setMsg(re.getMessage());
+			return ResponseEntity.status(401).body(responseDTO);
 		}
 		catch (Exception ex) {
+			responseDTO.setMsg(ex.getMessage());
 			return ResponseEntity.status(401).body("Invalid credentials");
 		}
 
@@ -86,17 +89,25 @@ public class AuthController {
 	}
 
 	@PostMapping("/create")
-	public boolean createMember(@RequestBody MemberDTO memberDTO) {
-		try {
-			if (isBlank(memberDTO.getMemberPw())) return false;
-			if (isBlank(memberDTO.getMemberNm())) return false;
+	public ResponseEntity<?> createMember(@RequestBody MemberDTO memberDTO) {
+		Map<String, Object> response = new HashMap<>();
+		response.put("res", false);
 
-			return memberService.createMember(memberDTO);
+
+		try {
+			if (isBlank(memberDTO.getMemberPw())) response.put("msg", "비밀번호가 없습니다.");
+			if (isBlank(memberDTO.getMemberNm())) response.put("msg", "이름이 없습니다.");
+
+			boolean result = memberService.createMember(memberDTO);
+			String msg = result ? "사용자를 생성하였습니다." : "사용자 생성에 실패하였습니다.";
+			response.put("res", result);
+			response.put("msg", msg);
 		}
 		catch (Exception ex) {
 			log.error(ex);
-			return false;
+			response.put("msg", ex.getMessage());
 		}
+		return ResponseEntity.ok().body(response);
 	}
 
 	@PostMapping("/update")
