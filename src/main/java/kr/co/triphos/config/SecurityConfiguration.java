@@ -29,7 +29,7 @@ public class SecurityConfiguration {
 			.authorizeHttpRequests(auth -> auth
 					.antMatchers("/swagger-ui/**").permitAll()
 					.antMatchers("/test/**").permitAll()  		// test 경로는 인증 불필요
-					.antMatchers("/auth/**").permitAll()  	// member/all 경로는 인증 불필요(비로그인시 사용)
+					.antMatchers("/auth/**").permitAll()  		// member/all 경로는 인증 불필요(비로그인시 사용)
 					.anyRequest().authenticated() 					// 나머지 요청은 인증 필요
 			)
 //			.formLogin(login -> login

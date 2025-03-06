@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 import java.lang.reflect.Field;
 import static java.lang.reflect.Modifier.*;
 
@@ -26,6 +28,7 @@ public class MemberService {
 		return memberRepository.findByMemberIdAndMemberPw(memberId, memberPw);
 	}
 
+	@Transactional
 	public boolean createMember(MemberDTO memberDTO) throws Exception{
 		String memberId = memberDTO.getMemberId();
 		String memberPw = memberDTO.getMemberPw();
@@ -39,6 +42,7 @@ public class MemberService {
 		return true;
 	}
 
+	@Transactional
 	public boolean updateMemberPw(MemberDTO memberDTO) throws Exception{
 		String memberId 	= memberDTO.getMemberId();
 		String memberPw 	= memberDTO.getMemberPw();
