@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,7 +90,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<?> createMember(@RequestBody MemberDTO memberDTO) {
+	public ResponseEntity<?> createMember(@RequestBody @Valid MemberDTO memberDTO) {
 		Map<String, Object> response = new HashMap<>();
 		response.put("res", false);
 
@@ -113,7 +114,10 @@ public class AuthController {
 	@PostMapping("/update")
 	// TODO test시에만 사용, 정식 배포시 MemberAllController에서는 삭제 필요
 	public boolean updateMember(@RequestBody MemberDTO memberDTO) {
+		ResponseDTO responseDTO = new ResponseDTO();
 		try {
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("로그인에 성공하였습니다");
 			return memberService.updateMemberPw(memberDTO);
 		}
 		catch (Exception ex) {

@@ -3,10 +3,10 @@ server:
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://127.0.0.1:3306/development_standard?allowMultiQueries=true
-    username: root
-    password: blackmusicnote14
+    url: jdbc:mariadb://dev.triphos.co.kr:23306/dev_standard?allowMultiQueries=true
+    username: dev_standard
+    password: $tri0605!
 
