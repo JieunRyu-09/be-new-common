@@ -27,9 +27,14 @@ public class SecurityConfiguration {
 			.csrf().disable()
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-					.antMatchers("/swagger-ui/**").permitAll()
+					.antMatchers(
+							"/swagger-ui.html",
+							"/swagger-ui/**",
+							"/v3/api-docs/**",  // 보통 기본 경로지만 현재는 '/api-docs'로 바꾸셨으니
+							"/api-docs/**"
+					).permitAll()  // swagger 경로 모두 허용
 					.antMatchers("/test/**").permitAll()  		// test 경로는 인증 불필요
-					.antMatchers("/auth/**").permitAll()  	// member/all 경로는 인증 불필요(비로그인시 사용)
+					.antMatchers("/auth/**").permitAll()  		// member/all 경로는 인증 불필요(비로그인시 사용)
 					.anyRequest().authenticated() 					// 나머지 요청은 인증 필요
 			)
 //			.formLogin(login -> login

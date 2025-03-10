@@ -1,14 +1,15 @@
 package kr.co.triphos.member.service;
 
-import kr.co.triphos.member.Member;
-import kr.co.triphos.member.MemberDTO;
+import kr.co.triphos.member.dto.memberDTO.MemberUpdateDTO;
+import kr.co.triphos.member.entity.Member;
+import kr.co.triphos.member.dto.memberDTO.MemberDTO;
 import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.lang.reflect.Field;
-import static java.lang.reflect.Modifier.*;
+
+import javax.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class MemberService {
 		return memberRepository.findByMemberIdAndMemberPw(memberId, memberPw);
 	}
 
+	@Transactional
 	public boolean createMember(MemberDTO memberDTO) throws Exception{
 		String memberId = memberDTO.getMemberId();
 		String memberPw = memberDTO.getMemberPw();
@@ -39,22 +41,28 @@ public class MemberService {
 		return true;
 	}
 
-	public boolean updateMemberPw(MemberDTO memberDTO) throws Exception{
+	@Transactional
+	public boolean updateMemberPw(MemberUpdateDTO memberDTO) throws Exception{
 		String memberId 	= memberDTO.getMemberId();
 		String memberPw 	= memberDTO.getMemberPw();
 		String newMemberPw 	= memberDTO.getNewMemberPw();
 		Member existMember 	= memberRepository.findByMemberId(memberId).orElseThrow(() -> new Exception("회원 정보가 존재하지 않습니다."));
+		//if (!passwordEncoder.matches(memberPw, existMember.getMemberPw())) {throw new Exception("잘못된 기존 비밀번호입니다.");}
 
-		if (!passwordEncoder.matches(memberPw, existMember.getMemberPw())) {throw new Exception("잘못된 기존 비밀번호입니다.");}
-
-		// 사용자가 입력한 정보만 업데이트
-		existMember.updateMember(memberDTO);
-		// 비밀번호 업데이트
-		if (newMemberPw != null) {
-			newMemberPw = passwordEncoder.encode(newMemberPw);
-			existMember.setMemberPw(newMemberPw);;
+		try {
+			// 사용자가 입력한 정보만 업데이트
+			existMember.updateMember(memberDTO);
+			// 비밀번호 업데이트
+			if (newMemberPw != null) {
+				newMemberPw = passwordEncoder.encode(newMemberPw);
+				existMember.setMemberPw(newMemberPw);;
+			}
+			memberRepository.save(existMember);
+			return true;
 		}
-		memberRepository.save(existMember);
-		return true;
+		catch (Exception ex) {
+			log.error(ex.getMessage());
+			return false;
+		}
 	}
 }

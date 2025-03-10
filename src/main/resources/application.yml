@@ -17,25 +17,18 @@ spring:
     restart:
       enabled: false
   jpa:
-    show-sql: true # jpa 쿼리출력여부
+    show-sql: false
     properties:
-      hibernate:
-        format_sql: true # SQL 포맷팅
-        highlight_sql: true # ANSI 코드에 색을 나타낸다
-        use_sql_comments: true # SQL 내부에 /* */ 주석 추가
-  logging:
-    level:
-      org.hibernate.SQL: DEBUG
-      org.hibernate.type: trace
+      hibernate.format_sql: true
+      highlight_sql: true # ANSI 코드에 색을 나타낸다
+      dialect: org.hibernate.dialect.H2Dialect
+      show-sql: true
+      properties:
+         hibernate:
+           format_sql: true
+
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
-springfox:
-  documentation:
-    swagger:
-      v2:
-        path: /api-docs  # Swagger JSON 경로
-    ui:
-      base-url: / # Swagger UI 경로
-      enabled: true  # Swagger UI 사용 여부
+
 

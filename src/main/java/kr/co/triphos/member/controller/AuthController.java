@@ -1,25 +1,33 @@
 package kr.co.triphos.member.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.triphos.common.service.ResponseDTO;
-import kr.co.triphos.member.MemberDTO;
+import kr.co.triphos.member.dto.memberDTO.MemberDTO;
+import kr.co.triphos.member.dto.memberDTO.MemberUpdateDTO;
 import kr.co.triphos.member.service.AuthService;
 import kr.co.triphos.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
 import static kr.co.triphos.common.service.CommonFunc.isBlank;
 
 
-@Controller
+@RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Log4j2
@@ -29,7 +37,13 @@ public class AuthController {
 	private final MemberService memberService;
 
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestParam String id, @RequestParam String password) {
+	@Tag(name="사용자 관리")
+	@Operation(summary = "사용자 로그인", description = "")
+	@ApiResponse(content = @Content(
+			mediaType = "application/json",
+			schema = @Schema(implementation = ResponseDTO.class)
+	))
+	public ResponseEntity<?> login(@Parameter(description = "사용자Id") @RequestParam String id,  @Parameter(description = "사용자Pw") @RequestParam String password) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
@@ -52,73 +66,82 @@ public class AuthController {
 			responseDTO.setMsg(ex.getMessage());
 			return ResponseEntity.status(401).body("Invalid credentials");
 		}
-
 	}
 
 	@PostMapping("/refresh")
+	@Hidden
 	public ResponseEntity<?> refreshToken(@RequestBody String refreshToken) {
-		Map<String, Object> response = new HashMap<>();
-		response.put("res", false);
+		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
 			String newAccessToken = authService.refreshAccessToken(refreshToken);
 			String newRefreshToken = authService.getRefreshToken(newAccessToken);
 
-			response.put("res", true);
-			response.put("accessToken", newAccessToken);
-			response.put("refreshToken", newRefreshToken);
+			responseDTO.setSuccess(true);
+			responseDTO.addData("accessToken", newAccessToken);
+			responseDTO.addData("refreshToken", newRefreshToken);
 
 			return ResponseEntity.ok()
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken)
-					.body(response);
+					.body(responseDTO);
 		}
 		catch (Exception ex) {
 			return ResponseEntity.status(401).body(ex.getMessage());
 		}
 	}
 
-	@GetMapping("/loginPage")
-	public ModelAndView loginPage(Model model) {
-		return new ModelAndView("member/login");
-	}
-
 	@GetMapping("/checkExistMemberId")
-	// 존재하는 ID 조회
-	public boolean checkExistMemberId(@RequestParam String memberId) {
-		return memberService.getMemberInfoById(memberId) != null;
+	@Tag(name="사용자 관리")
+	@Operation(summary = "존재하는 ID 조회", description = "사용자 회원가입 시 중복되는 ID 확인")
+	public ResponseEntity<?> checkExistMemberId(@RequestParam String memberId) {
+		ResponseDTO responseDTO = new ResponseDTO();
+
+		try {
+			responseDTO.setSuccess(true);
+			responseDTO.addData("result", memberService.getMemberInfoById(memberId) != null);
+			return ResponseEntity.ok().body(responseDTO);
+		} catch (Exception ex) {
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<?> createMember(@RequestBody MemberDTO memberDTO) {
-		Map<String, Object> response = new HashMap<>();
-		response.put("res", false);
-
+	@Tag(name="사용자 관리")
+	@Operation(summary = "사용자 회원가입", description = "")
+	public ResponseEntity<?> createMember(@RequestBody @Valid MemberDTO memberDTO) {
+		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			if (isBlank(memberDTO.getMemberPw())) response.put("msg", "비밀번호가 없습니다.");
-			if (isBlank(memberDTO.getMemberNm())) response.put("msg", "이름이 없습니다.");
-
 			boolean result = memberService.createMember(memberDTO);
 			String msg = result ? "사용자를 생성하였습니다." : "사용자 생성에 실패하였습니다.";
-			response.put("res", result);
-			response.put("msg", msg);
+			responseDTO.setSuccess(result);
+			responseDTO.setMsg(msg);
+			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {
 			log.error(ex);
-			response.put("msg", ex.getMessage());
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
 		}
-		return ResponseEntity.ok().body(response);
 	}
 
 	@PostMapping("/update")
-	// TODO test시에만 사용, 정식 배포시 MemberAllController에서는 삭제 필요
-	public boolean updateMember(@RequestBody MemberDTO memberDTO) {
+	@Tag(name="사용자 관리")
+	@Operation(summary = "사용자정보 수정", description = "해당 api는 회원가입 및 로그인 등 구현 완료 후 삭제 예정")
+	public ResponseEntity<?> updateMember(@RequestBody MemberUpdateDTO memberDTO) {
+		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			return memberService.updateMemberPw(memberDTO);
+			boolean res = memberService.updateMemberPw(memberDTO);
+			String msg = res ? "사용자 정보를 수정하였습니다." : "사용자 정보 수정에 실패하였습니다.";
+			responseDTO.setSuccess(res);
+			responseDTO.setMsg(msg);
+			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {
 			log.error(ex);
-			return false;
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
 		}
 	}
 }
