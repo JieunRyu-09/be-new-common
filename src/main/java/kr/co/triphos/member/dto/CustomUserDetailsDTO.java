@@ -1,5 +1,6 @@
-package kr.co.triphos.member;
+package kr.co.triphos.member.dto;
 
+import kr.co.triphos.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import static java.lang.reflect.Modifier.STATIC;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetailsDTO implements UserDetails {
 	private String 	memberId;
 	private String 	memberNm;
 	private String 	memberPw;
@@ -46,7 +47,7 @@ public class CustomUserDetails implements UserDetails {
 	private boolean credentialsNonExpired;
 	private boolean enabled;
 
-	public CustomUserDetails(Member member) {
+	public CustomUserDetailsDTO(Member member) {
 		try {
 			Field[] dtoFields = member.getClass().getDeclaredFields(); // MemberEntity의 모든 필드 가져오기
 			Field[] entityFields = this.getClass().getDeclaredFields(); // CustomUserDetails의 모든 필드 가져오기

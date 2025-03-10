@@ -30,12 +30,5 @@ spring:
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
-springfox:
-  documentation:
-    swagger:
-      v2:
-        path: /api-docs  # Swagger JSON 경로
-    ui:
-      base-url: / # Swagger UI 경로
-      enabled: true  # Swagger UI 사용 여부
+
 

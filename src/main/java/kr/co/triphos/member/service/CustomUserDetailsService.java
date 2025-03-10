@@ -1,6 +1,6 @@
 package kr.co.triphos.member.service;
 
-import kr.co.triphos.member.Member;
+import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

@@ -1,6 +1,6 @@
 package kr.co.triphos.member.repository;
 
-import kr.co.triphos.member.Member;
+import kr.co.triphos.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

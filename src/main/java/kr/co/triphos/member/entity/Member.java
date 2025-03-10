@@ -1,5 +1,6 @@
-package kr.co.triphos.member;
+package kr.co.triphos.member.entity;
 
+import kr.co.triphos.member.dto.memberDTO.MemberDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -96,7 +97,7 @@ public class Member {
 		}
 	}
 
-	public void updateMember(MemberDTO memberDTO) {
+	public void updateMember(Object memberDTO) {
 		try {
 			Field[] dtoFields = memberDTO.getClass().getDeclaredFields(); // DTO의 모든 필드 가져오기
 			Field[] entityFields = this.getClass().getDeclaredFields(); // Entity의 모든 필드 가져오기
