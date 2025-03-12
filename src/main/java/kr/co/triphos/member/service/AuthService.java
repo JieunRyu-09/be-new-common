@@ -76,8 +76,8 @@ public class AuthService {
             if (useYn.equals("Y")) {
                 HashMap<String, Object> resultItem = new HashMap<>();
                 resultItem.put("mainCd",    menuItem.getPk().getMainCd());
-                resultItem.put("sub1Cd",    menuItem.getPk().getMainCd());
-                resultItem.put("sub2Cd",    menuItem.getPk().getMainCd());
+                resultItem.put("sub1Cd",    menuItem.getPk().getSub1Cd());
+                resultItem.put("sub2Cd",    menuItem.getPk().getSub2Cd());
                 resultItem.put("orderBy",   menuItem.getOrderBy());
                 resultItem.put("menuId",    menuItem.getMenuId());
                 resultItem.put("menuTitle", menuItem.getMenuTitle());
