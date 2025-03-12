@@ -1,6 +1,7 @@
 package kr.co.triphos.config;
 
 
+import kr.co.triphos.member.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +23,7 @@ public class JwtFilter extends OncePerRequestFilter {
 //    private final UserDetailsService userDetailsService;
 
     private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
 //    public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
 //        this.jwtUtil = jwtUtil;

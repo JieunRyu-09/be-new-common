@@ -1,6 +1,6 @@
 package kr.co.triphos.member.entity;
 
-import kr.co.triphos.member.dto.memberDTO.MemberDTO;
+import kr.co.triphos.member.dto.MemberDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,7 +25,7 @@ import static java.lang.reflect.Modifier.STATIC;
 @AllArgsConstructor
 @Log4j2
 @Table(name = "mm_member_info")
-public class Member {
+public class MemberEntity {
 	@Id
 	private String 	memberId;
 
@@ -54,8 +54,7 @@ public class Member {
 	private String 	accessBrowser;
 	@NotNull
 	private String 	adminYn;
-	@NotNull
-	@Column(columnDefinition = "datetime default current_timestamp()")
+	@Column(insertable = false, updatable = false)
 	private String 	insDt;
 	@NotNull
 	private String 	insMember;
@@ -70,7 +69,7 @@ public class Member {
 	@Builder.Default
 	private boolean enabled = true;
 
-	public Member(MemberDTO memberDTO) {
+	public MemberEntity(MemberDTO memberDTO) {
 		try {
 			Field[] dtoFields = memberDTO.getClass().getDeclaredFields(); // DTO의 모든 필드 가져오기
 			Field[] entityFields = this.getClass().getDeclaredFields(); // Entity의 모든 필드 가져오기

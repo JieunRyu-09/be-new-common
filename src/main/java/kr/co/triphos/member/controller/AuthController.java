@@ -8,23 +8,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.triphos.common.service.ResponseDTO;
-import kr.co.triphos.member.dto.memberDTO.MemberDTO;
-import kr.co.triphos.member.dto.memberDTO.MemberUpdateDTO;
+import kr.co.triphos.member.dto.MemberDTO;
 import kr.co.triphos.member.service.AuthService;
 import kr.co.triphos.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
-import javax.validation.Valid;
 import java.util.HashMap;
-import java.util.Map;
-
-import static kr.co.triphos.common.service.CommonFunc.isBlank;
+import java.util.List;
 
 
 @RestController
@@ -43,15 +37,18 @@ public class AuthController {
 			mediaType = "application/json",
 			schema = @Schema(implementation = ResponseDTO.class)
 	))
-	public ResponseEntity<?> login(@Parameter(description = "사용자Id") @RequestParam String id,  @Parameter(description = "사용자Pw") @RequestParam String password) {
+	public ResponseEntity<?> login(@Parameter(description = "사용자Id") @RequestParam String id,
+								   @Parameter(description = "사용자Pw") @RequestParam String password) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
 			String accessToken = authService.login(id, password);
+			List<HashMap<String, Object>> menuList = authService.getMemberMenuList(id);
 
 			responseDTO.setSuccess(true);
 			responseDTO.addData("accessToken", accessToken);
 			responseDTO.addData("refreshToken", authService.getRefreshToken(accessToken));
+			responseDTO.addData("menuList", menuList);
 			responseDTO.setMsg("로그인에 성공하였습니다");
 
 			return ResponseEntity.ok()
@@ -100,7 +97,8 @@ public class AuthController {
 			responseDTO.setSuccess(true);
 			responseDTO.addData("result", memberService.getMemberInfoById(memberId) != null);
 			return ResponseEntity.ok().body(responseDTO);
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			return ResponseEntity.internalServerError().body(responseDTO);
 		}
 
@@ -109,32 +107,27 @@ public class AuthController {
 	@PostMapping("/create")
 	@Tag(name="사용자 관리")
 	@Operation(summary = "사용자 회원가입", description = "")
-	public ResponseEntity<?> createMember(@RequestBody @Valid MemberDTO memberDTO) {
+	public ResponseEntity<?> createMember(@Parameter(description = "사용자 Id")		@RequestParam String memberId,
+										  @Parameter(description = "사용자 Pw") 		@RequestParam String memberPw,
+										  @Parameter(description = "사용자 이름") 	@RequestParam String memberNm,
+										  @Parameter(description = "사용자 이메일") 	@RequestParam String email,
+										  @Parameter(description = "사용자 핸드폰") 	@RequestParam String phone,
+										  @Parameter(description = "사용자 등급") 	@RequestParam String memberType) {
+
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
+			MemberDTO memberDTO = MemberDTO.createMember()
+					.memberId(memberId)
+					.memberNm(memberNm)
+					.memberPw(memberPw)
+					.email(email)
+					.phone(phone)
+					.memberType(memberType)
+					.build();
 			boolean result = memberService.createMember(memberDTO);
 			String msg = result ? "사용자를 생성하였습니다." : "사용자 생성에 실패하였습니다.";
 			responseDTO.setSuccess(result);
-			responseDTO.setMsg(msg);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		catch (Exception ex) {
-			log.error(ex);
-			responseDTO.setMsg(ex.getMessage());
-			return ResponseEntity.internalServerError().body(responseDTO);
-		}
-	}
-
-	@PostMapping("/update")
-	@Tag(name="사용자 관리")
-	@Operation(summary = "사용자정보 수정", description = "해당 api는 회원가입 및 로그인 등 구현 완료 후 삭제 예정")
-	public ResponseEntity<?> updateMember(@RequestBody MemberUpdateDTO memberDTO) {
-		ResponseDTO responseDTO = new ResponseDTO();
-		try {
-			boolean res = memberService.updateMemberPw(memberDTO);
-			String msg = res ? "사용자 정보를 수정하였습니다." : "사용자 정보 수정에 실패하였습니다.";
-			responseDTO.setSuccess(res);
 			responseDTO.setMsg(msg);
 			return ResponseEntity.ok().body(responseDTO);
 		}
