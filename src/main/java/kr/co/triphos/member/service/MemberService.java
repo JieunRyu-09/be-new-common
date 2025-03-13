@@ -145,6 +145,7 @@ public class MemberService {
 				resultItem.put("sub2Cd",    menuItem.getPk().getMainCd());
 				resultItem.put("orderBy",   menuItem.getOrderBy());
 				resultItem.put("menuId",    menuItem.getMenuId());
+				resultItem.put("menuTitle", menuItem.getMenuTitle());
 				// authInfo
 				resultItem.put("memberId",  	id);
 				resultItem.put("useYn",    		useYn);
