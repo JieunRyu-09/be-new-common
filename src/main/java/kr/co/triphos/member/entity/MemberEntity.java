@@ -19,7 +19,7 @@ import static java.lang.reflect.Modifier.FINAL;
 import static java.lang.reflect.Modifier.STATIC;
 
 @Data
-@Entity
+@Entity(name = "Member")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
