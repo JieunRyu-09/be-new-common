@@ -107,12 +107,11 @@ public class MemberController {
 	@GetMapping("/getMenuMemberAuthList")
 	@Tag(name="사용자 권한")
 	@Operation(summary = "사용자의 메뉴권한 전체목록 조회", description = "전체 메뉴의 CRUD 권한 조회")
-	public ResponseEntity<?> getMenuMemberAuthList() {
+	public ResponseEntity<?> getMenuMemberAuthList(@Parameter(description = "사용자 Id")	@RequestParam String memberId) {
 
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			String memberId = authFacadeService.getMemberId();
 			List<HashMap<String, Object>> menuList = memberService.getMenuMemberAuthList(memberId);
 			responseDTO.addData("menuList", menuList);
 			responseDTO.setSuccess(true);
