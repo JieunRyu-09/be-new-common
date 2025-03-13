@@ -6,7 +6,7 @@ server:
 spring:
   profiles:
     include: secret
-    active: local
+    active: prod
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
