@@ -8,7 +8,7 @@ import java.util.Map;
 @Data
 public class ResponseDTO {
 	private boolean success = false;    // default true
-	private Map<String, Object> data; 	// 데이터 저장용 Map
+	private HashMap<String, Object> data; 	// 데이터 저장용 Map
 	private String msg;               	// 메시지
 
 	public ResponseDTO() {

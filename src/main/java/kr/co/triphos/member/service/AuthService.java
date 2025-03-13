@@ -34,7 +34,7 @@ public class AuthService {
      * @param memberPw
      * @return String JWT token
      */
-    public String login(String memberId, String memberPw) {
+    public HashMap<String, String> login(String memberId, String memberPw) {
         MemberEntity memberEntity = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new RuntimeException("ID, 비밀번호를 다시 확인해 주세요."));
 
@@ -53,7 +53,7 @@ public class AuthService {
         return jwtUtil.generateRefreshToken(jwtUtil.extractMemberId(accessToken));
     }
 
-    public String refreshAccessToken(String refreshToken) {
+    public  HashMap<String, String> refreshAccessToken(String refreshToken) {
         if (!jwtUtil.validateToken(refreshToken)) {
             throw new RuntimeException("Invalid Refresh Token");
         }

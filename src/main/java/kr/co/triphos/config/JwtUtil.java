@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.security.Key;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 
 @Component
 @Lazy
@@ -30,13 +32,20 @@ public class JwtUtil {
     }
 
     // Access Token 생성
-    public String generateAccessToken(String memberID) {
-        return Jwts.builder()
+    public HashMap<String, String> generateAccessToken(String memberID) {
+        HashMap<String, String> resultMap = new HashMap<>();
+        Date expirationDate = new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String accessToken = Jwts.builder()
                 .setSubject(memberID)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
+                .setExpiration(expirationDate)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
+        resultMap.put("accessToken", accessToken);
+        resultMap.put("expirationDate", sdf.format(expirationDate));
+        return resultMap;
     }
 
     // Refresh Token 생성

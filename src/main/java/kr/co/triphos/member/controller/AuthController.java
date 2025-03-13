@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,15 +43,17 @@ public class AuthController {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			String accessToken = authService.login(id, password);
+			HashMap<String, String> accessTokenMap = authService.login(id, password);
 			List<HashMap<String, Object>> menuList = authService.getMemberMenuList(id);
+			String accessToken 	= accessTokenMap.get("accessToken");
+			String expiresIn 	= accessTokenMap.get("expirationDate");
 
-			responseDTO.setSuccess(true);
 			responseDTO.addData("accessToken", accessToken);
 			responseDTO.addData("refreshToken", authService.getRefreshToken(accessToken));
+			responseDTO.addData("expiresIn", expiresIn);
 			responseDTO.addData("menuList", menuList);
 			responseDTO.setMsg("로그인에 성공하였습니다");
-
+			responseDTO.setSuccess(true);
 			return ResponseEntity.ok()
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
 				.body(responseDTO);
@@ -66,17 +69,22 @@ public class AuthController {
 	}
 
 	@PostMapping("/refresh")
-	@Hidden
-	public ResponseEntity<?> refreshToken(@RequestBody String refreshToken) {
+	@Tag(name="사용자 권한")
+	@Operation(summary = "토큰 재발행", description = "accessToken, refreshToken 재발행")
+	public ResponseEntity<?> refreshToken(@Parameter(description = "refreshToken") @RequestBody String refreshToken) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			String newAccessToken = authService.refreshAccessToken(refreshToken);
-			String newRefreshToken = authService.getRefreshToken(newAccessToken);
+
+			HashMap<String, String> newAccessTokenMap = authService.refreshAccessToken(refreshToken);
+			String newAccessToken 	= newAccessTokenMap.get("accessToken");
+			String newRefreshToken 	= authService.getRefreshToken(newAccessToken);
+			String expiresIn 		= newAccessTokenMap.get("expirationDate");
 
 			responseDTO.setSuccess(true);
 			responseDTO.addData("accessToken", newAccessToken);
 			responseDTO.addData("refreshToken", newRefreshToken);
+			responseDTO.addData("expiresIn", expiresIn);
 
 			return ResponseEntity.ok()
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken)
