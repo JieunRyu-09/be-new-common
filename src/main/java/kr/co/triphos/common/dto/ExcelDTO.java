@@ -18,7 +18,7 @@ public class ExcelDTO {
 	@Schema(description = "엑셀 data리스트")
 	private List<excelData> excelDataList;
 
-	private static class excelData {
+	public static class excelData {
 		@Schema(description = "데이터 순서(row순번)")
 		private String orderBy;
 		@Schema(description = "주문번호")

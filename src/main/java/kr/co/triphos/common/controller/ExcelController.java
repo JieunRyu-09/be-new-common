@@ -24,14 +24,15 @@ public class ExcelController {
 	@PostMapping("/save")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 저장", description = "신규저장, 수정 등 전부 사용가능. 저장/수정하고싶은 데이터만 송신")
-	public ResponseEntity<?> excelSave(@Parameter(description = "엑셀 정보") @RequestBody ExcelDTO ExcelDTO) {
+	public ResponseEntity<?> excelSave(@Parameter(description = "엑셀 정보") @RequestBody ExcelDTO excelDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
 			String memberId = authenticationFacadeService.getMemberId();
-			//excelService.excelSave(excelDTO, memberId);
-			responseDTO.setSuccess(true);
-
+			boolean res = excelService.excelSave(excelDTO, memberId);
+			String msg = res ? "엑셀정보를 저장하였습니다." : "엑셀정보 저장에 실패하였습니다.";
+			responseDTO.setSuccess(res);
+			responseDTO.setMsg(msg);
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {
