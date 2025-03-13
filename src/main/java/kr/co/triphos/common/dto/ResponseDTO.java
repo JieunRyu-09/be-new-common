@@ -1,4 +1,4 @@
-package kr.co.triphos.common.service;
+package kr.co.triphos.common.dto;
 
 import lombok.Data;
 

@@ -3,8 +3,7 @@ package kr.co.triphos.member.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.triphos.common.service.ResponseDTO;
-import kr.co.triphos.member.dto.CustomUserDetailsDTO;
+import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.member.dto.MemberDTO;
 import kr.co.triphos.member.dto.MenuMemberAuthDTO;
 import kr.co.triphos.member.service.MemberService;
@@ -28,20 +27,19 @@ public class MemberController {
 	@PostMapping("/update")
 	@Tag(name="사용자 관리")
 	@Operation(summary = "사용자정보 수정", description = "해당 api는 회원가입 및 로그인 등 구현 완료 후 삭제 예정")
-	public ResponseEntity<?> updateMember(@Parameter(description = "사용자 Id")		@RequestParam String memberId,
+	public ResponseEntity<?> updateMember(@AuthenticationPrincipal UserDetails userDetails,
 										  @Parameter(description = "사용자 이름") 	@RequestParam String memberNm,
 										  @Parameter(description = "사용자 Pw") 		@RequestParam String memberPw,
-										  @Parameter(description = "사용자 신규Pw") 	@RequestParam String newMemberPw,
+										  @Parameter(description = "사용자 신규Pw") 	String newMemberPw,
 										  @Parameter(description = "사용자 이메일") 	@RequestParam String email,
 										  @Parameter(description = "사용자 핸드폰") 	@RequestParam String phone,
 										  @Parameter(description = "사용자 등급") 	@RequestParam String memberType,
 										  @Parameter(description = "계정사용여부") 	@RequestParam String delYn,
 										  @Parameter(description = "관리자여부")	 	@RequestParam String adminYn) {
-
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			MemberDTO memberDTO = MemberDTO.updateMember()
-					.memberId(memberId)
+					.memberId(userDetails.getUsername())
 					.memberNm(memberNm)
 					.memberPw(memberPw)
 					.newMemberPw(newMemberPw)
@@ -67,12 +65,11 @@ public class MemberController {
 	@GetMapping("/getMemberMenuList")
 	@Tag(name="사용자 권한")
 	@Operation(summary = "사용자의 메뉴목록 조회", description = "메뉴목록만 조회")
-	public ResponseEntity<?> getMemberMenuList(@Parameter(description = "사용자 Id")	@RequestParam String memberId) {
-
+	public ResponseEntity<?> getMemberMenuList(@AuthenticationPrincipal UserDetails userDetails) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			List<HashMap<String, Object>> menuList = memberService.getMemberMenuList(memberId);
+			List<HashMap<String, Object>> menuList = memberService.getMemberMenuList(userDetails.getUsername());
 			responseDTO.addData("menuList", menuList);
 			responseDTO.setSuccess(true);
 			return ResponseEntity.ok().body(responseDTO);
@@ -87,13 +84,12 @@ public class MemberController {
 	@GetMapping("/getMenuMemberAuth")
 	@Tag(name="사용자 권한")
 	@Operation(summary = "메뉴의 사용자 권한 조회", description = "특정메뉴의 CRUD 권한 조회")
-	public ResponseEntity<?> getMenuMemberAuth(@Parameter(description = "사용자 Id")	@RequestParam String memberId,
+	public ResponseEntity<?> getMenuMemberAuth(@AuthenticationPrincipal UserDetails userDetails,
 										  	   @Parameter(description = "메뉴 Id")	@RequestParam String menuId) {
-
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			HashMap<String, Object> resultItem = memberService.getMenuMemberAuth(memberId, menuId);
+			HashMap<String, Object> resultItem = memberService.getMenuMemberAuth(userDetails.getUsername(), menuId);
 			responseDTO.addData("menuMemberAuth", resultItem);
 			responseDTO.setSuccess(true);
 			return ResponseEntity.ok().body(responseDTO);
@@ -108,12 +104,12 @@ public class MemberController {
 	@GetMapping("/getMenuMemberAuthList")
 	@Tag(name="사용자 권한")
 	@Operation(summary = "사용자의 메뉴권한 전체목록 조회", description = "전체 메뉴의 CRUD 권한 조회")
-	public ResponseEntity<?> getMenuMemberAuthList(@Parameter(description = "사용자 Id")	@RequestParam String memberId) {
+	public ResponseEntity<?> getMenuMemberAuthList(@AuthenticationPrincipal UserDetails userDetails) {
 
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			List<HashMap<String, Object>> menuList = memberService.getMenuMemberAuthList(memberId);
+			List<HashMap<String, Object>> menuList = memberService.getMenuMemberAuthList(userDetails.getUsername());
 			responseDTO.addData("menuList", menuList);
 			responseDTO.setSuccess(true);
 			return ResponseEntity.ok().body(responseDTO);
@@ -145,4 +141,23 @@ public class MemberController {
 		}
 	}
 
+	@GetMapping("/getMemberList")
+	@Tag(name="사용자 권한")
+	@Operation(summary = "사용자 목록 조회", description = "")
+	public ResponseEntity<?> getMenuMemberAuthList(@Parameter(description = "사용자 ID")String memberId,
+												   @Parameter(description = "사용자 이름")String memberNm) {
+		ResponseDTO responseDTO = new ResponseDTO();
+
+		try {
+			List<HashMap<String, String>> menuList = memberService.getMemberList(memberId, memberNm);
+			responseDTO.addData("menuList", menuList);
+			responseDTO.setSuccess(true);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
 }

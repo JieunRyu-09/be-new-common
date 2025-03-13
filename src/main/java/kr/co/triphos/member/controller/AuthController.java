@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.triphos.common.service.ResponseDTO;
+import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.member.dto.MemberDTO;
 import kr.co.triphos.member.service.AuthService;
 import kr.co.triphos.member.service.MemberService;
@@ -101,7 +101,6 @@ public class AuthController {
 		catch (Exception ex) {
 			return ResponseEntity.internalServerError().body(responseDTO);
 		}
-
 	}
 
 	@PostMapping("/create")

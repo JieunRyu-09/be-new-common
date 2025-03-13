@@ -17,6 +17,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class MemberService {
 	}
 
 	@Transactional
-	public boolean createMember(MemberDTO memberDTO) throws Exception{
+	public boolean createMember(MemberDTO memberDTO) throws Exception {
 		String memberId = memberDTO.getMemberId();
 		String memberPw = memberDTO.getMemberPw();
 		MemberEntity existMemberEntity = memberRepository.findByMemberId(memberId).orElse(new MemberEntity());
@@ -93,7 +94,7 @@ public class MemberService {
 		return resultItem;
 	}
 
-	public List<HashMap<String, Object>> getMemberMenuList(String id) {
+	public List<HashMap<String, Object>> getMemberMenuList(String id) throws Exception {
 		List<HashMap<String, Object>> resultList = new ArrayList<>();
 		List<MenuInfoEntity> menuList = menuInfoRepository.findAll();
 		List<MenuMemberAuthEntity> authList = menuMemberAuthRepository.findByPkMemberIdAndUseYn(id, "Y");
@@ -120,7 +121,7 @@ public class MemberService {
 		return resultList;
 	}
 
-	public List<HashMap<String, Object>> getMenuMemberAuthList(String id) {
+	public List<HashMap<String, Object>> getMenuMemberAuthList(String id) throws Exception {
 		List<HashMap<String, Object>> resultList = new ArrayList<>();
 		List<MenuInfoEntity> menuList = menuInfoRepository.findByDisplayYn("Y");
 		List<MenuMemberAuthEntity> authList = menuMemberAuthRepository.findByPkMemberIdAndUseYn(id, "Y");
@@ -154,7 +155,7 @@ public class MemberService {
 	}
 
 	@Transactional
-	public boolean updateMenuMemberAuth(List<MenuMemberAuthDTO> dtoAuthList, String modId) {
+	public boolean updateMenuMemberAuth(List<MenuMemberAuthDTO> dtoAuthList, String modId) throws Exception {
 		List<MenuMemberAuthEntity> authList = new ArrayList<>();
 
 		try {
@@ -166,12 +167,42 @@ public class MemberService {
 				entityAuthItem.updateMenuMemberAuth(dtoAuthItem);
 				authList.add(entityAuthItem);
 			});
-			menuMemberAuthRepository.saveAll(authList);https://checkout3.officekeeper.co.kr/alert?Culture=1042&AlertSiteInfo=3b5c8684ca76879a3d15c178934f37d6%7Cgoogle.com%7C%2Fsearch%3Fq%3Dsecurity%2Bbearer%26oq%3Dsecurity%2Bbearer%26gs_lcrp%3DEgZjaHJvbWUyCwgAEEUYExg5GIAEMggIARAAGBMYHjIICAIQABgTGB4yCAgDEAAYExgeMgoIBBAAGAUYExgeMgoIBRAAGAUYExgeMgoIBhAAGAUYExgeMgoIBxAAGAUYExgeMgoICBAAGAUYExgeMgoICRAAGAUYExge0gEINjQzOWowajeoAgCwAgA%26sourceid%3Dchrome%26ie%3DUTF-8%7Cgoogle.com%7CURLHost%7CWarning%7C0%7C7496%7C16030200%7C58%7C0e81b7236bc8cc68%7C273980%7Cheper%7C230&AlertSiteInfoDigest=afbd1aa52ec89a0bfc3448224f920544f47e5f08a0227b629641847037812b5d
+			menuMemberAuthRepository.saveAll(authList);
 			return true;
 		}
 		catch (RuntimeException ex) {
 			log.error(ex);
 			throw new RuntimeException("사용자 권한수정에 실패하였습니다.");
+		}
+	}
+
+	public List<HashMap<String, String>> getMemberList(String memberId, String memberNm) throws Exception {
+		List<HashMap<String, String>> resultList = new ArrayList<>();
+		try {
+			List<MemberEntity> entityList = null;
+			if (memberId != null && memberNm != null) {
+				entityList = memberRepository.findByMemberIdLikeAndMemberNmLike(memberId, memberNm);
+			}
+			else if (memberId != null) {
+				entityList = memberRepository.findByMemberIdLike(memberId);
+			}
+			else if (memberNm != null) {
+				entityList = memberRepository.findByMemberNmLike(memberNm);
+			}
+			else {
+				entityList = memberRepository.findAll();
+			}
+			entityList.forEach(entityItem -> {
+				HashMap<String, String> resultItem = new HashMap<>();
+				resultItem.put("memberId", entityItem.getMemberId());
+				resultItem.put("memberNm", entityItem.getMemberNm());
+				resultList.add(resultItem);
+			});
+			return resultList;
+		}
+		catch (RuntimeException ex) {
+			log.error(ex);
+			throw new RuntimeException("사용자 목록조회에 실패하였습니다.");
 		}
 	}
 
