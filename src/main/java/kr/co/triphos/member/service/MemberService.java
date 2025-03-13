@@ -124,16 +124,15 @@ public class MemberService {
 	public List<HashMap<String, Object>> getMenuMemberAuthList(String id) throws Exception {
 		List<HashMap<String, Object>> resultList = new ArrayList<>();
 		List<MenuInfoEntity> menuList = menuInfoRepository.findByDisplayYn("Y");
-		List<MenuMemberAuthEntity> authList = menuMemberAuthRepository.findByPkMemberIdAndUseYn(id, "Y");
+		List<MenuMemberAuthEntity> authList = menuMemberAuthRepository.findByPkMemberId(id);
 
-		menuList.forEach(menuItem -> {
-			MenuMemberAuthEntity authItem = authList.stream().filter(authListItem ->
-							menuItem.getMenuId().equals(authListItem.getPk().getMenuId()))
-							.findFirst().orElse(new MenuMemberAuthEntity());
-			String useYn = authItem.getUseYn();
+		try {
+			menuList.forEach(menuItem -> {
+				MenuMemberAuthEntity authItem = authList.stream().filter(authListItem ->
+								menuItem.getMenuId().equals(authListItem.getPk().getMenuId()))
+						.findFirst().orElse(new MenuMemberAuthEntity());
 
-			HashMap<String, Object> resultItem = new HashMap<>();
-			if (useYn != null && useYn.equals("Y")) {
+				HashMap<String, Object> resultItem = new HashMap<>();
 				// menuInfo
 				resultItem.put("mainCd",    menuItem.getPk().getMainCd());
 				resultItem.put("sub1Cd",    menuItem.getPk().getMainCd());
@@ -141,7 +140,7 @@ public class MemberService {
 				resultItem.put("orderBy",   menuItem.getOrderBy());
 				resultItem.put("menuId",    menuItem.getMenuId());
 				// authInfo
-				resultItem.put("memberId",  	authItem.getPk().getMemberId());
+				resultItem.put("memberId",  	id);
 				resultItem.put("useYn",    		authItem.getUseYn());
 				resultItem.put("authSearch",    authItem.getAuthSearch());
 				resultItem.put("authIns",    	authItem.getAuthIns());
@@ -149,9 +148,13 @@ public class MemberService {
 				resultItem.put("authMod",    	authItem.getAuthMod());
 				resultItem.put("excelExport",	authItem.getExcelExport());
 				resultList.add(resultItem);
-			}
-		});
-		return resultList;
+			});
+			return resultList;
+		}
+		catch (RuntimeException ex) {
+			log.error(ex.getMessage());
+			throw new RuntimeException(ex.getMessage());
+		}
 	}
 
 	@Transactional
