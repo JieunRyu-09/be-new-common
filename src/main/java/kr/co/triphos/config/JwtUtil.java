@@ -23,7 +23,7 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String SECRET_KEY;      // at least 32 characters long
     private Key key;
-    private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60; // 1시간
+    private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 1시간
     private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 7; // 7일
 
     @PostConstruct
@@ -77,7 +77,7 @@ public class JwtUtil {
         return extractMemberId(token) != null && !isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return getClaims(token).getExpiration().before(new Date());
     }
 
