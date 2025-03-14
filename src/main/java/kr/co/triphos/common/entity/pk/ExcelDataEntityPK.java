@@ -17,5 +17,5 @@ import java.io.Serializable;
 @Embeddable
 public class ExcelDataEntityPK implements Serializable {
 	private int idx;
-	private int orderBy;
+	private int rowIdx;
 }

@@ -1,5 +1,6 @@
 package kr.co.triphos.common.entity;
 
+import kr.co.triphos.common.dto.ExcelDTO;
 import kr.co.triphos.common.entity.pk.ExcelDataEntityPK;
 import kr.co.triphos.common.entity.pk.ExcelEntityPK;
 import lombok.AllArgsConstructor;
@@ -33,4 +34,17 @@ public class ExcelDataEntity {
 	private String orderDate;
 	private String customerName;
 	private String status;
+
+	public ExcelDataEntity(Integer idx, Integer rowIdx, ExcelDTO.excelData excelData) {
+		this.pk 			= new ExcelDataEntityPK(idx, rowIdx);
+		this.orderNo		= excelData.getOrderNo();
+		this.productCode	= excelData.getProductCode();
+		this.productName	= excelData.getProductName();
+		this.quantity		= excelData.getQuantity();
+		this.price			= excelData.getPrice();
+		this.totalAmount	= excelData.getTotalAmount();
+		this.orderDate		= excelData.getOrderDate();
+		this.customerName	= excelData.getCustomerName();
+		this.status			= excelData.getStatus();
+	}
 }
