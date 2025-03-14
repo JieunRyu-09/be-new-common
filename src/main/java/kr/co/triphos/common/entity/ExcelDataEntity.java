@@ -36,7 +36,7 @@ public class ExcelDataEntity {
 	private String status;
 
 	public ExcelDataEntity(Integer idx, ExcelDTO.excelData excelData) {
-		this.pk 			= new ExcelDataEntityPK(idx, excelData.getOrderBy());
+		this.pk 			= new ExcelDataEntityPK(idx, excelData.getRowIdx());
 		this.orderNo		= excelData.getOrderNo();
 		this.productCode	= excelData.getProductCode();
 		this.productName	= excelData.getProductName();

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Log4j2
 public class ExcelDataDTO {
 	@Schema(description = "데이터 순서(row순번)")
-	public int orderBy;
+	public int rowIdx;
 	@Schema(description = "주문번호")
 	private String orderNo;
 	@Schema(description = "제품코드")
@@ -33,7 +33,7 @@ public class ExcelDataDTO {
 	private String status;
 
 	public ExcelDataDTO(ExcelDataEntity excelDataEntity) {
-		this.orderBy		= excelDataEntity.getPk().getOrderBy();
+		this.rowIdx		= excelDataEntity.getPk().getRowIdx();
 		this.orderNo		= excelDataEntity.getOrderNo();
 		this.productCode	= excelDataEntity.getProductCode();
 		this.productName	= excelDataEntity.getProductName();
