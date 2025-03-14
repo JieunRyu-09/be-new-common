@@ -2,8 +2,10 @@ package kr.co.triphos.common.service;
 
 
 import kr.co.triphos.common.dto.ExcelDTO;
+import kr.co.triphos.common.entity.ExcelDataEntity;
 import kr.co.triphos.common.entity.ExcelInfoEntity;
 import kr.co.triphos.common.entity.pk.ExcelDataEntityPK;
+import kr.co.triphos.common.repository.ExcelDataRepository;
 import kr.co.triphos.common.repository.ExcelInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -11,12 +13,15 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class ExcelService {
 	private final ExcelInfoRepository excelInfoRepository;
+	private final ExcelDataRepository excelDataRepository;
 
 	@Transactional
 	public boolean excelSave(ExcelDTO excelDTO, String memberId) throws Exception {
@@ -39,11 +44,12 @@ public class ExcelService {
 			excelInfoRepository.save(excelInfoEntity);
 
 			// ExcelData 작업
+			List<ExcelDataEntity> excelDataEntityList = new ArrayList<>();
+			// excelData 의 정보로 entity 생성 후 saveAll
 			excelDTO.getExcelDataList().forEach(excelDataItem -> {
-				//int orderBy = excelDataItem.
-				//ExcelDataEntityPK pk = new ExcelDataEntityPK(idx, d)
+				excelDataEntityList.add(new ExcelDataEntity(idx, excelDataItem));
 			});
-
+			excelDataRepository.saveAll(excelDataEntityList);
 			return true;
 		}
 		catch (RuntimeException ex) {
