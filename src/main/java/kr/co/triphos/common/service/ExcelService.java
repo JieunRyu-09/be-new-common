@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -29,27 +30,61 @@ public class ExcelService {
 	@Transactional
 	public boolean excelSave(ExcelDTO excelDTO, String memberId) throws Exception {
 		try {
+			String excelNm = excelDTO.getExcelNm();
+			LocalDateTime nowDate = LocalDateTime.now();
+
+			// ExcelInfo 작업
+			ExcelInfoEntity excelInfoEntity = new ExcelInfoEntity(excelNm, nowDate, memberId);
+			excelInfoRepository.save(excelInfoEntity);
+			excelInfoRepository.flush();
+			Integer idx = excelInfoEntity.getIdx();
+			if (idx == null) throw new RuntimeException("엑셀정보 저장 실패.");
+
+			// ExcelData 작업
+			List<ExcelDataEntity> excelDataEntityList = new ArrayList<>();
+			// excelData 의 정보로 entity 생성 후 saveAll
+			// 인덱스를 추적하기 위한 AtomicInteger
+			AtomicInteger index = new AtomicInteger(1);  // 인덱스는 1부터 시작
+			excelDTO.getExcelDataList().forEach(excelDataItem -> {
+				int currentIdx = index.getAndIncrement();
+				excelDataEntityList.add(new ExcelDataEntity(idx, currentIdx, excelDataItem));
+			});
+			excelDataRepository.saveAll(excelDataEntityList);
+			return true;
+		}
+		catch (RuntimeException ex) {
+			log.error(ex.getMessage());
+			return false;
+		}
+	}
+
+	@Transactional
+	public boolean excelUpdate(ExcelDTO excelDTO, String memberId) throws Exception {
+		try {
 			Integer idx	= excelDTO.getIdx();
 			String excelNm = excelDTO.getExcelNm();
 			LocalDateTime nowDate = LocalDateTime.now();
 
 			// ExcelInfo 작업
 			// idx로 조회해서 있는 정보인지 체크
-			ExcelInfoEntity excelInfoEntity = excelInfoRepository.findByIdx(idx).orElse(new ExcelInfoEntity(excelNm, nowDate, memberId));
-			if (excelInfoEntity.getIdx() != null) {
-				excelInfoEntity.updateExcelInfoEntity(excelNm, nowDate, memberId);
-			}
+			ExcelInfoEntity excelInfoEntity = excelInfoRepository.findByIdx(idx)
+					.orElseThrow(() -> new RuntimeException("잘못된 엑셀정보입니다."));
+			excelInfoEntity.updateExcelInfoEntity(excelNm, nowDate, memberId);
 			excelInfoRepository.save(excelInfoEntity);
 			excelInfoRepository.flush();
 
 			// ExcelData 작업
 			List<ExcelDataEntity> excelDataEntityList = new ArrayList<>();
-			int finalIdx = excelInfoEntity.getIdx();
 			// excelData 의 정보로 entity 생성 후 saveAll
 			excelDTO.getExcelDataList().forEach(excelDataItem -> {
-				excelDataEntityList.add(new ExcelDataEntity(finalIdx, excelDataItem));
+				excelDataEntityList.add(new ExcelDataEntity(idx, excelDataItem.getRowIdx(), excelDataItem));
 			});
 			excelDataRepository.saveAll(excelDataEntityList);
+
+			excelDTO.getDeleteDataList().forEach(deleteData -> {
+				excelDataRepository.deleteByIdxAndRowIdx(idx, deleteData);
+			});
+
 			return true;
 		}
 		catch (RuntimeException ex) {

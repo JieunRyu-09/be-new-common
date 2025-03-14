@@ -35,8 +35,8 @@ public class ExcelDataEntity {
 	private String customerName;
 	private String status;
 
-	public ExcelDataEntity(Integer idx, ExcelDTO.excelData excelData) {
-		this.pk 			= new ExcelDataEntityPK(idx, excelData.getRowIdx());
+	public ExcelDataEntity(Integer idx, Integer rowIdx, ExcelDTO.excelData excelData) {
+		this.pk 			= new ExcelDataEntityPK(idx, rowIdx);
 		this.orderNo		= excelData.getOrderNo();
 		this.productCode	= excelData.getProductCode();
 		this.productName	= excelData.getProductName();

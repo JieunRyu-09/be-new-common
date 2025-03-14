@@ -17,6 +17,8 @@ public class ExcelDTO {
 	private String 	excelNm;
 	@Schema(description = "엑셀 data리스트")
 	private List<excelData> excelDataList;
+	@Schema(description = "엑셀 data 삭제 리스트")
+	private List<Integer> deleteDataList;
 
 	@Data
 	public static class excelData {
