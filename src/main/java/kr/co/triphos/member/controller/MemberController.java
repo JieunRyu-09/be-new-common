@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,6 +26,27 @@ import java.util.List;
 public class MemberController {
 	private final MemberService memberService;
 	private final AuthenticationFacadeService authFacadeService;
+
+	@GetMapping("/tokenCheck")
+	@Tag(name = "JWT 토큰")
+	@Operation(summary = "토큰 유효기간 확인", description = "")
+	public ResponseEntity<?> checkTokenValid () {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			String memberId = authFacadeService.getMemberId();
+
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("토큰유효");
+			responseDTO.addData("id", memberId);
+			responseDTO.addData("ServerTime", LocalDateTime.now());
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (RuntimeException ex) {
+			log.error(ex);
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
 
 	@PostMapping("/update")
 	@Tag(name="사용자 관리")

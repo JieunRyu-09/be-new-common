@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.member.dto.MemberDTO;
+import kr.co.triphos.member.dto.TokenDTO;
 import kr.co.triphos.member.service.AuthService;
 import kr.co.triphos.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -68,33 +69,6 @@ public class AuthController {
 		}
 	}
 
-	@PostMapping("/refresh")
-	@Tag(name="사용자 권한")
-	@Operation(summary = "토큰 재발행", description = "accessToken, refreshToken 재발행")
-	public ResponseEntity<?> refreshToken(@Parameter(description = "refreshToken") @RequestBody String refreshToken) {
-		ResponseDTO responseDTO = new ResponseDTO();
-
-		try {
-
-			HashMap<String, String> newAccessTokenMap = authService.refreshAccessToken(refreshToken);
-			String newAccessToken 	= newAccessTokenMap.get("accessToken");
-			String newRefreshToken 	= authService.getRefreshToken(newAccessToken);
-			String expiresIn 		= newAccessTokenMap.get("expirationDate");
-
-			responseDTO.setSuccess(true);
-			responseDTO.addData("accessToken", newAccessToken);
-			responseDTO.addData("refreshToken", newRefreshToken);
-			responseDTO.addData("expiresIn", expiresIn);
-
-			return ResponseEntity.ok()
-					.header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken)
-					.body(responseDTO);
-		}
-		catch (Exception ex) {
-			return ResponseEntity.status(401).body(ex.getMessage());
-		}
-	}
-
 	@GetMapping("/checkExistMemberId")
 	@Tag(name="사용자 관리")
 	@Operation(summary = "존재하는 ID 조회", description = "사용자 회원가입 시 중복되는 ID 확인")
@@ -142,6 +116,33 @@ public class AuthController {
 			log.error(ex);
 			responseDTO.setMsg(ex.getMessage());
 			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@PostMapping("/refresh")
+	@Tag(name="JWT 토큰")
+	@Operation(summary = "토큰 재발행", description = "accessToken, refreshToken 재발행")
+	public ResponseEntity<?> refreshToken(@Parameter(description = "refreshToken") @RequestBody TokenDTO dto) {
+		ResponseDTO responseDTO = new ResponseDTO();
+
+		try {
+			HashMap<String, String> newAccessTokenMap = authService.refreshAccessToken(dto.getRefreshToken());
+			String newAccessToken 	= newAccessTokenMap.get("accessToken");
+			String newRefreshToken 	= authService.getRefreshToken(newAccessToken);
+			String expiresIn 		= newAccessTokenMap.get("expirationDate");
+
+			responseDTO.setSuccess(true);
+			responseDTO.addData("accessToken", newAccessToken);
+			responseDTO.addData("refreshToken", newRefreshToken);
+			responseDTO.addData("expiresIn", expiresIn);
+			responseDTO.setMsg("토큰을 재발행하였습니다.");
+
+			return ResponseEntity.ok()
+					.header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken)
+					.body(responseDTO);
+		}
+		catch (Exception ex) {
+			return ResponseEntity.status(401).body(ex.getMessage());
 		}
 	}
 }
