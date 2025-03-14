@@ -5,10 +5,7 @@ import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.Nullable;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -22,6 +19,7 @@ import java.util.Date;
 public class ExcelInfoEntity {
 	@Id
 	@Nullable
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer			idx;
 	private String			excelNm;
 	private LocalDateTime 	insDt;
@@ -29,7 +27,7 @@ public class ExcelInfoEntity {
 	private LocalDateTime	updDt;
 	private String			updMember;
 
-	public void createExcelInfoEntity(String excelNm, LocalDateTime insDt, String insMember) {
+	public ExcelInfoEntity(String excelNm, LocalDateTime insDt, String insMember) {
 		this.excelNm 	= excelNm;
 		this.insDt		= insDt;
 		this.insMember	= insMember;

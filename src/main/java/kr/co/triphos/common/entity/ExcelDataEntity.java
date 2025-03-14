@@ -35,8 +35,7 @@ public class ExcelDataEntity {
 	private String customerName;
 	private String status;
 
-	@Builder(builderClassName = "updateExcelData", builderMethodName = "updateExcelData")
-	public ExcelDataEntity(int idx, ExcelDTO.excelData excelData) {
+	public ExcelDataEntity(Integer idx, ExcelDTO.excelData excelData) {
 		this.pk 			= new ExcelDataEntityPK(idx, excelData.getOrderBy());
 		this.orderNo		= excelData.getOrderNo();
 		this.productCode	= excelData.getProductCode();
