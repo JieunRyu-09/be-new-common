@@ -4,6 +4,7 @@ package kr.co.triphos.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import kr.co.triphos.common.dto.ResponseDTO;
+import kr.co.triphos.member.dto.CustomUserDetails;
 import kr.co.triphos.member.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,16 +30,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
-    private static final List<String> EXCLUDE_URL = Arrays.asList(
-            "/swagger-ui.html",
-            "/swagger-ui/",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/api-docs/**",
-            "/auth/login",
-            "/test/**",
-            "/auth/**"
-    );
 
 //    public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
 //        this.jwtUtil = jwtUtil;
@@ -67,7 +58,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             String username = jwtUtil.extractMemberId(token);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                CustomUserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 if (jwtUtil.isTokenValid(token)) {
                     UsernamePasswordAuthenticationToken authToken =

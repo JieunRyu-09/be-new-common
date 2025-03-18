@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class MenuInfoEntityPK implements Serializable {
+public class MenuInfoPK implements Serializable {
 	private int	mainCd;
 	@Column(name = "SUB1_CD")
 	private int sub1Cd;

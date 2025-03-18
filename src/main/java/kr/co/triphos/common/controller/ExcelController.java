@@ -8,7 +8,7 @@ import kr.co.triphos.common.dto.ExcelDTO;
 import kr.co.triphos.common.dto.ExcelDataDTO;
 import kr.co.triphos.common.dto.ExcelInfoDTO;
 import kr.co.triphos.common.dto.ResponseDTO;
-import kr.co.triphos.common.entity.ExcelInfoEntity;
+import kr.co.triphos.common.entity.ExcelInfo;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.common.service.ExcelService;
 import lombok.RequiredArgsConstructor;
@@ -73,9 +73,9 @@ public class ExcelController {
 
 		try {
 
-			List<ExcelInfoDTO> excelDataList = excelService.getExcelInfoList(excelNm);
+			List<ExcelInfoDTO> excelInfoList = excelService.getExcelInfoList(excelNm);
 			responseDTO.setSuccess(true);
-			responseDTO.addData("excelDataList", excelDataList);
+			responseDTO.addData("excelInfoList", excelInfoList);
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {

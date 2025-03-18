@@ -1,6 +1,6 @@
 package kr.co.triphos.member.entity;
 
-import kr.co.triphos.member.entity.pk.MenuInfoEntityPK;
+import kr.co.triphos.member.entity.pk.MenuInfoPK;
 import kr.co.triphos.member.entity.pk.MenuMemberAuthEntityPK;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,9 +19,9 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Log4j2
 @Table(name = "sy_menu_info")
-public class MenuInfoEntity {
+public class MenuInfo {
 	@EmbeddedId
-	private MenuInfoEntityPK pk;
+	private MenuInfoPK pk;
 
 	private int 	orderBy;
 	private String	menuId;

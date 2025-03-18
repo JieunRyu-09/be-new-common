@@ -16,7 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Log4j2
 @Table(name = "mm_excel_info")
-public class ExcelInfoEntity {
+public class ExcelInfo {
 	@Id
 	@Nullable
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class ExcelInfoEntity {
 	private LocalDateTime	updDt;
 	private String			updMember;
 
-	public ExcelInfoEntity(String excelNm, LocalDateTime insDt, String insMember) {
+	public ExcelInfo(String excelNm, LocalDateTime insDt, String insMember) {
 		this.excelNm 	= excelNm;
 		this.insDt		= insDt;
 		this.insMember	= insMember;

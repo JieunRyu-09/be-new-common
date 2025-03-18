@@ -19,7 +19,7 @@ import static java.lang.reflect.Modifier.STATIC;
 @AllArgsConstructor
 @Log4j2
 @Table(name = "sy_menu_member_auth")
-public class MenuMemberAuthEntity {
+public class MenuMemberAuth {
 	@EmbeddedId
 	private MenuMemberAuthEntityPK pk;
 

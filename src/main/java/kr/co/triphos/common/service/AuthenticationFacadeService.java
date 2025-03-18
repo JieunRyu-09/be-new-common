@@ -7,4 +7,8 @@ public interface AuthenticationFacadeService {
 	Authentication getAuthentication();
 	// 로그인한 사용자의 memberId조회
 	String getMemberId();
+	// 로그인한 사용자의 memberNm조회
+	String getMemberNm();
+	// 로그인한 사용자의 권한조회
+	String getMemberType();
 }

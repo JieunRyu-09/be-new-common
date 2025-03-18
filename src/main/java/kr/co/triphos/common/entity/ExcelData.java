@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Log4j2
 @Table(name = "mm_excel_data")
-public class ExcelDataEntity {
+public class ExcelData {
 	@EmbeddedId
 	ExcelDataEntityPK pk;
 
@@ -35,7 +35,7 @@ public class ExcelDataEntity {
 	private String customerName;
 	private String status;
 
-	public ExcelDataEntity(Integer idx, Integer rowIdx, ExcelDTO.excelData excelData) {
+	public ExcelData(Integer idx, Integer rowIdx, ExcelDTO.excelData excelData) {
 		this.pk 			= new ExcelDataEntityPK(idx, rowIdx);
 		this.orderNo		= excelData.getOrderNo();
 		this.productCode	= excelData.getProductCode();

@@ -1,8 +1,8 @@
 package kr.co.triphos.common.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.triphos.common.entity.ExcelDataEntity;
-import kr.co.triphos.common.entity.ExcelInfoEntity;
+import kr.co.triphos.common.entity.ExcelData;
+import kr.co.triphos.common.entity.ExcelInfo;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 

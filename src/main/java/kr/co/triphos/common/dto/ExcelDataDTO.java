@@ -1,8 +1,8 @@
 package kr.co.triphos.common.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.triphos.common.entity.ExcelDataEntity;
-import kr.co.triphos.common.entity.ExcelInfoEntity;
+import kr.co.triphos.common.entity.ExcelData;
+import kr.co.triphos.common.entity.ExcelInfo;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 
@@ -32,16 +32,16 @@ public class ExcelDataDTO {
 	@Schema(description = "상태 (텍스트)")
 	private String status;
 
-	public ExcelDataDTO(ExcelDataEntity excelDataEntity) {
-		this.rowIdx		= excelDataEntity.getPk().getRowIdx();
-		this.orderNo		= excelDataEntity.getOrderNo();
-		this.productCode	= excelDataEntity.getProductCode();
-		this.productName	= excelDataEntity.getProductName();
-		this.quantity		= excelDataEntity.getQuantity();
-		this.price			= excelDataEntity.getPrice();
-		this.totalAmount	= excelDataEntity.getTotalAmount();
-		this.orderDate		= excelDataEntity.getOrderDate();
-		this.customerName	= excelDataEntity.getCustomerName();
-		this.status			= excelDataEntity.getStatus();
+	public ExcelDataDTO(ExcelData excelData) {
+		this.rowIdx		= excelData.getPk().getRowIdx();
+		this.orderNo		= excelData.getOrderNo();
+		this.productCode	= excelData.getProductCode();
+		this.productName	= excelData.getProductName();
+		this.quantity		= excelData.getQuantity();
+		this.price			= excelData.getPrice();
+		this.totalAmount	= excelData.getTotalAmount();
+		this.orderDate		= excelData.getOrderDate();
+		this.customerName	= excelData.getCustomerName();
+		this.status			= excelData.getStatus();
 	}
 }
