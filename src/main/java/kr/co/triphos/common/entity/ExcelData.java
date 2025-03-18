@@ -1,8 +1,7 @@
 package kr.co.triphos.common.entity;
 
 import kr.co.triphos.common.dto.ExcelDTO;
-import kr.co.triphos.common.entity.pk.ExcelDataEntityPK;
-import kr.co.triphos.common.entity.pk.ExcelEntityPK;
+import kr.co.triphos.common.entity.pk.ExcelDataPK;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,6 @@ import lombok.extern.log4j.Log4j2;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -21,9 +19,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Log4j2
 @Table(name = "mm_excel_data")
-public class ExcelDataEntity {
+public class ExcelData {
 	@EmbeddedId
-	ExcelDataEntityPK pk;
+	ExcelDataPK pk;
 
 	private String orderNo;
 	private String productCode;
@@ -35,8 +33,8 @@ public class ExcelDataEntity {
 	private String customerName;
 	private String status;
 
-	public ExcelDataEntity(Integer idx, Integer rowIdx, ExcelDTO.excelData excelData) {
-		this.pk 			= new ExcelDataEntityPK(idx, rowIdx);
+	public ExcelData(Integer idx, Integer rowIdx, ExcelDTO.excelData excelData) {
+		this.pk 			= new ExcelDataPK(idx, rowIdx);
 		this.orderNo		= excelData.getOrderNo();
 		this.productCode	= excelData.getProductCode();
 		this.productName	= excelData.getProductName();

@@ -1,6 +1,6 @@
 package kr.co.triphos.member.dto;
 
-import kr.co.triphos.member.entity.MemberEntity;
+import kr.co.triphos.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,9 +47,9 @@ public class CustomUserDetailsDTO implements UserDetails {
 	private boolean credentialsNonExpired;
 	private boolean enabled;
 
-	public CustomUserDetailsDTO(MemberEntity memberEntity) {
+	public CustomUserDetailsDTO(Member member) {
 		try {
-			Field[] dtoFields = memberEntity.getClass().getDeclaredFields(); // MemberEntity의 모든 필드 가져오기
+			Field[] dtoFields = member.getClass().getDeclaredFields(); // MemberEntity의 모든 필드 가져오기
 			Field[] entityFields = this.getClass().getDeclaredFields(); // CustomUserDetails의 모든 필드 가져오기
 
 			for (Field dtoField : dtoFields) {
@@ -60,9 +60,9 @@ public class CustomUserDetailsDTO implements UserDetails {
 					entityField.setAccessible(true);  // Entity 필드 접근
 					if ((entityField.getModifiers() & (STATIC | FINAL)) != 0) continue;
 
-					// memberEntity 필드명과 CustomUserDetails 필드명이 같으면 값을 할당
+					// member 필드명과 CustomUserDetails 필드명이 같으면 값을 할당
 					if (dtoField.getName().equals(entityField.getName())) {
-						Object value = dtoField.get(memberEntity); // DTO의 값 가져오기
+						Object value = dtoField.get(member); // DTO의 값 가져오기
 						entityField.set(this, value); // Entity 필드에 값 설정
 					}
 				}

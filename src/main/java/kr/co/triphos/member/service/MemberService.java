@@ -1,10 +1,10 @@
 package kr.co.triphos.member.service;
 
 import kr.co.triphos.member.dto.MenuMemberAuthDTO;
-import kr.co.triphos.member.entity.MemberEntity;
+import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.dto.MemberDTO;
-import kr.co.triphos.member.entity.MenuInfoEntity;
-import kr.co.triphos.member.entity.MenuMemberAuthEntity;
+import kr.co.triphos.member.entity.MenuInfo;
+import kr.co.triphos.member.entity.MenuMemberAuth;
 import kr.co.triphos.member.repository.MemberRepository;
 import kr.co.triphos.member.repository.MenuInfoRepository;
 import kr.co.triphos.member.repository.MenuMemberAuthRepository;
@@ -28,11 +28,11 @@ public class MemberService {
 	private final MenuMemberAuthRepository menuMemberAuthRepository;
 	private final MenuInfoRepository menuInfoRepository;
 
-	public MemberEntity getMemberInfoById(String memberId) {
+	public Member getMemberInfoById(String memberId) {
 		return memberRepository.findByMemberId(memberId).orElse(null);
 	}
 
-	public MemberEntity getMemberInfoByIdAndPw(String memberId, String memberPw) {
+	public Member getMemberInfoByIdAndPw(String memberId, String memberPw) {
 		return memberRepository.findByMemberIdAndMemberPw(memberId, memberPw);
 	}
 
@@ -40,11 +40,11 @@ public class MemberService {
 	public boolean createMember(MemberDTO memberDTO) throws Exception {
 		String memberId = memberDTO.getMemberId();
 		String memberPw = memberDTO.getMemberPw();
-		MemberEntity existMemberEntity = memberRepository.findByMemberId(memberId).orElse(new MemberEntity());
+		Member existMemberEntity = memberRepository.findByMemberId(memberId).orElse(new Member());
 
 		if (existMemberEntity.getMemberId() != null) {throw new Exception("이미 등록된 사용자입니다.");}
 
-		MemberEntity newMemberEntity = new MemberEntity(memberDTO);
+		Member newMemberEntity = new Member(memberDTO);
 		newMemberEntity.setMemberPw(passwordEncoder.encode(memberDTO.getMemberPw()));
 		newMemberEntity.setMemberStatus("MMS001");
 		newMemberEntity.setAdminYn("N");
@@ -59,7 +59,7 @@ public class MemberService {
 		String memberId 	= memberDTO.getMemberId();
 		String memberPw 	= memberDTO.getMemberPw();
 		String newMemberPw 	= memberDTO.getNewMemberPw();
-		MemberEntity existMemberEntity = memberRepository.findByMemberId(memberId).orElseThrow(() -> new Exception("회원 정보가 존재하지 않습니다."));
+		Member existMemberEntity = memberRepository.findByMemberId(memberId).orElseThrow(() -> new Exception("회원 정보가 존재하지 않습니다."));
 		if (!passwordEncoder.matches(memberPw, existMemberEntity.getMemberPw())) {throw new Exception("잘못된 기존 비밀번호입니다.");}
 
 		try {
@@ -82,7 +82,7 @@ public class MemberService {
 	public HashMap<String, Object> getMenuMemberAuth (String memberId, String menuId) throws Exception {
 		HashMap<String, Object> resultItem = new HashMap<>();
 
-		MenuMemberAuthEntity authItem = menuMemberAuthRepository.findByPkMenuIdAndPkMemberId(menuId, memberId);
+		MenuMemberAuth authItem = menuMemberAuthRepository.findByPkMenuIdAndPkMemberId(menuId, memberId);
 		resultItem.put("menuId", 		authItem.getPk().getMenuId());
 		resultItem.put("memberId", 		authItem.getPk().getMemberId());
 		resultItem.put("useYn", 		authItem.getUseYn());
@@ -96,13 +96,13 @@ public class MemberService {
 
 	public List<HashMap<String, Object>> getMemberMenuList(String id) throws Exception {
 		List<HashMap<String, Object>> resultList = new ArrayList<>();
-		List<MenuInfoEntity> menuList = menuInfoRepository.findAll();
-		List<MenuMemberAuthEntity> authList = menuMemberAuthRepository.findByPkMemberIdAndUseYn(id, "Y");
+		List<MenuInfo> menuList = menuInfoRepository.findAll();
+		List<MenuMemberAuth> authList = menuMemberAuthRepository.findByPkMemberIdAndUseYn(id, "Y");
 
 		menuList.forEach(menuItem -> {
 			String useYn = authList.stream().filter(authItem ->
 							menuItem.getMenuId().equals(authItem.getPk().getMenuId()))
-					.findFirst().map(MenuMemberAuthEntity::getUseYn)
+					.findFirst().map(MenuMemberAuth::getUseYn)
 					.orElse("N");
 
 			if (useYn.equals("Y")) {
@@ -123,14 +123,14 @@ public class MemberService {
 
 	public List<HashMap<String, Object>> getMenuMemberAuthList(String id) throws Exception {
 		List<HashMap<String, Object>> resultList = new ArrayList<>();
-		List<MenuInfoEntity> menuList = menuInfoRepository.findByDisplayYn("Y");
-		List<MenuMemberAuthEntity> authList = menuMemberAuthRepository.findByPkMemberId(id);
+		List<MenuInfo> menuList = menuInfoRepository.findByDisplayYn("Y");
+		List<MenuMemberAuth> authList = menuMemberAuthRepository.findByPkMemberId(id);
 
 		try {
 			menuList.forEach(menuItem -> {
-				MenuMemberAuthEntity authItem = authList.stream().filter(authListItem ->
+				MenuMemberAuth authItem = authList.stream().filter(authListItem ->
 								menuItem.getMenuId().equals(authListItem.getPk().getMenuId()))
-						.findFirst().orElse(new MenuMemberAuthEntity());
+						.findFirst().orElse(new MenuMemberAuth());
 
 				HashMap<String, Object> resultItem = new HashMap<>();
 				String useYn		= authItem.getUseYn() != null ? authItem.getUseYn() : "N";
@@ -166,14 +166,14 @@ public class MemberService {
 
 	@Transactional
 	public boolean updateMenuMemberAuth(List<MenuMemberAuthDTO> dtoAuthList, String modId) throws Exception {
-		List<MenuMemberAuthEntity> authList = new ArrayList<>();
+		List<MenuMemberAuth> authList = new ArrayList<>();
 
 		try {
 			dtoAuthList.forEach(dtoAuthItem -> {
 				String memberId = dtoAuthItem.getMemberId();
 				String menuId 	= dtoAuthItem.getMenuId();
 
-				MenuMemberAuthEntity entityAuthItem = menuMemberAuthRepository.findByPkMenuIdAndPkMemberId(menuId, memberId);
+				MenuMemberAuth entityAuthItem = menuMemberAuthRepository.findByPkMenuIdAndPkMemberId(menuId, memberId);
 				entityAuthItem.updateMenuMemberAuth(dtoAuthItem);
 				authList.add(entityAuthItem);
 			});
@@ -189,7 +189,7 @@ public class MemberService {
 	public List<HashMap<String, String>> getMemberList(String memberId, String memberNm) throws Exception {
 		List<HashMap<String, String>> resultList = new ArrayList<>();
 		try {
-			List<MemberEntity> entityList = null;
+			List<Member> entityList = null;
 			if (memberId != null && memberNm != null) {
 				entityList = memberRepository.findByMemberIdLikeAndMemberNmLike(memberId, memberNm);
 			}

@@ -1,9 +1,9 @@
 package kr.co.triphos.member.service;
 
 import kr.co.triphos.config.JwtUtil;
-import kr.co.triphos.member.entity.MemberEntity;
-import kr.co.triphos.member.entity.MenuInfoEntity;
-import kr.co.triphos.member.entity.MenuMemberAuthEntity;
+import kr.co.triphos.member.entity.Member;
+import kr.co.triphos.member.entity.MenuInfo;
+import kr.co.triphos.member.entity.MenuMemberAuth;
 import kr.co.triphos.member.repository.MemberRepository;
 import kr.co.triphos.member.repository.MenuInfoRepository;
 import kr.co.triphos.member.repository.MenuMemberAuthRepository;
@@ -35,13 +35,13 @@ public class AuthService {
      * @return String JWT token
      */
     public HashMap<String, String> login(String memberId, String memberPw) {
-        MemberEntity memberEntity = memberRepository.findByMemberId(memberId)
+        Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new RuntimeException("ID, 비밀번호를 다시 확인해 주세요."));
 
-        if (!memberEntity.isEnabled()) throw new RuntimeException("미사용처리된 계정입니다.");
+        if (!member.isEnabled()) throw new RuntimeException("미사용처리된 계정입니다.");
 
         // 비밀번호 확인 후 JWT 토큰 생성
-        if (passwordEncoder.matches(memberPw, memberEntity.getMemberPw())) {
+        if (passwordEncoder.matches(memberPw, member.getMemberPw())) {
             return jwtUtil.generateAccessToken(memberId);
         }
         else {
@@ -64,13 +64,13 @@ public class AuthService {
 
     public List<HashMap<String, Object>> getMemberMenuList(String id) {
         List<HashMap<String, Object>> resultList = new ArrayList<>();
-        List<MenuInfoEntity> menuList = menuInfoRepository.findByDisplayYn("Y");
-        List<MenuMemberAuthEntity> authList = menuMemberAuthRepository.findByPkMemberIdAndUseYn(id, "Y");
+        List<MenuInfo> menuList = menuInfoRepository.findByDisplayYn("Y");
+        List<MenuMemberAuth> authList = menuMemberAuthRepository.findByPkMemberIdAndUseYn(id, "Y");
 
         menuList.forEach(menuItem -> {
             String useYn = authList.stream().filter(authItem ->
                     menuItem.getMenuId().equals(authItem.getPk().getMenuId()))
-                    .findFirst().map(MenuMemberAuthEntity::getUseYn)
+                    .findFirst().map(MenuMemberAuth::getUseYn)
                     .orElse("N");
 
             if (useYn.equals("Y")) {

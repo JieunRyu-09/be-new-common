@@ -4,9 +4,9 @@ package kr.co.triphos.common.service;
 import kr.co.triphos.common.dto.ExcelDTO;
 import kr.co.triphos.common.dto.ExcelDataDTO;
 import kr.co.triphos.common.dto.ExcelInfoDTO;
-import kr.co.triphos.common.entity.ExcelDataEntity;
-import kr.co.triphos.common.entity.ExcelInfoEntity;
-import kr.co.triphos.common.entity.pk.ExcelDataEntityPK;
+import kr.co.triphos.common.entity.ExcelData;
+import kr.co.triphos.common.entity.ExcelInfo;
+import kr.co.triphos.common.entity.pk.ExcelDataPK;
 import kr.co.triphos.common.repository.ExcelDataRepository;
 import kr.co.triphos.common.repository.ExcelInfoRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,20 +34,20 @@ public class ExcelService {
 			LocalDateTime nowDate = LocalDateTime.now();
 
 			// ExcelInfo 작업
-			ExcelInfoEntity excelInfoEntity = new ExcelInfoEntity(excelNm, nowDate, memberId);
-			excelInfoRepository.save(excelInfoEntity);
+			ExcelInfo excelInfo = new ExcelInfo(excelNm, nowDate, memberId);
+			excelInfoRepository.save(excelInfo);
 			excelInfoRepository.flush();
-			Integer idx = excelInfoEntity.getIdx();
+			Integer idx = excelInfo.getIdx();
 			if (idx == null) throw new RuntimeException("엑셀정보 저장 실패.");
 
 			// ExcelData 작업
-			List<ExcelDataEntity> excelDataEntityList = new ArrayList<>();
+			List<ExcelData> excelDataEntityList = new ArrayList<>();
 			// excelData 의 정보로 entity 생성 후 saveAll
 			// 인덱스를 추적하기 위한 AtomicInteger
 			AtomicInteger index = new AtomicInteger(1);  // 인덱스는 1부터 시작
 			excelDTO.getExcelDataList().forEach(excelDataItem -> {
 				int currentIdx = index.getAndIncrement();
-				excelDataEntityList.add(new ExcelDataEntity(idx, currentIdx, excelDataItem));
+				excelDataEntityList.add(new ExcelData(idx, currentIdx, excelDataItem));
 			});
 			excelDataRepository.saveAll(excelDataEntityList);
 			return true;
@@ -67,17 +67,17 @@ public class ExcelService {
 
 			// ExcelInfo 작업
 			// idx로 조회해서 있는 정보인지 체크
-			ExcelInfoEntity excelInfoEntity = excelInfoRepository.findByIdx(idx)
+			ExcelInfo excelInfo = excelInfoRepository.findByIdx(idx)
 					.orElseThrow(() -> new RuntimeException("잘못된 엑셀정보입니다."));
-			excelInfoEntity.updateExcelInfoEntity(excelNm, nowDate, memberId);
-			excelInfoRepository.save(excelInfoEntity);
+			excelInfo.updateExcelInfoEntity(excelNm, nowDate, memberId);
+			excelInfoRepository.save(excelInfo);
 			excelInfoRepository.flush();
 
 			// ExcelData 작업
-			List<ExcelDataEntity> excelDataEntityList = new ArrayList<>();
+			List<ExcelData> excelDataEntityList = new ArrayList<>();
 			// excelData 의 정보로 entity 생성 후 saveAll
 			excelDTO.getExcelDataList().forEach(excelDataItem -> {
-				excelDataEntityList.add(new ExcelDataEntity(idx, excelDataItem.getRowIdx(), excelDataItem));
+				excelDataEntityList.add(new ExcelData(idx, excelDataItem.getRowIdx(), excelDataItem));
 			});
 			excelDataRepository.saveAll(excelDataEntityList);
 
@@ -95,13 +95,13 @@ public class ExcelService {
 
 	public List<ExcelInfoDTO> getExcelInfoList (String excelNm) throws Exception {
 		try {
-			List<ExcelInfoEntity> excelInfoEntityList = null;
+			List<ExcelInfo> excelInfoEntityList = null;
 			if (excelNm == null)  excelInfoEntityList = excelInfoRepository.findAll();
 			else				  excelInfoEntityList = excelInfoRepository.findByExcelNmLike("%" + excelNm + "%");
 
 			List<ExcelInfoDTO> excelInfoDTOList = new ArrayList<>();
-			excelInfoEntityList.forEach(excelInfoEntity -> {
-				excelInfoDTOList.add(new ExcelInfoDTO(excelInfoEntity));
+			excelInfoEntityList.forEach(excelInfo -> {
+				excelInfoDTOList.add(new ExcelInfoDTO(excelInfo));
 			});
 			return excelInfoDTOList;
 		}
@@ -114,12 +114,12 @@ public class ExcelService {
 
 	public List<ExcelDataDTO> getExcelDataList (int idx) throws Exception {
 		try {
-			List<ExcelDataEntity> excelDataEntityList = excelDataRepository.findByPkIdx(idx);
+			List<ExcelData> excelDataEntityList = excelDataRepository.findByPkIdx(idx);
 
 			List<ExcelDataDTO> excelDataDTOList = new ArrayList<>();
-			excelDataEntityList.forEach(excelDataEntity -> {
+			excelDataEntityList.forEach(excelData -> {
 				HashMap<String, Object> excelInfoDTO = new HashMap<>();
-				excelDataDTOList.add(new ExcelDataDTO(excelDataEntity));
+				excelDataDTOList.add(new ExcelDataDTO(excelData));
 			});
 			return excelDataDTOList;
 		}

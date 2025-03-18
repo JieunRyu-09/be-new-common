@@ -8,7 +8,7 @@ import kr.co.triphos.common.dto.ExcelDTO;
 import kr.co.triphos.common.dto.ExcelDataDTO;
 import kr.co.triphos.common.dto.ExcelInfoDTO;
 import kr.co.triphos.common.dto.ResponseDTO;
-import kr.co.triphos.common.entity.ExcelInfoEntity;
+import kr.co.triphos.common.entity.ExcelInfo;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.common.service.ExcelService;
 import lombok.RequiredArgsConstructor;
