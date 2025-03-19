@@ -8,7 +8,7 @@ import kr.co.triphos.common.dto.ExcelDTO;
 import kr.co.triphos.common.dto.ExcelDataDTO;
 import kr.co.triphos.common.dto.ExcelInfoDTO;
 import kr.co.triphos.common.dto.ResponseDTO;
-import kr.co.triphos.common.entity.ExcelInfoEntity;
+import kr.co.triphos.common.entity.ExcelInfo;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.common.service.ExcelService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class ExcelController {
 	private final ExcelService excelService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 
-	@PostMapping("/save")
+	@PostMapping("/excelSave")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 신규저장", description = "idx = null, rowIdx = null")
 	public ResponseEntity<?> excelSave(@Parameter(description = "엑셀 정보") @RequestBody ExcelDTO excelDTO) {
@@ -46,7 +46,7 @@ public class ExcelController {
 		}
 	}
 
-	@PostMapping("/update")
+	@PostMapping("/excelUpdate")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 데이터 수정", description = "idx != null, rowIdx != null<br>deleteDataList = [rowIdx]")
 	public ResponseEntity<?> excelUpdate(@Parameter(description = "엑셀 정보") @RequestBody ExcelDTO excelDTO) {
@@ -68,14 +68,14 @@ public class ExcelController {
 	@GetMapping("/getExcelInfoList")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 파일 목록 조회", description = "")
-	public ResponseEntity<?> getExcelInfoList(@Parameter(description = "엑셀 이름. null 로 보낼 시 전체조회") String excelNm) {
+	public ResponseEntity<?> getExcelInfoList(@Parameter(description = "엑셀 이름. null 로 보낼 시 전체조회") @RequestParam(required = false) String excelNm) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
 
-			List<ExcelInfoDTO> excelDataList = excelService.getExcelInfoList(excelNm);
+			List<ExcelInfoDTO> excelInfoList = excelService.getExcelInfoList(excelNm);
 			responseDTO.setSuccess(true);
-			responseDTO.addData("excelDataList", excelDataList);
+			responseDTO.addData("excelInfoList", excelInfoList);
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {

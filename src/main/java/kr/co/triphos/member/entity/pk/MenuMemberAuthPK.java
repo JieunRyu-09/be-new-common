@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class MenuMemberAuthEntityPK implements Serializable {
+public class MenuMemberAuthPK implements Serializable {
 	private String 	menuId;
 	private String 	memberId;
 

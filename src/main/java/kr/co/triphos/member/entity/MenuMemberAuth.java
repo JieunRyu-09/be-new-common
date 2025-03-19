@@ -1,7 +1,7 @@
 package kr.co.triphos.member.entity;
 
 import kr.co.triphos.member.dto.MenuMemberAuthDTO;
-import kr.co.triphos.member.entity.pk.MenuMemberAuthEntityPK;
+import kr.co.triphos.member.entity.pk.MenuMemberAuthPK;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
@@ -19,9 +19,9 @@ import static java.lang.reflect.Modifier.STATIC;
 @AllArgsConstructor
 @Log4j2
 @Table(name = "sy_menu_member_auth")
-public class MenuMemberAuthEntity {
+public class MenuMemberAuth {
 	@EmbeddedId
-	private MenuMemberAuthEntityPK pk;
+	private MenuMemberAuthPK pk;
 
 	private String	useYn;
 	private String	authSearch;

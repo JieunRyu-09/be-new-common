@@ -48,13 +48,33 @@ public class MemberController {
 		}
 	}
 
-	@PostMapping("/update")
+	@GetMapping("/getMemberInfo")
 	@Tag(name="사용자 관리")
-	@Operation(summary = "사용자정보 수정", description = "해당 api는 회원가입 및 로그인 등 구현 완료 후 삭제 예정")
-	public ResponseEntity<?> updateMember(@Parameter(description = "사용자 이름") 	@RequestParam String memberId,
+	@Operation(summary = "사용자정보 조회", description = "")
+	public ResponseEntity<?> updateMember(@Parameter(description = "사용자 ID") @RequestParam(required = false) String memberId) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			if (memberId == null) memberId = authFacadeService.getMemberId();
+			MemberDTO memberDTO = memberService.getMemberInfo(memberId);
+			responseDTO.addData("memberInfo", memberDTO);
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("사용자정보 조회 성공");
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@PostMapping("/updateMember")
+	@Tag(name="사용자 관리")
+	@Operation(summary = "사용자정보 수정", description = "")
+	public ResponseEntity<?> updateMember(@Parameter(description = "사용자 ID") 		@RequestParam String memberId,
 										  @Parameter(description = "사용자 이름") 	@RequestParam String memberNm,
 										  @Parameter(description = "사용자 Pw") 		@RequestParam String memberPw,
-										  @Parameter(description = "사용자 신규Pw") 	String newMemberPw,
+										  @Parameter(description = "사용자 신규Pw") 	@RequestParam(required = false) String newMemberPw,
 										  @Parameter(description = "사용자 이메일") 	@RequestParam String email,
 										  @Parameter(description = "사용자 핸드폰") 	@RequestParam String phone,
 										  @Parameter(description = "사용자 등급") 	@RequestParam String memberType,
@@ -170,8 +190,8 @@ public class MemberController {
 	@GetMapping("/getMemberList")
 	@Tag(name="사용자 권한")
 	@Operation(summary = "사용자 목록 조회", description = "")
-	public ResponseEntity<?> getMenuMemberAuthList(@Parameter(description = "사용자 ID")String memberId,
-												   @Parameter(description = "사용자 이름")String memberNm) {
+	public ResponseEntity<?> getMenuMemberAuthList(@Parameter(description = "사용자 ID") @RequestParam(required = false) String memberId,
+												   @Parameter(description = "사용자 이름") @RequestParam(required = false) String memberNm) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {

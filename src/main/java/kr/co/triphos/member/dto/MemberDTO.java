@@ -1,6 +1,7 @@
 package kr.co.triphos.member.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.co.triphos.member.entity.Member;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.log4j.Log4j2;
@@ -48,11 +49,24 @@ public class MemberDTO {
 	@Schema(description = "사용자 관리자 권한여부")
 	private String	adminYn;
 
+	public MemberDTO(Member member) {
+		this.memberId 	= member.getMemberId();
+		this.memberNm 	= member.getMemberNm();
+		this.memberPw 	= member.getMemberPw();
+		this.email 		= member.getEmail();
+		this.phone 		= member.getPhone();
+		this.memberType = member.getMemberType();
+		this.delYn 		= member.getDelYn();
+		this.adminYn 	= member.getAdminYn();
+	}
 
 	@Builder(builderClassName = "createMember", builderMethodName = "createMember")
 	public MemberDTO(@NonNull String memberId,
 					 @NonNull String memberNm,
-					 @NonNull String memberPw,  @NonNull String email,  @NonNull String phone,  @NonNull String memberType) {
+					 @NonNull String memberPw,
+					 @NonNull String email,
+					 @NonNull String phone,
+					 @NonNull String memberType) {
 		this.memberId 	= memberId;
 		this.memberNm 	= memberNm;
 		this.memberPw 	= memberPw;

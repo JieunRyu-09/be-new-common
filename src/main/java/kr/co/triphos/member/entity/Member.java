@@ -25,7 +25,7 @@ import static java.lang.reflect.Modifier.STATIC;
 @AllArgsConstructor
 @Log4j2
 @Table(name = "mm_member_info")
-public class MemberEntity {
+public class Member {
 	@Id
 	private String 	memberId;
 
@@ -69,7 +69,7 @@ public class MemberEntity {
 	@Builder.Default
 	private boolean enabled = true;
 
-	public MemberEntity(MemberDTO memberDTO) {
+	public Member(MemberDTO memberDTO) {
 		try {
 			Field[] dtoFields = memberDTO.getClass().getDeclaredFields(); // DTO의 모든 필드 가져오기
 			Field[] entityFields = this.getClass().getDeclaredFields(); // Entity의 모든 필드 가져오기

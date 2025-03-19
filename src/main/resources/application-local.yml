@@ -15,3 +15,5 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html  # Swagger UI 경로 (기본: /swagger-ui/index.html)
     operations-sorter: alpha  # API 정렬
+file:
+  upload-dir: C:/triphos/files/
