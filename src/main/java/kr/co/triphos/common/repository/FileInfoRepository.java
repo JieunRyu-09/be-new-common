@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface FileInfoRepository extends JpaRepository<FileInfo, Long> {
 	List<FileInfo> findByRealFileNmLike(String fileNm);
 	Optional<FileInfo> findByFileIdx(Integer fileIdx);
+	void deleteByFileIdx(Integer fileIdx);
 }

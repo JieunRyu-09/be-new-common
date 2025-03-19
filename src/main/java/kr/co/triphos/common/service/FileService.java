@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -35,66 +36,57 @@ public class FileService {
 
 	@Transactional
 	public boolean fileSave (List<MultipartFile> fileList, String memberId) throws Exception {
-		try {
-			// 파일경로 선언
-			LocalDateTime nowDate 	= LocalDateTime.now();
-			String yearMonth 		= nowDate.format(DateTimeFormatter.ofPattern("yyyyMM"));
-			String rootPath 		= System.getProperty("user.dir");
+		// 파일경로 선언
+		LocalDateTime nowDate 	= LocalDateTime.now();
+		String yearMonth 		= nowDate.format(DateTimeFormatter.ofPattern("yyyyMM"));
+		String rootPath 		= System.getProperty("user.dir");
 
-			// 파일 개별 저장
-			String fileGroup = "FGI001";
-			String fileType  = "FTI001";
-			fileList.forEach(fileItem -> {
-				try {
-					long fileSize = fileItem.getSize();
-					String realFileNm = fileItem.getOriginalFilename();
-					if (realFileNm == null) throw new RuntimeException("잘못된 파일정보입니다.");
+		// 파일 개별 저장
+		String fileGroup = "FGI001";
+		String fileType  = "FTI001";
+		fileList.forEach(fileItem -> {
+			try {
+				long fileSize = fileItem.getSize();
+				String realFileNm = fileItem.getOriginalFilename();
+				if (realFileNm == null) throw new RuntimeException("잘못된 파일정보입니다.");
 
-					// FileInfo Entity 생성
-					FileInfo fileInfo = FileInfo.builder()
-							.fileGroup(fileGroup)
-							.fileType(fileType)
-							.filePath("temp")
-							.fileNm("temp")
-							.realFileNm(realFileNm)
-							.fileSize(fileSize)
-							.insDt(nowDate)
-							.insMember(memberId)
-							.build();
-					// FileInfo Entity 저장 및 저장하면서 생긴 IDX 조회
-					// 조회한 IDX로 추후 파일명 등 설정
-					fileInfoRepository.save(fileInfo);
-					fileInfoRepository.flush();
-					Integer idx = fileInfo.getFileIdx();
-					if (idx == null) throw new RuntimeException("파일 저장 실패.");
+				// FileInfo Entity 생성
+				FileInfo fileInfo = FileInfo.builder()
+						.fileGroup(fileGroup)
+						.fileType(fileType)
+						.filePath("temp")
+						.fileNm("temp")
+						.realFileNm(realFileNm)
+						.fileSize(fileSize)
+						.insDt(nowDate)
+						.insMember(memberId)
+						.build();
+				// FileInfo Entity 저장 및 저장하면서 생긴 IDX 조회
+				// 조회한 IDX로 추후 파일명 등 설정
+				fileInfoRepository.save(fileInfo);
+				fileInfoRepository.flush();
+				Integer idx = fileInfo.getFileIdx();
+				if (idx == null) throw new RuntimeException("파일 저장 실패.");
 
-					// 확장자, 파일경로 등 파일정보 설정
-					// 경로 체크 후 없으면 경로까지 생성
-					String fileExtender = realFileNm.substring(realFileNm.lastIndexOf("."));
-					String fileName = yearMonth + "_" + idx + fileExtender;
-					String shortPath = "/Files/" + yearMonth + "/";
-					Path filePath = Paths.get(rootPath + shortPath + fileName);
-					Path existPath = Paths.get(rootPath + shortPath);
-					if (!Files.exists(existPath)) Files.createDirectories(existPath);
-					// 파일 저장(출력)
-					fileItem.transferTo(filePath.toFile());
-					// 파일 경로 및 파일명 정보 저장
-					fileInfo.setFileNm(fileName);
-					fileInfo.setFilePath(existPath.toString());
-					fileInfoRepository.save(fileInfo);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			});
-			return true;
-		}
-		catch (RuntimeException ex) {
-			log.error(ex.getMessage());
-			throw new RuntimeException("파일 저장에 실패하였습니다.");
-		}
-		catch (Exception ex) {
-			throw new Exception(ex);
-		}
+				// 확장자, 파일경로 등 파일정보 설정
+				// 경로 체크 후 없으면 경로까지 생성
+				String fileExtender = realFileNm.substring(realFileNm.lastIndexOf("."));
+				String fileName = yearMonth + "_" + idx + fileExtender;
+				String shortPath = "/Files/" + yearMonth + "/";
+				Path filePath = Paths.get(rootPath + shortPath + fileName);
+				Path existPath = Paths.get(rootPath + shortPath);
+				if (!Files.exists(existPath)) Files.createDirectories(existPath);
+				// 파일 저장(출력)
+				fileItem.transferTo(filePath.toFile());
+				// 파일 경로 및 파일명 정보 저장
+				fileInfo.setFileNm(fileName);
+				fileInfo.setFilePath(existPath.toString());
+				fileInfoRepository.save(fileInfo);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+		return true;
 	}
 
 	public List<HashMap<String, Object>> getFileList (String fileNm) {
@@ -140,5 +132,21 @@ public class FileService {
 		fileData.put("resource", resource);
 		fileData.put("fileSize", fileSize);
 		return fileData;
+	}
+
+	@Transactional
+	public void deleteFile (Integer fileIdx) throws Exception {
+		FileInfo fileInfo = fileInfoRepository.findByFileIdx(fileIdx).orElseThrow(() ->
+			new RuntimeException("삭제할 파일정보를 찾지 못하였습니다.")
+		);
+
+		String deleteFilePath = fileInfo.getFilePath();
+		String deleteFileName = fileInfo.getFileNm();
+		File file = new File(deleteFilePath, deleteFileName);
+		boolean deleteResult = file.delete();
+		if (!deleteResult) {
+			throw new RuntimeException("파일삭제 중 오류가 발생하였습니다.");
+		}
+		fileInfoRepository.deleteByFileIdx(fileIdx);
 	}
 }

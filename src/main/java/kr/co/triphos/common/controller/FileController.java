@@ -66,7 +66,8 @@ public class FileController {
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {
-			responseDTO.setMsg(ex.getMessage());
+			log.error(ex.getMessage());
+			responseDTO.setMsg("파일목록 조회에 실패하였습니다.");
 			return ResponseEntity.internalServerError().body(responseDTO);
 		}
 	}
@@ -101,6 +102,30 @@ public class FileController {
 		catch (Exception ex) {
 			log.error(ex.toString());
 			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@PostMapping(value = "/deleteFile")
+	@Tag(name="파일")
+	@Operation(summary = "파일 삭제", description = "")
+	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx") @RequestParam Integer fileIdx) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			fileService.deleteFile(fileIdx);
+			String msg = "파일을 삭제하였습니다";
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg(msg);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (RuntimeException ex) {
+			log.error(ex);
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex.getMessage());
+			responseDTO.setMsg("파일 삭제에 실패하였습니다.");
 			return ResponseEntity.internalServerError().body(responseDTO);
 		}
 	}
