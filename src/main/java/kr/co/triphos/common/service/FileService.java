@@ -5,18 +5,18 @@ import kr.co.triphos.common.entity.FileInfo;
 import kr.co.triphos.common.repository.FileInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletContext;
 import javax.transaction.Transactional;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -88,5 +88,25 @@ public class FileService {
 		catch (Exception ex) {
 			throw new Exception(ex);
 		}
+	}
+
+	public List<HashMap<String, Object>> getFileList (String fileNm) {
+		// 반환할 파일목록
+		List<FileInfo> fileInfoEntityList = new ArrayList<>();
+		// 파일명 입력에 따라 조회
+		if (fileNm == null) fileInfoEntityList = fileInfoRepository.findAll();
+		else 				fileInfoEntityList = fileInfoRepository.findByRealFileNmLike("%" + fileNm + "%");
+
+		List<HashMap<String, Object>> fileInfoDTOList = new ArrayList<>();
+		fileInfoEntityList.forEach(fileInfoEntity -> {
+			HashMap<String, Object> fileInfoDTO = new HashMap<>();
+			fileInfoDTO.put("fileIdx", 	fileInfoEntity.getFileIdx());
+			fileInfoDTO.put("fileNm", 	fileInfoEntity.getFileNm());
+			fileInfoDTO.put("fileSize", fileInfoEntity.getFileSize());
+			fileInfoDTO.put("insDt", 	fileInfoEntity.getInsDt());
+			fileInfoDTO.put("insMember",fileInfoEntity.getInsMember());
+			fileInfoDTOList.add(fileInfoDTO);
+		});
+		return fileInfoDTOList;
 	}
 }

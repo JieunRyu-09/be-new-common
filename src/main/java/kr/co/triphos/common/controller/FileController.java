@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -38,6 +39,25 @@ public class FileController {
 			String msg = res ? "파일을 저장하였습니다." : "파일저장에 실패하였습니다.";
 			responseDTO.setSuccess(res);
 			responseDTO.setMsg(msg);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@PostMapping(value = "/getFileList")
+	@Tag(name="파일")
+	@Operation(summary = "파일 목록조회", description = "")
+	public ResponseEntity<?> getFileList(@Parameter(description = "파일") @RequestParam(required = false) String fileNm) {
+		ResponseDTO responseDTO = new ResponseDTO();
+
+		try {
+			List<HashMap<String, Object>> fileList = fileService.getFileList(fileNm);
+			responseDTO.addData("fileList", fileList);
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("");
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {
