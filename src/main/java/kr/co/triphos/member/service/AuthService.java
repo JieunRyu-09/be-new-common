@@ -39,6 +39,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("ID, 비밀번호를 다시 확인해 주세요."));
 
         if (!member.isEnabled()) throw new RuntimeException("미사용처리된 계정입니다.");
+        if (member.getDelYn().equals("Y")) throw new RuntimeException("미사용처리된 계정입니다.");
 
         // 비밀번호 확인 후 JWT 토큰 생성
         if (passwordEncoder.matches(memberPw, member.getMemberPw())) {

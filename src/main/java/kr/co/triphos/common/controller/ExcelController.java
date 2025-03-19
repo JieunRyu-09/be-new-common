@@ -73,9 +73,9 @@ public class ExcelController {
 
 		try {
 
-			List<ExcelInfoDTO> excelDataList = excelService.getExcelInfoList(excelNm);
+			List<ExcelInfoDTO> excelInfoList = excelService.getExcelInfoList(excelNm);
 			responseDTO.setSuccess(true);
-			responseDTO.addData("excelDataList", excelDataList);
+			responseDTO.addData("excelInfoList", excelInfoList);
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {

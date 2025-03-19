@@ -36,6 +36,12 @@ public class MemberService {
 		return memberRepository.findByMemberIdAndMemberPw(memberId, memberPw);
 	}
 
+	public MemberDTO getMemberInfo(String memberId) {
+		Member member = memberRepository.findByMemberId(memberId).orElseThrow(() -> new RuntimeException("사용자 정보를 찾지 못하였습니다."));
+		member.setMemberPw(null);
+		return new MemberDTO(member);
+	}
+
 	@Transactional
 	public boolean createMember(MemberDTO memberDTO) throws Exception {
 		String memberId = memberDTO.getMemberId();
