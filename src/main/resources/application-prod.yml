@@ -10,3 +10,5 @@ spring:
     username: dev_standard
     password: $tri0605!
 
+file:
+  upload-dir: E:\_PUBLIC\HOME_DEV\dev-standard-backend\files

@@ -4,6 +4,7 @@ package kr.co.triphos.common.service;
 import kr.co.triphos.common.entity.FileInfo;
 import kr.co.triphos.common.repository.FileInfoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
@@ -31,6 +32,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Log4j2
 public class FileService {
+	@Value("${file.upload-dir}")
+	private String rootPath;
 
 	private final FileInfoRepository fileInfoRepository;
 
@@ -39,7 +42,6 @@ public class FileService {
 		// 파일경로 선언
 		LocalDateTime nowDate 	= LocalDateTime.now();
 		String yearMonth 		= nowDate.format(DateTimeFormatter.ofPattern("yyyyMM"));
-		String rootPath 		= System.getProperty("user.dir");
 
 		// 파일 개별 저장
 		String fileGroup = "FGI001";
