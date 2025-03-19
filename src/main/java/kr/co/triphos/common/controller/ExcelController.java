@@ -27,7 +27,7 @@ public class ExcelController {
 	private final ExcelService excelService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 
-	@PostMapping("/save")
+	@PostMapping("/excelSave")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 신규저장", description = "idx = null, rowIdx = null")
 	public ResponseEntity<?> excelSave(@Parameter(description = "엑셀 정보") @RequestBody ExcelDTO excelDTO) {
@@ -46,7 +46,7 @@ public class ExcelController {
 		}
 	}
 
-	@PostMapping("/update")
+	@PostMapping("/excelUpdate")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 데이터 수정", description = "idx != null, rowIdx != null<br>deleteDataList = [rowIdx]")
 	public ResponseEntity<?> excelUpdate(@Parameter(description = "엑셀 정보") @RequestBody ExcelDTO excelDTO) {
