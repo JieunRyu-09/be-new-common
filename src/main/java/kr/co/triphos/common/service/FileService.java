@@ -127,8 +127,14 @@ public class FileService {
 		String encodedFileName = URLEncoder.encode(realFileNm, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
 
 		File file = new File(filePath, fileName);
+		if (!file.exists() || !file.isFile()) {
+			throw new RuntimeException("잘못된 파일정보입니다. 파일을 업로드한 환경을 확인하여주십시오.");
+		}
 		InputStreamResource resource = new InputStreamResource(Files.newInputStream(file.toPath()));
 		long fileSize = file.length();
+		if (fileSize == 0) {
+			throw new RuntimeException("파일용량이 없습니다. 파일을 업로드한 환경을 확인하여주십시오.");
+		}
 
 		fileData.put("encodedFileName", encodedFileName);
 		fileData.put("resource", resource);

@@ -93,7 +93,13 @@ public class FileController {
 					.contentType(MediaType.APPLICATION_OCTET_STREAM)
 					.body(resource);
 		}
+		catch (RuntimeException ex) {
+			log.error(ex);
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
 		catch (Exception ex) {
+			log.error(ex.toString());
 			responseDTO.setMsg(ex.getMessage());
 			return ResponseEntity.internalServerError().body(responseDTO);
 		}
