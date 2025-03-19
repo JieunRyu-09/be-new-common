@@ -68,7 +68,7 @@ public class ExcelController {
 	@GetMapping("/getExcelInfoList")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 파일 목록 조회", description = "")
-	public ResponseEntity<?> getExcelInfoList(@Parameter(description = "엑셀 이름. null 로 보낼 시 전체조회") String excelNm) {
+	public ResponseEntity<?> getExcelInfoList(@Parameter(description = "엑셀 이름. null 로 보낼 시 전체조회") @RequestParam(required = false) String excelNm) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {

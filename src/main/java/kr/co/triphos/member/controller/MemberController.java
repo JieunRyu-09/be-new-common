@@ -54,7 +54,7 @@ public class MemberController {
 	public ResponseEntity<?> updateMember(@Parameter(description = "사용자 이름") 	@RequestParam String memberId,
 										  @Parameter(description = "사용자 이름") 	@RequestParam String memberNm,
 										  @Parameter(description = "사용자 Pw") 		@RequestParam String memberPw,
-										  @Parameter(description = "사용자 신규Pw") 	String newMemberPw,
+										  @Parameter(description = "사용자 신규Pw") 	@RequestParam(required = false) String newMemberPw,
 										  @Parameter(description = "사용자 이메일") 	@RequestParam String email,
 										  @Parameter(description = "사용자 핸드폰") 	@RequestParam String phone,
 										  @Parameter(description = "사용자 등급") 	@RequestParam String memberType,
@@ -170,8 +170,8 @@ public class MemberController {
 	@GetMapping("/getMemberList")
 	@Tag(name="사용자 권한")
 	@Operation(summary = "사용자 목록 조회", description = "")
-	public ResponseEntity<?> getMenuMemberAuthList(@Parameter(description = "사용자 ID")String memberId,
-												   @Parameter(description = "사용자 이름")String memberNm) {
+	public ResponseEntity<?> getMenuMemberAuthList(@Parameter(description = "사용자 ID") @RequestParam(required = false) String memberId,
+												   @Parameter(description = "사용자 이름") @RequestParam(required = false) String memberNm) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
