@@ -1,0 +1,56 @@
+오라클 락 조회 및 해제
+
+1.lock 걸린 개체 확인
+SELECT OBJECT_ID
+     , SESSION_ID       -- SID
+     , ORACLE_USERNAME
+     , OS_USER_NAME
+  FROM V$LOCKED_OBJECT;
+
+
+
+2. 해당 sid 와 serial 번호로 락걸린 object name 을 확인
+SELECT A.SID
+     , A.SERIAL#
+     , object_name
+     , A.SID || ', ' || A.SERIAL# AS KILL_TASK
+  FROM V$SESSION A
+ INNER JOIN V$LOCK B
+    ON A.SID = B.SID
+ INNER JOIN DBA_OBJECTS C
+    ON B.ID1 = C.OBJECT_ID
+ WHERE B.TYPE  = 'TM';
+
+
+
+3. sid 와 시리얼 번호로 세션 해제
+ALTER SYSTEM KILL SESSION '401, 12761';
+SID, SERIAL
+
+
+
+4. 락 발생 사용자 및 OBJECT 조회 + 어떤 sql 를 실행중하여 lock 을 걸고 있는지 확인
+SELECT DISTINCT T1.SESSION_ID
+     , T2.SERIAL#
+     , T4.OBJECT_NAME
+     , T2.MACHINE
+     , T2.TERMINAL
+     , T2.PROGRAM
+     , T3.ADDRESS
+     , T3.PIECE
+     , T3.SQL_TEXT
+  FROM V$LOCKED_OBJECT T1
+     , V$SESSION T2
+     , V$SQLTEXT T3
+     , DBA_OBJECTS T4
+ WHERE 1=1
+   AND T1.SESSION_ID = T2.SID
+   AND T1.OBJECT_ID = T4.OBJECT_ID
+   AND T2.SQL_ADDRESS = T3.ADDRESS
+   ORDER BY T3.ADDRESS, T3.PIECE;
+
+SELECT *
+  FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+SELECT * FROM V$SQL_MONITOR;
+V$SQL_PLAN_MONITOR
