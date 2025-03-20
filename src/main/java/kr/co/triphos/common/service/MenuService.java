@@ -47,4 +47,12 @@ public class MenuService {
 		menuInfoRepository.saveAll(updateMenuInfoEntityList);
 		return true;
 	}
+
+	public List<MenuInfoDTO> getMenuList() throws Exception {
+		List<MenuInfoDTO> menuInfoDTOList = new ArrayList<>();
+		for (MenuInfo menuInfo : menuInfoRepository.findAll()) {
+			menuInfoDTOList.add(new MenuInfoDTO(menuInfo));
+		}
+		return menuInfoDTOList;
+	}
 }

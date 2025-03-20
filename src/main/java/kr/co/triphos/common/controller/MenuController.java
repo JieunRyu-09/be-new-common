@@ -47,4 +47,27 @@ public class MenuController {
 		}
 	}
 
+	@GetMapping(value = "/getMenuList")
+	@Tag(name="메뉴")
+	@Operation(summary = "메뉴목록 조회", description = "")
+	public ResponseEntity<?> getMenuList() {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			List<MenuInfoDTO> menuList = menusService.getMenuList();
+			responseDTO.setSuccess(true);
+			responseDTO.addData("menuList", menuList);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (RuntimeException ex) {
+			log.error(ex);
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("메뉴정보 수정에 실패하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
 }
