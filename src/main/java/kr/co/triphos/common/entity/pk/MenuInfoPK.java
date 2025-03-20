@@ -1,4 +1,4 @@
-package kr.co.triphos.member.entity.pk;
+package kr.co.triphos.common.entity.pk;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

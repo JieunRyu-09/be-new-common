@@ -1,8 +1,6 @@
-package kr.co.triphos.member.repository;
+package kr.co.triphos.common.repository;
 
-import kr.co.triphos.member.entity.Member;
-import kr.co.triphos.member.entity.MenuInfo;
-import kr.co.triphos.member.entity.MenuMemberAuth;
+import kr.co.triphos.common.entity.MenuInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
