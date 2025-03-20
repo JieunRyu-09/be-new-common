@@ -3,10 +3,16 @@ server:
     encoding:
       charset: UTF-8
       force: true
+  tomcat:
+    connection-timeout: 10s #커넥션 타임아웃 시간
 spring:
   profiles:
     include: secret
     active: local
+  datasource:
+    hikari:
+      connection-timeout: 10000 #db 10초이상 응답없으면 타임아웃
+      validation-timeout: 10000 #커넥션 유효성 검사 타임아웃
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
