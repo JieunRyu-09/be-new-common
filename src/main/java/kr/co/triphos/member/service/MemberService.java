@@ -3,10 +3,10 @@ package kr.co.triphos.member.service;
 import kr.co.triphos.member.dto.MenuMemberAuthDTO;
 import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.dto.MemberDTO;
-import kr.co.triphos.member.entity.MenuInfo;
+import kr.co.triphos.common.entity.MenuInfo;
 import kr.co.triphos.member.entity.MenuMemberAuth;
 import kr.co.triphos.member.repository.MemberRepository;
-import kr.co.triphos.member.repository.MenuInfoRepository;
+import kr.co.triphos.common.repository.MenuInfoRepository;
 import kr.co.triphos.member.repository.MenuMemberAuthRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,10 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -86,9 +83,22 @@ public class MemberService {
 	}
 
 	public HashMap<String, Object> getMenuMemberAuth (String memberId, String menuId) throws Exception {
-		HashMap<String, Object> resultItem = new HashMap<>();
+		HashMap<String, Object> resultItem = new LinkedHashMap<>();
+		List<MenuInfo> menuList = menuInfoRepository.findByDisplayYn("Y");
+		MenuInfo menuItem = menuInfoRepository.findByMenuId(menuId);
 
 		MenuMemberAuth authItem = menuMemberAuthRepository.findByPkMenuIdAndPkMemberId(menuId, memberId);
+
+		MenuInfo subMenuItem = menuList.stream().filter(subMenu ->
+				subMenu.getPk().getMainCd() == menuItem.getPk().getMainCd() &&
+						subMenu.getPk().getSub1Cd() == menuItem.getPk().getSub1Cd() &&
+						subMenu.getPk().getSub2Cd() == 0
+		).findFirst().orElse(null);
+		assert subMenuItem != null;
+
+		String mainTitle	= subMenuItem.getMenuTitle();
+		String subTitle		= menuItem.getPk().getSub2Cd() == 0 ? null : menuItem.getMenuTitle();
+
 		resultItem.put("menuId", 		authItem.getPk().getMenuId());
 		resultItem.put("memberId", 		authItem.getPk().getMemberId());
 		resultItem.put("useYn", 		authItem.getUseYn());
@@ -97,7 +107,57 @@ public class MemberService {
 		resultItem.put("authDel", 		authItem.getAuthDel());
 		resultItem.put("authMod", 		authItem.getAuthMod());
 		resultItem.put("excelExport", 	authItem.getExcelExport());
+		resultItem.put("mainTitle", 	mainTitle);
+		resultItem.put("menuTitle", 	menuItem.getMenuTitle());
+		resultItem.put("subTitle",  	subTitle);
 		return resultItem;
+	}
+
+	public List<HashMap<String, Object>> getMenuMemberAuthList(String id) throws Exception {
+		List<HashMap<String, Object>> resultList = new ArrayList<>();
+		List<MenuInfo> menuList = menuInfoRepository.findByDisplayYn("Y");
+		List<MenuMemberAuth> authList = menuMemberAuthRepository.findByPkMemberId(id);
+
+		menuList.forEach(menuItem -> {
+			MenuMemberAuth authItem = authList.stream().filter(authListItem ->
+							menuItem.getMenuId().equals(authListItem.getPk().getMenuId()))
+					.findFirst().orElse(new MenuMemberAuth());
+			MenuInfo subMenuItem = menuList.stream().filter(subMenu ->
+					subMenu.getPk().getMainCd() == menuItem.getPk().getMainCd() &&
+							subMenu.getPk().getSub1Cd() == menuItem.getPk().getSub1Cd() &&
+							subMenu.getPk().getSub2Cd() == 0
+			).findFirst().orElse(null);
+			assert subMenuItem != null;
+
+			HashMap<String, Object> resultItem = new LinkedHashMap<>();
+			String useYn		= authItem.getUseYn() 		!= null ? authItem.getUseYn() : "N";
+			String authSearch	= authItem.getAuthSearch() 	!= null ? authItem.getAuthSearch() : "N";
+			String authIns		= authItem.getAuthIns() 	!= null ? authItem.getAuthIns() : "N";
+			String authDel		= authItem.getAuthDel() 	!= null ? authItem.getAuthDel() : "N";
+			String authMod		= authItem.getAuthMod() 	!= null ? authItem.getAuthMod() : "N";
+			String excelExport	= authItem.getExcelExport() != null ? authItem.getExcelExport() : "N";
+			String mainTitle	= subMenuItem.getMenuTitle();
+			String subTitle		= menuItem.getPk().getSub2Cd() == 0 ? null : menuItem.getMenuTitle();
+			// menuInfo
+			resultItem.put("mainCd",    menuItem.getPk().getMainCd());
+			resultItem.put("sub1Cd",    menuItem.getPk().getSub1Cd());
+			resultItem.put("sub2Cd",    menuItem.getPk().getSub2Cd());
+			resultItem.put("orderBy",   menuItem.getOrderBy());
+			resultItem.put("menuId",    menuItem.getMenuId());
+			resultItem.put("mainTitle", mainTitle);
+			resultItem.put("menuTitle", menuItem.getMenuTitle());
+			resultItem.put("subTitle",  subTitle);
+			// authInfo
+			resultItem.put("memberId",  	id);
+			resultItem.put("useYn",    		useYn);
+			resultItem.put("authSearch",    authSearch);
+			resultItem.put("authIns",    	authIns);
+			resultItem.put("authDel",    	authDel);
+			resultItem.put("authMod",    	authMod);
+			resultItem.put("excelExport",	excelExport);
+			resultList.add(resultItem);
+		});
+		return resultList;
 	}
 
 	public List<HashMap<String, Object>> getMemberMenuList(String id) throws Exception {
@@ -125,49 +185,6 @@ public class MemberService {
 			}
 		});
 		return resultList;
-	}
-
-	public List<HashMap<String, Object>> getMenuMemberAuthList(String id) throws Exception {
-		List<HashMap<String, Object>> resultList = new ArrayList<>();
-		List<MenuInfo> menuList = menuInfoRepository.findByDisplayYn("Y");
-		List<MenuMemberAuth> authList = menuMemberAuthRepository.findByPkMemberId(id);
-
-		try {
-			menuList.forEach(menuItem -> {
-				MenuMemberAuth authItem = authList.stream().filter(authListItem ->
-								menuItem.getMenuId().equals(authListItem.getPk().getMenuId()))
-						.findFirst().orElse(new MenuMemberAuth());
-
-				HashMap<String, Object> resultItem = new HashMap<>();
-				String useYn		= authItem.getUseYn() != null ? authItem.getUseYn() : "N";
-				String authSearch	= authItem.getAuthSearch() != null ? authItem.getAuthSearch() : "N";
-				String authIns		= authItem.getAuthIns() != null ? authItem.getAuthIns() : "N";
-				String authDel		= authItem.getAuthDel() != null ? authItem.getAuthDel() : "N";
-				String authMod		= authItem.getAuthMod() != null ? authItem.getAuthMod() : "N";
-				String excelExport	= authItem.getExcelExport() != null ? authItem.getExcelExport() : "N";
-				// menuInfo
-				resultItem.put("mainCd",    menuItem.getPk().getMainCd());
-				resultItem.put("sub1Cd",    menuItem.getPk().getMainCd());
-				resultItem.put("sub2Cd",    menuItem.getPk().getMainCd());
-				resultItem.put("orderBy",   menuItem.getOrderBy());
-				resultItem.put("menuId",    menuItem.getMenuId());
-				resultItem.put("menuTitle", menuItem.getMenuTitle());
-				// authInfo
-				resultItem.put("memberId",  	id);
-				resultItem.put("useYn",    		useYn);
-				resultItem.put("authSearch",    authSearch);
-				resultItem.put("authIns",    	authIns);
-				resultItem.put("authDel",    	authDel);
-				resultItem.put("authMod",    	authMod);
-				resultItem.put("excelExport",	excelExport);
-				resultList.add(resultItem);
-			});
-			return resultList;
-		}
-		catch (RuntimeException ex) {
-			log.error(ex.getMessage());
-			throw new RuntimeException(ex.getMessage());
-		}
 	}
 
 	@Transactional

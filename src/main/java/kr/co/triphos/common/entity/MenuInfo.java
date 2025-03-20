@@ -1,16 +1,17 @@
-package kr.co.triphos.member.entity;
+package kr.co.triphos.common.entity;
 
-import kr.co.triphos.member.entity.pk.MenuInfoPK;
-import kr.co.triphos.member.entity.pk.MenuMemberAuthPK;
+import kr.co.triphos.common.entity.pk.MenuInfoPK;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -30,8 +31,8 @@ public class MenuInfo {
 	private String	menuLinkDev;
 	private String	displayYn;
 	private String	note;
-	private String	insDt;
+	private LocalDateTime insDt;
 	private String 	insMember;
-	private String	updDt;
+	private LocalDateTime	updDt;
 	private String	updMember;
 }
