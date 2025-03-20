@@ -10,4 +10,6 @@ import java.util.List;
 
 public interface MenuInfoRepository extends JpaRepository<MenuInfo, Long> {
 	List<MenuInfo> findByDisplayYn(String displayYn);
+
+	MenuInfo findByMenuId(String menuId);
 }

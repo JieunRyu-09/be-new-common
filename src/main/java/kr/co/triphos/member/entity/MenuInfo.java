@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -24,6 +25,7 @@ public class MenuInfo {
 	private MenuInfoPK pk;
 
 	private int 	orderBy;
+	@UniqueElements
 	private String	menuId;
 	private String	menuTitle;
 	private String 	menuLink;
