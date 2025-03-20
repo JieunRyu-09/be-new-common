@@ -30,7 +30,7 @@ public class MenuController {
 		try {
 			String memberId = authenticationFacadeService.getMemberId();
 			boolean res = menusService.updateMenu(menuInfoDTOList, memberId);
-			String msg = res ? "파일을 저장하였습니다." : "파일저장에 실패하였습니다.";
+			String msg = res ? "메뉴정보를 수정하였습니다." : "메뉴정보 수정에 실패하였습니다.";
 			responseDTO.setSuccess(res);
 			responseDTO.setMsg(msg);
 			return ResponseEntity.ok().body(responseDTO);
