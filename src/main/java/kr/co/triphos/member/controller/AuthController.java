@@ -14,6 +14,7 @@ import kr.co.triphos.member.service.AuthService;
 import kr.co.triphos.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,11 +60,18 @@ public class AuthController {
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
 				.body(responseDTO);
 		}
+		catch (DataAccessException de) {
+			log.error(de.getMessage());
+			responseDTO.setMsg("서버현황이 불안정합니다. 잠시 후 다시 시도하여주십시오.");
+			return ResponseEntity.status(408).body(responseDTO);
+		}
 		catch (RuntimeException re) {
+			log.error(re.getMessage());
 			responseDTO.setMsg(re.getMessage());
 			return ResponseEntity.status(401).body(responseDTO);
 		}
 		catch (Exception ex) {
+			log.error(ex.getMessage());
 			responseDTO.setMsg(ex.getMessage());
 			return ResponseEntity.status(401).body("Invalid credentials");
 		}
@@ -79,6 +87,11 @@ public class AuthController {
 			responseDTO.setSuccess(true);
 			responseDTO.addData("result", memberService.getMemberInfoById(memberId) != null);
 			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (DataAccessException de) {
+			log.error(de.getMessage());
+			responseDTO.setMsg("서버현황이 불안정합니다. 잠시 후 다시 시도하여주십시오.");
+			return ResponseEntity.status(408).body(responseDTO);
 		}
 		catch (Exception ex) {
 			return ResponseEntity.internalServerError().body(responseDTO);
@@ -112,6 +125,11 @@ public class AuthController {
 			responseDTO.setMsg(msg);
 			return ResponseEntity.ok().body(responseDTO);
 		}
+		catch (DataAccessException de) {
+			log.error(de.getMessage());
+			responseDTO.setMsg("서버현황이 불안정합니다. 잠시 후 다시 시도하여주십시오.");
+			return ResponseEntity.status(408).body(responseDTO);
+		}
 		catch (Exception ex) {
 			log.error(ex);
 			responseDTO.setMsg(ex.getMessage());
@@ -140,6 +158,11 @@ public class AuthController {
 			return ResponseEntity.ok()
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken)
 					.body(responseDTO);
+		}
+		catch (DataAccessException de) {
+			log.error(de.getMessage());
+			responseDTO.setMsg("서버현황이 불안정합니다. 잠시 후 다시 시도하여주십시오.");
+			return ResponseEntity.status(408).body(responseDTO);
 		}
 		catch (Exception ex) {
 			return ResponseEntity.status(401).body(ex.getMessage());

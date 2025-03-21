@@ -6,6 +6,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.member.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,27 +27,10 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Log4j2
 public class JwtFilter extends OncePerRequestFilter {
-//    private final JwtUtil jwtUtil;
-//    private final UserDetailsService userDetailsService;
-
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
-    private static final List<String> EXCLUDE_URL = Arrays.asList(
-            "/swagger-ui.html",
-            "/swagger-ui/",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/api-docs/**",
-            "/auth/login",
-            "/test/**",
-            "/auth/**"
-    );
-
-//    public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
-//        this.jwtUtil = jwtUtil;
-//        this.userDetailsService = userDetailsService;
-//    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -77,21 +64,35 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             chain.doFilter(request, response);
         }
-        catch (ExpiredJwtException e) {
-            ResponseDTO responseDTO = new ResponseDTO();
-            responseDTO.setMsg("토큰이 만료되었습니다.");
-
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
-            response.getWriter().write(new ObjectMapper().writeValueAsString(responseDTO)); // JSON으로 응답
+        catch (DataAccessException ex) {
+            log.error(ex.getMessage());
+            sendErrorResponse(response, HttpServletResponse.SC_REQUEST_TIMEOUT, "서버현황이 불안정합니다. 잠시 후 다시 시도하여주십시오.");
             return;
         }
-        catch (RuntimeException e) {
-            ResponseDTO responseDTO = new ResponseDTO();
-            responseDTO.setMsg("잘못된 토큰정보입니다.");
-
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
-            response.getWriter().write(new ObjectMapper().writeValueAsString(responseDTO)); // JSON으로 응답
+        catch (ExpiredJwtException ex) {
+            log.error(ex.getMessage());
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "토큰이 만료되었습니다.");
             return;
         }
+        catch (RuntimeException ex) {
+            log.error(ex.getMessage());
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "잘못된 토큰정보입니다.");
+            return;
+        }
+        catch (Exception ex) {
+            log.error(ex.getMessage());
+            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "서버에 이상이 발생하였습니다. 잠시후 시도하여주십시오.");
+            return;
+        }
+
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, int status, String message) throws IOException {
+        ResponseDTO responseDTO = new ResponseDTO();
+        responseDTO.setMsg(message);
+
+        response.setStatus(status);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(responseDTO));
     }
 }
