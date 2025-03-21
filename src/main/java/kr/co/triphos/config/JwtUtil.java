@@ -23,7 +23,11 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String SECRET_KEY;      // at least 32 characters long
     private Key key;
-    private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 1시간
+    /** 로컬테스트랑 서버랑 토큰시간 별도로 관리
+     *  서버는 일정시간마다 access토큰 유효시간 체크
+     */
+    @Value("${token.time}")
+    private long ACCESS_TOKEN_VALIDITY;
     private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 7; // 7일
 
     @PostConstruct
