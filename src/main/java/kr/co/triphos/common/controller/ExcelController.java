@@ -68,11 +68,11 @@ public class ExcelController {
 	@PostMapping("/excelDelete")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 삭제", description = "List<integer> deleteExcelList")
-	public ResponseEntity<?> excelDelete(@Parameter(description = "엑셀Idx List") @RequestParam List<Integer> deleteExcelList) {
+	public ResponseEntity<?> excelDelete(@Parameter(description = "엑셀Idx List") @RequestBody ExcelInfoDTO excelInfoDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			 excelService.excelDelete(deleteExcelList);
+			 excelService.excelDelete(excelInfoDTO.getDeleteExcelList());
 			String msg = "엑셀정보를 삭제하였습니다";
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg(msg);

@@ -2,7 +2,9 @@ package kr.co.triphos.common.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.triphos.common.entity.ExcelInfo;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.bytebuddy.asm.Advice;
 
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Data
 @Log4j2
+@AllArgsConstructor
+@NoArgsConstructor
 public class ExcelInfoDTO {
 	@Schema(description = "엑셀파일 idx")
 	private Integer idx;
@@ -24,6 +28,8 @@ public class ExcelInfoDTO {
 	private LocalDateTime updDt;
 	@Schema(description = "수정일자")
 	private String 	updMember;
+	@Schema(description = "수정일자")
+	private List<Integer> deleteExcelList;
 
 	public ExcelInfoDTO (ExcelInfo excelInfo) {
 		this.idx 		= excelInfo.getIdx();
