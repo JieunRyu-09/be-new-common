@@ -8,7 +8,7 @@ server:
 spring:
   profiles:
     include: secret
-    active: prod
+    active: local
   datasource:
     hikari:
       connection-timeout: 10000 #db 10초이상 응답없으면 타임아웃
