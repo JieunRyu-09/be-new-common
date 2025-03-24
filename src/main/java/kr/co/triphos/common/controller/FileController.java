@@ -53,7 +53,7 @@ public class FileController {
 		}
 	}
 
-	@PostMapping(value = "/getFileList")
+	@GetMapping(value = "/getFileList")
 	@Tag(name="파일")
 	@Operation(summary = "파일 목록조회", description = "")
 	public ResponseEntity<?> getFileList(@Parameter(description = "파일명") @RequestParam(required = false) String fileNm) {
