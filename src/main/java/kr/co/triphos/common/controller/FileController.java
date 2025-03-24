@@ -108,8 +108,8 @@ public class FileController {
 
 	@PostMapping(value = "/deleteFile")
 	@Tag(name="파일")
-	@Operation(summary = "파일 삭제", description = "")
-	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx") @RequestParam List<Integer> deleteFileList) {
+	@Operation(summary = "파일 삭제", description = "List<Integer> deleteFileList")
+	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx List") @RequestParam List<Integer> deleteFileList) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			fileService.deleteFile(deleteFileList);

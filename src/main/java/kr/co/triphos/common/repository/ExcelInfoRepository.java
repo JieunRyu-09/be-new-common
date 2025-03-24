@@ -16,4 +16,6 @@ public interface ExcelInfoRepository extends JpaRepository<ExcelInfo, Long> {
 
 	@Query(value = "SELECT IFNULL(MAX(IDX), 1) FROM mm_excel_info", nativeQuery = true)
 	int getExcelInfoMaxIdx();
+
+	void deleteByIdx(int idx);
 }

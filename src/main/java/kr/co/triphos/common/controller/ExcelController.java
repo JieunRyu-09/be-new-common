@@ -65,6 +65,31 @@ public class ExcelController {
 		}
 	}
 
+	@PostMapping("/excelDelete")
+	@Tag(name="엑셀 파일")
+	@Operation(summary = "엑셀 삭제", description = "List<integer> deleteExcelList")
+	public ResponseEntity<?> excelDelete(@Parameter(description = "엑셀Idx List") @RequestParam List<Integer> deleteExcelList) {
+		ResponseDTO responseDTO = new ResponseDTO();
+
+		try {
+			 excelService.excelDelete(deleteExcelList);
+			String msg = "엑셀정보를 삭제하였습니다";
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg(msg);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (RuntimeException ex) {
+			responseDTO.setMsg(ex.getMessage());
+			log.error(ex);
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+		catch (Exception ex) {
+			responseDTO.setMsg("엑셀 삭제에 실패하였습니다.");
+			log.error(ex);
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
 	@GetMapping("/getExcelInfoList")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 파일 목록 조회", description = "")

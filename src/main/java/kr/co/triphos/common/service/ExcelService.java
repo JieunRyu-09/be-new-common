@@ -93,6 +93,15 @@ public class ExcelService {
 		}
 	}
 
+	@Transactional
+	public boolean excelDelete(List<Integer> deleteExcelList) throws Exception {
+		deleteExcelList.forEach(excelIdx -> {
+			excelDataRepository.deleteByPkIdx(excelIdx);
+			excelInfoRepository.deleteByIdx(excelIdx);
+		});
+		return true;
+	}
+
 	public List<ExcelInfoDTO> getExcelInfoList (String excelNm) throws Exception {
 		try {
 			List<ExcelInfo> excelInfoEntityList = null;
