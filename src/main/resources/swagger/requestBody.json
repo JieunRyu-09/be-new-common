@@ -1,0 +1,12 @@
+{
+  "member.update": {
+      "memberId": "triphos"
+      , "memberNm": "트리포스"
+      , "memberPw": ""
+      , "email":  "test@triphos.co.kr"
+      , "phone": "01012345678"
+      , "memberType": "MMG001"
+      , "delYn": "N"
+      , "adminYn":  "N"
+  }
+}
