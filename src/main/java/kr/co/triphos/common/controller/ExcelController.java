@@ -93,11 +93,13 @@ public class ExcelController {
 	@GetMapping("/getExcelInfoList")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 파일 목록 조회", description = "")
-	public ResponseEntity<?> getExcelInfoList(@Parameter(description = "엑셀 이름. null 로 보낼 시 전체조회") @RequestParam(required = false) String excelNm) {
+	public ResponseEntity<?> getExcelInfoList(@Parameter(description = "엑셀 이름.") 			@RequestParam(required = false) String excelNm,
+											  @Parameter(description = "등록일자 From (type: yyyymmdd)") @RequestParam String fromDate,
+											  @Parameter(description = "등록일자 To (type: yyyymmdd)") @RequestParam String toDate) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			List<ExcelInfoDTO> excelInfoList = excelService.getExcelInfoList(excelNm);
+			List<ExcelInfoDTO> excelInfoList = excelService.getExcelInfoList(excelNm, fromDate, toDate);
 			responseDTO.setSuccess(true);
 			responseDTO.addData("excelInfoList", excelInfoList);
 			return ResponseEntity.ok().body(responseDTO);

@@ -28,7 +28,7 @@ public class ExcelInfoDTO {
 	private LocalDateTime updDt;
 	@Schema(description = "수정일자")
 	private String 	updMember;
-	@Schema(description = "수정일자")
+	@Schema(description = "삭제할 엑셀파일 Idx")
 	private List<Integer> deleteExcelList;
 
 	public ExcelInfoDTO (ExcelInfo excelInfo) {

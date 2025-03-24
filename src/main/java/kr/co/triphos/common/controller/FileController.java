@@ -57,10 +57,12 @@ public class FileController {
 	@GetMapping(value = "/getFileList")
 	@Tag(name="파일")
 	@Operation(summary = "파일 목록조회", description = "")
-	public ResponseEntity<?> getFileList(@Parameter(description = "파일명") @RequestParam(required = false) String fileNm) {
+	public ResponseEntity<?> getFileList(@Parameter(description = "파일명") @RequestParam(required = false) String fileNm,
+										 @Parameter(description = "등록일자 From (type: yyyymmdd)") @RequestParam String fromDate,
+										 @Parameter(description = "등록일자 To (type: yyyymmdd)") @RequestParam String toDate) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			List<HashMap<String, Object>> fileList = fileService.getFileList(fileNm);
+			List<HashMap<String, Object>> fileList = fileService.getFileList(fileNm, fromDate, toDate);
 			responseDTO.addData("fileList", fileList);
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg("");

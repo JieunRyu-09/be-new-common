@@ -86,12 +86,12 @@ public class FileService {
 		return true;
 	}
 
-	public List<HashMap<String, Object>> getFileList (String fileNm) {
+	public List<HashMap<String, Object>> getFileList (String fileNm, String fromDate, String toDate) {
 		// 반환할 파일목록
 		List<FileInfo> fileInfoEntityList = new ArrayList<>();
 		// 파일명 입력에 따라 조회
-		if (fileNm == null) fileInfoEntityList = fileInfoRepository.findAll();
-		else 				fileInfoEntityList = fileInfoRepository.findByRealFileNmLike("%" + fileNm + "%");
+		if (fileNm == null) fileInfoEntityList = fileInfoRepository.findByPeriod(fromDate, toDate);
+		else 				fileInfoEntityList = fileInfoRepository.findByRealFileNmAndPeriod(fromDate, toDate, "%" + fileNm + "%");
 
 		List<HashMap<String, Object>> fileInfoDTOList = new ArrayList<>();
 		fileInfoEntityList.forEach(fileInfoEntity -> {

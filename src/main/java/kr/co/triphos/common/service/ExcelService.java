@@ -102,11 +102,11 @@ public class ExcelService {
 		return true;
 	}
 
-	public List<ExcelInfoDTO> getExcelInfoList (String excelNm) throws Exception {
+	public List<ExcelInfoDTO> getExcelInfoList (String excelNm, String fromDate, String toDate) throws Exception {
 		try {
 			List<ExcelInfo> excelInfoEntityList = null;
-			if (excelNm == null)  excelInfoEntityList = excelInfoRepository.findAll();
-			else				  excelInfoEntityList = excelInfoRepository.findByExcelNmLike("%" + excelNm + "%");
+			if (excelNm == null)  excelInfoEntityList = excelInfoRepository.findByPeriod(fromDate, toDate);
+			else				  excelInfoEntityList = excelInfoRepository.findByExcelNmAndPeriod(fromDate, toDate, "%" + excelNm + "%");
 
 			List<ExcelInfoDTO> excelInfoDTOList = new ArrayList<>();
 			excelInfoEntityList.forEach(excelInfo -> {
