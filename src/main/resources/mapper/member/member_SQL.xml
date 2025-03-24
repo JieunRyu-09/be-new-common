@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="member">
+
+    <select id="getMembers" resultType="hashMap">
+        /*
+            getMembers
+        */
+        SELECT MI.MEMBER_ID
+             , MI.MEMBER_NM
+             , MI.MEMBER_PW
+             , MI.EMAIL
+             , MI.PHONE
+             , MI.MEMBER_TYPE
+             , MI.MEMBER_STATUS
+             , MI.DEVICE_TYPE
+             , MI.DEVICE_TOKEN
+             , MI.DEL_YN
+             , MI.LOGIN_CNT
+             , MI.LOGIN_DT
+             , MI.LAST_PWD_CHANGE_DT
+             , MI.AUTH_KEY
+             , MI.ACCESS_IP
+             , MI.ACCESS_BROWSER
+             , MI.ADMIN_YN
+             , MI.ACCOUNT_NON_EXPIRED
+             , MI.ACCOUNT_NON_LOCKED
+             , MI.CREDENTIALS_NON_EXPIRED
+             , MI.ENABLED
+             , MI.INS_DT
+             , MI.INS_MEMBER
+             , MI.UPD_DT
+             , MI.UPD_MEMBER
+        FROM mm_member_info MI
+        <where>
+            <if test="memberId != null and memberId.trim().length > 0"> AND MI.MEMBER_ID LIKE CONCAT('%', #{memberId}, '%') </if>
+            <if test="memberNm != null and memberNm.trim().length > 0"> AND MI.MEMBER_NM LIKE CONCAT('%', #{memberNm}, '%') </if>
+            <if test="memberType != null and memberType.trim().length > 0"> AND MI.MEMBER_TYPE = #{memberType} </if>
+            <if test="memberStatus != null and memberStatus.trim().length > 0"> AND MI.MEMBER_STATUS = #{memberStatus} </if>
+        </where>
+    </select>
+
+    <select id="getMembersCount" resultType="int">
+        /*
+            getMembersCount
+        */
+        SELECT COUNT(MI.MEMBER_ID) AS RECORD_COUNT
+        FROM mm_member_info MI
+        <where>
+            <if test="memberId != null and memberId.trim().length > 0"> AND MI.MEMBER_ID LIKE CONCAT('%', #{memberId}, '%') </if>
+            <if test="memberNm != null and memberNm.trim().length > 0"> AND MI.MEMBER_NM LIKE CONCAT('%', #{memberNm}, '%') </if>
+            <if test="memberType != null and memberType.trim().length > 0"> AND MI.MEMBER_TYPE = #{memberType} </if>
+            <if test="memberStatus != null and memberStatus.trim().length > 0"> AND MI.MEMBER_STATUS = #{memberStatus} </if>
+        </where>
+    </select>
+
+</mapper>
