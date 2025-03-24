@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.triphos.common.dto.ExcelDTO;
+import kr.co.triphos.common.dto.FileDTO;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.common.service.FileService;
@@ -109,10 +110,10 @@ public class FileController {
 	@PostMapping(value = "/deleteFile")
 	@Tag(name="파일")
 	@Operation(summary = "파일 삭제", description = "List<Integer> deleteFileList")
-	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx List") @RequestParam List<Integer> deleteFileList) {
+	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx List") @RequestBody FileDTO fileDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			fileService.deleteFile(deleteFileList);
+			fileService.deleteFile(fileDTO.getDeleteFileList());
 			String msg = "파일을 삭제하였습니다";
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg(msg);
