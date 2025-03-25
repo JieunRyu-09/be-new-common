@@ -69,7 +69,7 @@ public class FileService {
 				// 경로 체크 후 없으면 경로까지 생성
 				String fileExtender = realFileNm.substring(realFileNm.lastIndexOf("."));
 				String fileName = yearMonth + "_" + idx + fileExtender;
-				String shortPath = "/Files/" + yearMonth + "/";
+				String shortPath = "/" + yearMonth + "/";
 				Path filePath = Paths.get(rootPath + shortPath + fileName);
 				Path existPath = Paths.get(rootPath + shortPath);
 				if (!Files.exists(existPath)) Files.createDirectories(existPath);
@@ -86,21 +86,21 @@ public class FileService {
 		return true;
 	}
 
-	public List<HashMap<String, Object>> getFileList (String fileNm) {
+	public List<HashMap<String, Object>> getFileList (String fileNm, String fromDate, String toDate) {
 		// 반환할 파일목록
 		List<FileInfo> fileInfoEntityList = new ArrayList<>();
 		// 파일명 입력에 따라 조회
-		if (fileNm == null) fileInfoEntityList = fileInfoRepository.findAll();
-		else 				fileInfoEntityList = fileInfoRepository.findByRealFileNmLike("%" + fileNm + "%");
+		if (fileNm == null) fileInfoEntityList = fileInfoRepository.findByPeriod(fromDate, toDate);
+		else 				fileInfoEntityList = fileInfoRepository.findByRealFileNmAndPeriod(fromDate, toDate, "%" + fileNm + "%");
 
 		List<HashMap<String, Object>> fileInfoDTOList = new ArrayList<>();
 		fileInfoEntityList.forEach(fileInfoEntity -> {
 			HashMap<String, Object> fileInfoDTO = new HashMap<>();
-			fileInfoDTO.put("fileIdx", 	fileInfoEntity.getFileIdx());
-			fileInfoDTO.put("fileNm", 	fileInfoEntity.getFileNm());
-			fileInfoDTO.put("fileSize", fileInfoEntity.getFileSize());
-			fileInfoDTO.put("insDt", 	fileInfoEntity.getInsDt());
-			fileInfoDTO.put("insMember",fileInfoEntity.getInsMember());
+			fileInfoDTO.put("fileIdx", 		fileInfoEntity.getFileIdx());
+			fileInfoDTO.put("fileNm", 		fileInfoEntity.getRealFileNm());
+			fileInfoDTO.put("fileSize", 	fileInfoEntity.getFileSize());
+			fileInfoDTO.put("insDt", 		fileInfoEntity.getInsDt());
+			fileInfoDTO.put("insMember",	fileInfoEntity.getInsMember());
 			fileInfoDTOList.add(fileInfoDTO);
 		});
 		return fileInfoDTOList;
@@ -132,18 +132,20 @@ public class FileService {
 	}
 
 	@Transactional
-	public void deleteFile (Integer fileIdx) throws Exception {
-		FileInfo fileInfo = fileInfoRepository.findByFileIdx(fileIdx).orElseThrow(() ->
-			new RuntimeException("삭제할 파일정보를 찾지 못하였습니다.")
-		);
+	public void deleteFile (List<Integer> deleteFileList) throws Exception {
+		deleteFileList.forEach(fileIdx -> {
+			FileInfo fileInfo = fileInfoRepository.findByFileIdx(fileIdx).orElseThrow(() ->
+					new RuntimeException("삭제할 파일정보를 찾지 못하였습니다.")
+			);
 
-		String deleteFilePath = fileInfo.getFilePath();
-		String deleteFileName = fileInfo.getFileNm();
-		File file = new File(deleteFilePath, deleteFileName);
-		boolean deleteResult = file.delete();
-		if (!deleteResult) {
-			throw new RuntimeException("파일삭제 중 오류가 발생하였습니다.");
-		}
-		fileInfoRepository.deleteByFileIdx(fileIdx);
+			String deleteFilePath = fileInfo.getFilePath();
+			String deleteFileName = fileInfo.getFileNm();
+			File file = new File(deleteFilePath, deleteFileName);
+			boolean deleteResult = file.delete();
+			if (!deleteResult) {
+				throw new RuntimeException("파일삭제 중 오류가 발생하였습니다.");
+			}
+			fileInfoRepository.deleteByFileIdx(fileIdx);
+		});
 	}
 }

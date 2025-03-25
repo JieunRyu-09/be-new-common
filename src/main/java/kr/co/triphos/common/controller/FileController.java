@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.triphos.common.dto.ExcelDTO;
+import kr.co.triphos.common.dto.FileDTO;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.common.service.FileService;
@@ -53,13 +54,15 @@ public class FileController {
 		}
 	}
 
-	@PostMapping(value = "/getFileList")
+	@GetMapping(value = "/getFileList")
 	@Tag(name="파일")
 	@Operation(summary = "파일 목록조회", description = "")
-	public ResponseEntity<?> getFileList(@Parameter(description = "파일명") @RequestParam(required = false) String fileNm) {
+	public ResponseEntity<?> getFileList(@Parameter(description = "파일명") @RequestParam(required = false) String fileNm,
+										 @Parameter(description = "등록일자 From (type: yyyymmdd)") @RequestParam String fromDate,
+										 @Parameter(description = "등록일자 To (type: yyyymmdd)") @RequestParam String toDate) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			List<HashMap<String, Object>> fileList = fileService.getFileList(fileNm);
+			List<HashMap<String, Object>> fileList = fileService.getFileList(fileNm, fromDate, toDate);
 			responseDTO.addData("fileList", fileList);
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg("");
@@ -108,11 +111,11 @@ public class FileController {
 
 	@PostMapping(value = "/deleteFile")
 	@Tag(name="파일")
-	@Operation(summary = "파일 삭제", description = "")
-	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx") @RequestParam Integer fileIdx) {
+	@Operation(summary = "파일 삭제", description = "List<Integer> deleteFileList")
+	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx List") @RequestBody FileDTO fileDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			fileService.deleteFile(fileIdx);
+			fileService.deleteFile(fileDTO.getDeleteFileList());
 			String msg = "파일을 삭제하였습니다";
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg(msg);

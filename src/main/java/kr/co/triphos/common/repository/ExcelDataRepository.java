@@ -16,4 +16,5 @@ public interface ExcelDataRepository extends JpaRepository<ExcelData, Long> {
 	@Query(value = "DELETE FROM mm_excel_data WHERE IDX = :idx AND ROW_IDX = :rowIdx", nativeQuery = true)
 	void deleteByIdxAndRowIdx(@Param("idx") int idx, @Param("rowIdx") int rowIdx);
 
+	void deleteByPkIdx(int idx);
 }
