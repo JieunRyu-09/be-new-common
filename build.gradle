@@ -17,7 +17,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    all*.exclude module: 'spring-boot-starter-logging' //logback 충돌방지
+    all*.exclude module: 'spring-boot-starter-logging'                                      // logback 충돌방지
 }
 
 repositories {
@@ -27,13 +27,13 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.security:spring-security-crypto'        // Spring Security - PasswordEncoder
+    implementation 'org.springframework.security:spring-security-crypto'                    // Spring Security - PasswordEncoder
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation('org.springframework.boot:spring-boot-starter-web') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging' // logback 충돌방지
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'    // logback 충돌방지
     }
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -54,6 +54,20 @@ dependencies {
     implementation 'org.mybatis:mybatis:3.5.11'
     implementation 'org.mybatis:mybatis-spring:3.0.0'
 
+    /* 기존 개발표준 */
+    implementation 'commons-codec:commons-codec:1.16.0'                                     // Apache Commons Codec (Base64 인코딩/디코딩)
+//    implementation 'commons-fileupload:commons-fileupload:1.5'
+//    implementation 'commons-io:commons-io:2.16.1'
+//    implementation 'com.drewnoakes:metadata-extractor:2.18.0'
+
+    /* Excel */
+    implementation 'org.apache.poi:poi:5.2.3'                                               // HSSF, XSSF 지원
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'                                         // OOXML 지원
+
+    // 필요 시 추가 (POI에서 수식을 평가할 때 사용)
+    implementation 'org.apache.poi:poi-ooxml-schemas:4.1.2'
+    implementation 'org.apache.xmlbeans:xmlbeans:5.2.0'
+
     /* reflections */
     implementation 'org.reflections:reflections:0.10.2'
 
@@ -61,17 +75,6 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    /** 기존 개발표준 */
-    // Apache Commons Codec (Base64 인코딩/디코딩)
-    implementation 'commons-codec:commons-codec:1.15'
-
-    // Apache POI (Excel 파일 처리)
-    implementation 'org.apache.poi:poi:5.2.3' // HSSF, XSSF 지원
-    implementation 'org.apache.poi:poi-ooxml:5.2.3' // OOXML 지원
-
-    // 필요 시 추가 (POI에서 수식을 평가할 때 사용)
-    implementation 'org.apache.poi:poi-ooxml-schemas:4.1.2'
-    implementation 'org.apache.xmlbeans:xmlbeans:5.2.0'
 }
 
 tasks.named('test') {
