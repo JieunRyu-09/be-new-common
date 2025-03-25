@@ -57,6 +57,18 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    /** 기존 개발표준 */
+    // Apache Commons Codec (Base64 인코딩/디코딩)
+    implementation 'commons-codec:commons-codec:1.15'
+
+    // Apache POI (Excel 파일 처리)
+    implementation 'org.apache.poi:poi:5.2.3' // HSSF, XSSF 지원
+    implementation 'org.apache.poi:poi-ooxml:5.2.3' // OOXML 지원
+
+    // 필요 시 추가 (POI에서 수식을 평가할 때 사용)
+    implementation 'org.apache.poi:poi-ooxml-schemas:4.1.2'
+    implementation 'org.apache.xmlbeans:xmlbeans:5.2.0'
 }
 
 tasks.named('test') {
