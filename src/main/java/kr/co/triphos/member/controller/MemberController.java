@@ -2,6 +2,10 @@ package kr.co.triphos.member.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
@@ -193,13 +197,13 @@ public class MemberController {
 	@GetMapping("/getMemberList")
 	@Tag(name="사용자 권한")
 	@Operation(summary = "사용자 목록 조회", description = "")
-	public ResponseEntity<?> getMenuMemberAuthList(@Parameter(description = "사용자 ID") @RequestParam(required = false) String memberId,
+	public ResponseEntity<?> getMemberList(@Parameter(description = "사용자 ID") @RequestParam(required = false) String memberId,
 												   @Parameter(description = "사용자 이름") @RequestParam(required = false) String memberNm) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			List<HashMap<String, String>> menuList = memberService.getMemberList(memberId, memberNm);
-			responseDTO.addData("menuList", menuList);
+			List<HashMap<String, String>> memberList = memberService.getMemberList(memberId, memberNm);
+			responseDTO.addData("memberList", memberList);
 			responseDTO.setSuccess(true);
 			return ResponseEntity.ok().body(responseDTO);
 		}

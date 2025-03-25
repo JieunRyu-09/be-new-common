@@ -220,10 +220,10 @@ public class MemberService {
 				entityList = memberRepository.findByMemberIdLikeAndMemberNmLike(memberId, memberNm);
 			}
 			else if (memberId != null) {
-				entityList = memberRepository.findByMemberIdLike(memberId);
+				entityList = memberRepository.findByMemberIdLike("%" + memberId + "%");
 			}
 			else if (memberNm != null) {
-				entityList = memberRepository.findByMemberNmLike(memberNm);
+				entityList = memberRepository.findByMemberNmLike("%" + memberNm + "%");
 			}
 			else {
 				entityList = memberRepository.findAll();

@@ -1,15 +1,15 @@
 package kr.co.triphos.common.service;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
+//import org.apache.commons.codec.binary.Base64;
+//import org.apache.poi.hssf.usermodel.HSSFCell;
+//import org.apache.poi.hssf.usermodel.HSSFRow;
+//import org.apache.poi.ss.usermodel.CellType;
+//import org.apache.poi.ss.usermodel.DataFormatter;
+//import org.apache.poi.ss.usermodel.DateUtil;
+//import org.apache.poi.ss.usermodel.FormulaEvaluator;
+//import org.apache.poi.xssf.usermodel.XSSFCell;
+//import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;
@@ -29,6 +29,7 @@ import java.security.Key;
 import java.security.MessageDigest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -555,7 +556,8 @@ public class CommonFunc {
         md.update(bytes);
 
         // Base64
-        return new String(Base64.encodeBase64(md.digest()));
+        //return new String(Base64.encodeBase64(md.digest()));
+        return new String(Base64.getEncoder().encode(md.digest()));
     }
 
     /**
@@ -890,7 +892,7 @@ public class CommonFunc {
      * @param index int
      * @return String
      */
-    public static String GetCellValue(HSSFRow hssfRow, int index) {
+    /*public static String GetCellValue(HSSFRow hssfRow, int index) {
         String value = "";
         HSSFCell cell = hssfRow.getCell(index);
 
@@ -959,7 +961,7 @@ public class CommonFunc {
         }
 
         return value;
-    }
+    }*/
 
     /**
      * xlsx파일 GetCellValue
@@ -967,7 +969,7 @@ public class CommonFunc {
      * @param index int
      * @return String
      */
-    public static String GetCellValue(XSSFRow xssfRow, int index) {
+    /*public static String GetCellValue(XSSFRow xssfRow, int index) {
         String value = "";
         XSSFCell cell = xssfRow.getCell(index);
 
@@ -1028,7 +1030,7 @@ public class CommonFunc {
         }
 
         return value;
-    }
+    }*/
 
     /**
      * 서버 URL 가져오기
