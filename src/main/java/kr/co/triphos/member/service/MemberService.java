@@ -90,7 +90,8 @@ public class MemberService {
 		List<MenuInfo> menuList = menuInfoRepository.findByDisplayYn("Y");
 		MenuInfo menuItem = menuInfoRepository.findByMenuId(menuId);
 
-		MenuMemberAuth authItem = menuMemberAuthRepository.findByPkMenuIdAndPkMemberId(menuId, memberId);
+		MenuMemberAuth authItem = menuMemberAuthRepository.findByPkMenuIdAndPkMemberId(menuId, memberId)
+				.orElseThrow(() -> new RuntimeException("사용자/권한 정보를 찾지 못하였습니다."));;
 
 		MenuInfo subMenuItem = menuList.stream().filter(subMenu ->
 				subMenu.getPk().getMainCd() == menuItem.getPk().getMainCd() &&
@@ -252,7 +253,8 @@ public class MemberService {
 				String memberId = dtoAuthItem.getMemberId();
 				String menuId 	= dtoAuthItem.getMenuId();
 
-				MenuMemberAuth entityAuthItem = menuMemberAuthRepository.findByPkMenuIdAndPkMemberId(menuId, memberId);
+				MenuMemberAuth entityAuthItem = menuMemberAuthRepository.findByPkMenuIdAndPkMemberId(menuId, memberId)
+						.orElseThrow(() -> new RuntimeException("사용자/권한 정보를 찾지 못하였습니다."));;
 				entityAuthItem.updateMenuMemberAuth(dtoAuthItem);
 				authList.add(entityAuthItem);
 			});

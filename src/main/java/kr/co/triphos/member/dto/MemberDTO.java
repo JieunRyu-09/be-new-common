@@ -2,13 +2,13 @@ package kr.co.triphos.member.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.triphos.member.entity.Member;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberDTO {
 	@NotBlank(message = "아이디를 입력하세요.")
 	@Schema(description = "사용자 ID")
@@ -71,26 +71,4 @@ public class MemberDTO {
 		this.phone 		= phone;
 		this.memberType = memberType;
 	}
-
-	@Builder(builderClassName = "updateMember", builderMethodName = "updateMember")
-	public MemberDTO(@NonNull String memberId,
-					 @NonNull String memberNm,
-					 @NonNull String memberPw,
-					 @NonNull String newMemberPw,
-					 @NonNull String email,
-					 @NonNull String phone,
-					 @NonNull String memberType,
-					 @NonNull String delYn,
-					 @NonNull String adminYn) {
-		this.memberId 		= memberId;
-		this.memberNm 		= memberNm;
-		this.memberPw 		= memberPw;
-		this.newMemberPw 	= newMemberPw;
-		this.email 			= email;
-		this.phone 			= phone;
-		this.memberType 	= memberType;
-		this.delYn 			= delYn;
-		this.adminYn 		= adminYn;
-	}
-
 }

@@ -2,11 +2,46 @@
   "put.info": {
       "memberId": "triphos"
       , "memberNm": "트리포스"
-      , "memberPw": ""
+      , "newMemberPw": "1234"
       , "email":  "test@triphos.co.kr"
       , "phone": "01012345678"
       , "memberType": "MMG001"
       , "delYn": "N"
       , "adminYn":  "N"
-  }
+  },
+
+  "put.myInfo": {
+    "memberId": "triphos"
+  , "memberNm": "트리포스"
+  , "memberPw": "1234"
+  , "newMemberPw": "12345"
+  , "email":  "test@triphos.co.kr"
+  , "phone": "010123456789"
+  , "memberType": "MMG001"
+  , "delYn": "N"
+  , "adminYn":  "N"
+  },
+
+  "put.menuAuth": [
+    {
+      "menuId": "component"
+      , "memberId": "scardy"
+      , "useYn": "Y"
+      , "authSearch": "Y"
+      , "authIns": "Y"
+      , "authDel": "Y"
+      , "authMod": "Y"
+      , "excelExport": "Y"
+    },
+    {
+      "menuId": "ui"
+    , "memberId": "scardy"
+    , "useYn": "N"
+    , "authSearch": "N"
+    , "authIns": "N"
+    , "authDel": "N"
+    , "authMod": "N"
+    , "excelExport": "N"
+    }
+  ]
 }

@@ -4,6 +4,7 @@ import kr.co.triphos.member.entity.MenuMemberAuth;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface MenuMemberAuthRepository extends JpaRepository<MenuMemberAuth, Long> {
@@ -11,5 +12,5 @@ public interface MenuMemberAuthRepository extends JpaRepository<MenuMemberAuth, 
 
 	List<MenuMemberAuth> findByPkMemberId(String memberId);
 
-	MenuMemberAuth findByPkMenuIdAndPkMemberId(String menuId, String memberId);
+	Optional<MenuMemberAuth> findByPkMenuIdAndPkMemberId(String menuId, String memberId);
 }

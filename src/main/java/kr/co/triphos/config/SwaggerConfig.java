@@ -53,8 +53,11 @@ public class SwaggerConfig {
 
 	@Bean
 	public GroupedOpenApi memberGroup() {
-		return createGroup("2. 회원", true, new String[]{"/member/**"});
+		return createGroup("2. 회원 - 구버전", true, new String[]{"/member/**"});
 	}
+
+	@Bean
+	public GroupedOpenApi newMemberGroup() {return createGroup("3. 회원 - 신버전", true, new String[]{"/v1/member/**"});}
 
 	/**
 	 * GroupedOpenApi 설정
