@@ -1,5 +1,5 @@
 {
-  "member.update": {
+  "put.info": {
       "memberId": "triphos"
       , "memberNm": "트리포스"
       , "memberPw": ""

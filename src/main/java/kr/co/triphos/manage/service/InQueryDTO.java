@@ -14,8 +14,8 @@ public class InQueryDTO {
 	private String namespace;
 	private String tag;
 	private Map<String, Object> param;
-	private int pagePerSize = 20;
-	private int viewPageNo = 1;
+	@Builder.Default private int pagePerSize = 20;
+	@Builder.Default private int viewPageNo = 1;
 	private String sortIndex;
 	private String sortType;
 	private String authMenuId;

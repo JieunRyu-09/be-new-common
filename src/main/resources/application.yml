@@ -9,10 +9,10 @@ spring:
   profiles:
     include: secret
     active: local
-    datasource:
-      hikari:
-        connection-timeout: 10000 #db 10초이상 응답없으면 타임아웃
-        validation-timeout: 10000 #커넥션 유효성 검사 타임아웃
+  datasource:
+    hikari:
+      connection-timeout: 10000 #db 10초이상 응답없으면 타임아웃
+      validation-timeout: 10000 #커넥션 유효성 검사 타임아웃
   devtools:
     restart:
       enabled: false
@@ -36,16 +36,18 @@ mybatis:
   type-aliases-package: kr.co.triphos
   mapper-locations: classpath:mapper/**/*.xml
 springdoc:
+  cache:
+    disabled: true
   swagger-ui:
-    path: /swagger-ui/index.html
-    use-root-path: true
-    groups-order: DESC
+    path: /api-docs
     tags-sorter: alpha
     operations-sorter: method
   paths-to-exclude:
     - /common/**
     - /command/**
-  doc-locations: classpath:/swagger/
+  doc-locations: classpath:/swagger/ # custom option
   api-docs:
     groups:
       enabled: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
