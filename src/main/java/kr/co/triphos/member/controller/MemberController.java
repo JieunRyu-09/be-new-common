@@ -71,28 +71,20 @@ public class MemberController {
 	@PostMapping("/updateMember")
 	@Tag(name="사용자 관리")
 	@Operation(summary = "사용자정보 수정", description = "")
-	public ResponseEntity<?> updateMember(@Parameter(description = "사용자 ID") 		@RequestParam String memberId,
-										  @Parameter(description = "사용자 이름") 	@RequestParam String memberNm,
-										  @Parameter(description = "사용자 Pw") 		@RequestParam String memberPw,
-										  @Parameter(description = "사용자 신규Pw") 	@RequestParam(required = false) String newMemberPw,
-										  @Parameter(description = "사용자 이메일") 	@RequestParam String email,
-										  @Parameter(description = "사용자 핸드폰") 	@RequestParam String phone,
-										  @Parameter(description = "사용자 등급") 	@RequestParam String memberType,
-										  @Parameter(description = "계정사용여부") 	@RequestParam String delYn,
-										  @Parameter(description = "관리자여부")	 	@RequestParam String adminYn) {
+	@io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(
+			mediaType = "application/json",
+			examples = {
+					@ExampleObject(name = "사용자정보 수정 예시", ref="#/components/examples/member.update")
+			},
+			schema = @Schema(implementation = MemberDTO.class)
+	))
+	@ApiResponse(content = @Content(
+			mediaType = "application/json",
+			schema = @Schema(implementation = ResponseDTO.class)
+	))
+	public ResponseEntity<?> updateMember(@RequestBody MemberDTO memberDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			MemberDTO memberDTO = MemberDTO.updateMember()
-					.memberId(memberId)
-					.memberNm(memberNm)
-					.memberPw(memberPw)
-					.newMemberPw(newMemberPw)
-					.email(email)
-					.phone(phone)
-					.memberType(memberType)
-					.delYn(delYn)
-					.adminYn(adminYn)
-					.build();
 			boolean res = memberService.updateMember(memberDTO);
 			String msg = res ? "사용자 정보를 수정하였습니다." : "사용자 정보 수정에 실패하였습니다.";
 			responseDTO.setSuccess(res);

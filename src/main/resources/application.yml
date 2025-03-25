@@ -9,36 +9,43 @@ spring:
   profiles:
     include: secret
     active: local
-  datasource:
-    hikari:
-      connection-timeout: 10000 #db 10초이상 응답없으면 타임아웃
-      validation-timeout: 10000 #커넥션 유효성 검사 타임아웃
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html
-    mode: HTML
-    encoding: UTF-8
-    cache: false
+    datasource:
+      hikari:
+        connection-timeout: 10000 #db 10초이상 응답없으면 타임아웃
+        validation-timeout: 10000 #커넥션 유효성 검사 타임아웃
   devtools:
     restart:
       enabled: false
   jpa:
-    show-sql: false
+    show-sql: true
     properties:
-      hibernate.format_sql: true
-      highlight_sql: true # ANSI 코드에 색을 나타낸다
-      dialect: org.hibernate.dialect.H2Dialect
-      show-sql: true
-      properties:
-         hibernate:
-           format_sql: true
-  logging:
-    level:
-      org.hibernate.SQL: debug  # 실제 실행되는 SQL
-      org.hibernate.type: trace  # 바인딩되는 파라미터 값까지 출력
-
-  jackson:
-    serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
-
-
+      hibernate:
+        format_sql: true
+        highlight_sql: true # ANSI 코드에 색을 나타낸다
+        dialect: org.hibernate.dialect.H2Dialect
+logging:
+  level:
+    org.hibernate:
+      SQL: debug  # 실제 실행되는 SQL
+      type: trace  # 바인딩되는 파라미터 값까지 출력
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: NULL
+    call-setters-on-nulls: true
+  type-aliases-package: kr.co.triphos
+  mapper-locations: classpath:mapper/**/*.xml
+springdoc:
+  swagger-ui:
+    path: /swagger-ui/index.html
+    use-root-path: true
+    groups-order: DESC
+    tags-sorter: alpha
+    operations-sorter: method
+  paths-to-exclude:
+    - /common/**
+    - /command/**
+  doc-locations: classpath:/swagger/
+  api-docs:
+    groups:
+      enabled: true

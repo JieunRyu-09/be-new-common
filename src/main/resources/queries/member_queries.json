@@ -1,6 +1,0 @@
-{
-  "member": {
-    "findByFilter": "SELECT M FROM Member M ",
-    "findByFilterCount": "SELECT COUNT(M) FROM Member M "
-  }
-}
