@@ -2,149 +2,160 @@ package kr.co.triphos.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.security.acl.Group;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Configuration
-@Lazy
 @OpenAPIDefinition (
 	info = @io.swagger.v3.oas.annotations.info.Info(title = "Triphos 개발표준 API문서", version = "v1.0.0")
 )
 @Log4j2
-@RequiredArgsConstructor
 public class SwaggerConfig {
 
-	private final ResourceLoader resourceLoader;
+	private static final String BASE_PACKAGE = "kr.co.triphos";
+	private static final String JWT_SCHEME_NAME = "JWT";
+	private static final String[] EXCLUDE_PATHS = {"/common/**", "/command/**"};
 
 	@Value("${springdoc.doc-locations}")
 	private String swaggerDocPath;
 
-//	@Bean
-//	public GroupedOpenApi all() {
-//		return GroupedOpenApi.builder()
-//				.group("전체")
-//				.pathsToMatch("/**")
-//				.addOpenApiCustomiser(getAuthCustom())
-//				.build();
-//	}
-//
-//	@Bean
-//	public GroupedOpenApi memberGroup() {
-//		String[] excludePaths = {"/auth/**"};
-//
-//		return GroupedOpenApi.builder()
-//				.group("회원")
-//				.pathsToMatch("/member/**")
-//				.addOpenApiCustomiser(getAuthCustom())
-//				.build();
-//	}
-//
-//	@Bean
-//	public GroupedOpenApi authGroup() {
-//		Components components = new Components();
-//		components.setExamples(getAPIExamples());
-//
-//		return GroupedOpenApi.builder()
-//				.group("인증")
-//				.pathsToMatch("/auth/**")
-//				.build();
-//	}
-//
-//	private OpenApiCustomiser getAuthCustom() {
-//		String jwt = "JWT";
-//		SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
-//		Components components = new Components()
-//				.addSecuritySchemes(jwt, new SecurityScheme()
-//						.name(jwt)
-//						.type(SecurityScheme.Type.HTTP)
-//						.scheme("bearer")
-//						.bearerFormat("JWT"));
-//		components.setExamples(getAPIExamples());
-//
-//		return openApi -> openApi
-//				.addSecurityItem(securityRequirement)
-//				.components(components);
-//	}
-
 	@Bean
-	public OpenAPI openAPI() {
-		String jwt = "JWT";
-		SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
-		Components components = new Components()
-				.addSecuritySchemes(jwt, new SecurityScheme()
-						.name(jwt)
-						.type(SecurityScheme.Type.HTTP)
-						.scheme("bearer")
-						.bearerFormat("JWT"));
-		components.setExamples(getAPIExamples());
-
-		return new OpenAPI()
-				.components(components)
-				.addSecurityItem(securityRequirement);
+	public GroupedOpenApi all() {
+		return createGroup("99. 전체", true, "/**");
 	}
 
-	private Map<String, Example> getAPIExamples() {
+	@Bean
+	public GroupedOpenApi authGroup() {
+		return createGroup("1. 인증", false, "/auth/**");
+	}
+
+	@Bean
+	public GroupedOpenApi memberGroup() {
+		return createGroup("2. 회원", true, new String[]{"/member/**"});
+	}
+
+	/**
+	 * GroupedOpenApi 설정
+	 * @return GroupedOpenApi
+	 */
+	private GroupedOpenApi createGroup(String groupName, boolean enableSecurity, String... pathPattern) {
+		GroupedOpenApi.Builder builder = GroupedOpenApi.builder()
+				.group(groupName)
+				.pathsToMatch(pathPattern)
+				.pathsToExclude(EXCLUDE_PATHS)
+				.packagesToScan(BASE_PACKAGE)
+				.addOpenApiCustomiser(enableSecurity ? schemaAutoRegisterWithSecurity() : schemaAutoRegister());
+
+		return builder.build();
+	}
+
+	/**
+	 * 스키마 자동 등록
+	 * @return OpenApiCustomiser
+	 */
+	private OpenApiCustomiser schemaAutoRegister() {
+		return openApi -> {
+			Components components = openApi.getComponents();
+			components.setExamples(loadApiExamples());
+			registerSchemas(components);
+			openApi.setComponents(components);
+		};
+	}
+
+	/**
+	 * 스키마 자동 등록 + JWT 설정
+	 * @return OpenApiCustomiser
+	 */
+	private OpenApiCustomiser schemaAutoRegisterWithSecurity() {
+		return openApi -> {
+			Components components = openApi.getComponents();
+			components.setExamples(loadApiExamples());
+			registerSchemas(components);
+
+			// JWT Security 설정 추가
+			components.addSecuritySchemes(JWT_SCHEME_NAME, new SecurityScheme()
+					.name(JWT_SCHEME_NAME)
+					.type(SecurityScheme.Type.HTTP)
+					.scheme("bearer")
+					.bearerFormat("JWT"));
+
+			openApi.addSecurityItem(new SecurityRequirement().addList(JWT_SCHEME_NAME));
+			openApi.setComponents(components);
+		};
+	}
+
+	/**
+	 * 패키지 스캔, DTO 자동 등록
+	 * @param components
+	 */
+	private void registerSchemas(Components components) {
+		Reflections reflections = new Reflections(BASE_PACKAGE, Scanners.TypesAnnotated);
+		Set<Class<?>> dtoClasses = reflections.getTypesAnnotatedWith(io.swagger.v3.oas.annotations.media.Schema.class);
+
+		for (Class<?> dtoClass : dtoClasses) {
+			String dtoName = dtoClass.getSimpleName();
+			Schema<Object> schema = new Schema<>();
+			schema.setDescription(dtoName + " DTO");
+			components.addSchemas(dtoName, schema);
+		}
+	}
+
+	/**
+	 * Swagger 예제 JSON 파일 로드
+	 * @return Map<String, Example>
+	 */
+	private Map<String, Example> loadApiExamples() {
 		Map<String, Example> examples = new HashMap<>();
 
 		try {
-			Resource resource = resourceLoader.getResource(swaggerDocPath);
+			String pattern = swaggerDocPath + "*.json";
+			Resource[] resources = new PathMatchingResourcePatternResolver().getResources(pattern);
 
-			// 파일 경로 검증 및 파일 읽기 처리
-			File swaggerDir = resource.getFile();
-			if (swaggerDir.exists() && swaggerDir.isDirectory()) {
-				File[] swaggerExampleJsonFiles = swaggerDir.listFiles(
-						file -> file.isFile() && file.getName().endsWith(".json")
-				);
+			for (Resource resource : resources) {
+				try (InputStream inputStream = resource.getInputStream();
+					 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 
-				if (swaggerExampleJsonFiles != null) {
-					for (File file : swaggerExampleJsonFiles) {
-						try (InputStreamReader reader = new InputStreamReader(
-								resourceLoader.getResource("file:" + file.getPath()).getInputStream(),
-								StandardCharsets.UTF_8)) {
+					String fileName = resource.getFilename().replace(".json", "");
+					JSONObject json = (JSONObject) new JSONParser().parse(reader);
 
-							// JSON 파싱 & Example 객체 변환
-							JSONObject json = (JSONObject) new JSONParser().parse(reader);
+					json.forEach((key, value) -> {
+						Example example = new Example();
+						example.setValue(value);
+						example.setDescription(key.toString());
+						examples.put(fileName + "." + key, example);
+					});
 
-							json.forEach((key, value) -> {
-								Example example = new Example();
-								example.setValue(value);
-								example.setDescription(key.toString());
-								examples.put(key.toString(), example);
-							});
-						}
-						catch (Exception fileEx) {
-							log.error("파일 읽기 실패: {} - {}", file.getName(), fileEx.getMessage());
-						}
-					}
+				}
+				catch (Exception fileEx) {
+					log.error("Swagger 예제 파일 읽기 실패: {} - {}", resource.getFilename(), fileEx.getMessage());
 				}
 			}
-			else {
-				log.error("Swagger 예제 JSON 경로를 찾을 수 없습니다: {}", swaggerDocPath);
-			}
+
 		}
 		catch (Exception ex) {
-			log.error("Swagger 예제 로드 실패: {}", ex.getMessage());
+			log.error("Swagger 예제 파일 경로 로드 실패: {}", ex.getMessage());
 		}
 
 		return examples;
