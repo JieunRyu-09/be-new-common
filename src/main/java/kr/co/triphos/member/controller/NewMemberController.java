@@ -51,12 +51,13 @@ public class NewMemberController {
 		}
 	}
 
-	@GetMapping("/info/{memberId}")
+	@GetMapping(value={"/info/{memberId}", "/info"})
 	@Tag(name="사용자 관리", description = "회원 정보 관련 API")
 	@Operation(summary = "사용자정보 조회", description = "")
-	public ResponseEntity<?> updateMember(@Parameter(description = "사용자 ID") @PathVariable String memberId) {
+	public ResponseEntity<?> updateMember(@Parameter(description = "사용자 ID") @PathVariable(required = false) String memberId) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
+			memberId = memberId == null ? authFacadeService.getMemberId() : memberId;
 			MemberDTO memberDTO = memberService.getMemberInfo(memberId);
 			responseDTO.addData("memberInfo", memberDTO);
 			responseDTO.setSuccess(true);
@@ -126,13 +127,14 @@ public class NewMemberController {
 		}
 	}
 
-	@GetMapping("/{memberId}/menuList")
+	@GetMapping("/menuList")
 	@Tag(name="사용자 권한", description = "사용자 권한 관련 API")
 	@Operation(summary = "사용자의 메뉴목록 조회", description = "메뉴목록만 조회")
-	public ResponseEntity<?> getMemberMenuList(@Parameter(description = "사용자 ID") @PathVariable String memberId) {
+	public ResponseEntity<?> getMemberMenuList() {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
+			String memberId = authFacadeService.getMemberId();
 			List<HashMap<String, Object>> menuList = memberService.getMemberMenuList(memberId);
 			responseDTO.addData("menuList", menuList);
 			responseDTO.setSuccess(true);
@@ -165,13 +167,14 @@ public class NewMemberController {
 		}
 	}
 
-	@GetMapping("/{memberId}/menuAuth")
+	@GetMapping(value={"/{memberId}/menuAuth", "/menuAuth"})
 	@Tag(name="사용자 권한")
 	@Operation(summary = "사용자의 메뉴권한 조회", description = "회원 권한 관련 API")
-	public ResponseEntity<?> getMemberMenuAuth(@Parameter(description = "사용자 Id")	@PathVariable String memberId) {
+	public ResponseEntity<?> getMemberMenuAuth(@Parameter(description = "사용자 Id")	@PathVariable(required = false) String memberId) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
+			memberId = memberId == null ? authFacadeService.getMemberId() : memberId;
 			List<HashMap<String, Object>> menuList = memberService.getMenuMemberAuth(memberId, null);
 			responseDTO.addData("menuList", menuList);
 			responseDTO.setSuccess(true);
@@ -184,16 +187,17 @@ public class NewMemberController {
 		}
 	}
 
-	@GetMapping("/{memberId}/menuAuth/{menuId}")
+	@GetMapping("/menuAuth/{menuId}")
 	@Tag(name="사용자 권한")
 	@Operation(summary = "사용자의 메뉴권한 목록조회", description = "회원 권한 관련 API")
-	public ResponseEntity<?> getMemberMenuAuthList(@Parameter(description = "사용자 Id")	@PathVariable String memberId,
+	public ResponseEntity<?> getMemberMenuAuthList(@Parameter(description = "사용자 Id")	@PathVariable(required = false) String memberId,
 												   @Parameter(description = "메뉴 Id")	@PathVariable(required = false) String menuId) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			List<HashMap<String, Object>> menuList = memberService.getMenuMemberAuth(memberId, menuId);
-			responseDTO.addData("menuList", menuList);
+			memberId = memberId == null ? authFacadeService.getMemberId() : memberId;
+			HashMap<String, Object> menuMemberAuth = memberService.getMenuMemberAuth(memberId, menuId).get(0);
+			responseDTO.addData("menuMemberAuth", menuMemberAuth);
 			responseDTO.setSuccess(true);
 			return ResponseEntity.ok().body(responseDTO);
 		}
