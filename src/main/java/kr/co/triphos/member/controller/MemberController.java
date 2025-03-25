@@ -69,19 +69,30 @@ public class MemberController {
 	}
 
 	@PostMapping("/updateMember")
-	@Tag(name="사용자 관리")
-	@Operation(summary = "사용자정보 수정", description = "")
-	@io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(
-			mediaType = "application/json",
-			examples = {
-					@ExampleObject(name = "사용자정보 수정 예시", ref="#/components/examples/member.update")
-			},
-			schema = @Schema(implementation = MemberDTO.class)
-	))
-	@ApiResponse(content = @Content(
-			mediaType = "application/json",
-			schema = @Schema(implementation = ResponseDTO.class)
-	))
+	@Tag(name = "사용자 관리", description = "회원 정보 관련 API")
+	@Operation(
+		summary = "사용자 정보 수정",
+		description = "사용자의 정보를 수정합니다.",
+		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+			description = "수정할 사용자 정보",
+			content = @Content(
+				schema = @Schema(hidden = true),
+				examples = @ExampleObject(name = "사용자정보 수정 예시", ref = "#/components/examples/member.put.info")
+			)
+		),
+		responses = {
+			@ApiResponse(
+				responseCode = "200",
+				description = "수정 성공",
+				content = @Content(schema = @Schema(implementation = ResponseDTO.class))
+			),
+			@ApiResponse(
+				responseCode = "400",
+				description = "잘못된 요청",
+				content = @Content(schema = @Schema(implementation = ResponseDTO.class))
+			)
+		}
+	)
 	public ResponseEntity<?> updateMember(@RequestBody MemberDTO memberDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {

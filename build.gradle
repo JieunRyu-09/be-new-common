@@ -39,7 +39,7 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // JWT 관련 의존성
+    /* JWT 관련 의존성 */
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
@@ -53,6 +53,9 @@ dependencies {
 
     implementation 'org.mybatis:mybatis:3.5.11'
     implementation 'org.mybatis:mybatis-spring:3.0.0'
+
+    /* reflections */
+    implementation 'org.reflections:reflections:0.10.2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
