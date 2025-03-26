@@ -9,6 +9,9 @@ spring:
     url: jdbc:mariadb://dev.triphos.co.kr:23306/dev_standard?allowMultiQueries=true
     username: dev_standard
     password: $tri0605!
+  redis:
+    host: localhost
+    port: 6379
 file:
   upload-dir: C:/triphos/files/
 token:

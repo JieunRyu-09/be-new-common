@@ -14,10 +14,13 @@ import kr.co.triphos.member.service.AuthService;
 import kr.co.triphos.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +32,10 @@ import java.util.List;
 @Log4j2
 //@EnableWebMvc
 public class NewAuthController {
+	@Value("${token.time}")
+	private long ACCESS_TOKEN_VALIDITY;
+
+	private final JedisPool jedisPool;
 	private final AuthService authService;
 	private final MemberService memberService;
 
@@ -43,18 +50,34 @@ public class NewAuthController {
 								   @Parameter(description = "사용자Pw") @RequestParam String password) {
 		ResponseDTO responseDTO = new ResponseDTO();
 
-		try {
+		try (Jedis jedis = jedisPool.getResource()) {
+			// 토큰 발행
 			HashMap<String, String> accessTokenMap = authService.login(id, password);
 			List<HashMap<String, Object>> menuList = authService.getMemberMenuList(id);
 			String accessToken 	= accessTokenMap.get("accessToken");
+			String refreshToken = authService.getRefreshToken(accessToken);
 			String expiresIn 	= accessTokenMap.get("expirationDate");
-
+			// 로그인 return 설정
 			responseDTO.addData("accessToken", accessToken);
-			responseDTO.addData("refreshToken", authService.getRefreshToken(accessToken));
+			responseDTO.addData("refreshToken", refreshToken);
 			responseDTO.addData("expiresIn", expiresIn);
 			responseDTO.addData("menuList", menuList);
 			responseDTO.setMsg("로그인에 성공하였습니다");
 			responseDTO.setSuccess(true);
+			// redis에 토큰정보 저장
+			String key = "jwt:" + id;
+			String existingToken = jedis.get(key);
+			// 기존 토큰이 있으면 삭제
+			if (existingToken != null) {
+				jedis.del(key);
+			}
+			jedis.hset(key, "accessToken", accessToken);
+			jedis.hset(key, "refreshToken", refreshToken);
+
+			// 새 JWT 저장 (만료 시간 설정)
+			jedis.expire(key, ACCESS_TOKEN_VALIDITY);
+			log.info("scardy jedis:" + jedis.get(key));
+
 			return ResponseEntity.ok()
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
 				.body(responseDTO);
