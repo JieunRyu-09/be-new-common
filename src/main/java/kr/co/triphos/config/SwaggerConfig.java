@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,36 +43,37 @@ public class SwaggerConfig {
 	private String swaggerDocPath;
 
 	@Bean
-	public GroupedOpenApi all() {
-		return createGroup("99. 전체", true, "/**");
-	}
+	public GroupedOpenApi authGroup() {return createGroup("001", "01. 인증", false, "/auth/**");}
 
 	@Bean
-	public GroupedOpenApi authGroup() {
-		return createGroup("1. 인증", false, "/auth/**");
-	}
+	public GroupedOpenApi memberGroup() {return createGroup("002", "02. 회원", true, new String[]{"/member/**"});}
 
 	@Bean
-	public GroupedOpenApi memberGroup() {
-		return createGroup("2. 회원 - 구버전", true, new String[]{"/member/**"});
-	}
+	public GroupedOpenApi excelGroup() {return createGroup("003","03. 엑셀", true, new String[]{"/excel/**"});}
 
 	@Bean
-	public GroupedOpenApi newAuthGroup() {return createGroup("3. 인증 - 신버전", true, new String[]{"/v1/auth/**"});}
+	public GroupedOpenApi newAuthGroup() {return createGroup("004","11. 인증 - 신버전", true, new String[]{"/v1/auth/**"});}
 
 	@Bean
-	public GroupedOpenApi newMemberGroup() {return createGroup("4. 회원 - 신버전", true, new String[]{"/v1/member/**"});}
+	public GroupedOpenApi newMemberGroup() {return createGroup("005","12. 회원 - 신버전", true, new String[]{"/v1/member/**"});}
+
+	@Bean
+	public GroupedOpenApi newExcelGroup() {return createGroup("006","13. 엑셀 - 신버전", true, new String[]{"/v1/excel/**"});}
+
+	@Bean
+	public GroupedOpenApi all() {return createGroup("099","99. 전체", true, "/**");}
 
 	/**
 	 * GroupedOpenApi 설정
 	 * @return GroupedOpenApi
 	 */
-	private GroupedOpenApi createGroup(String groupName, boolean enableSecurity, String... pathPattern) {
+	private GroupedOpenApi createGroup(String group, String groupName, boolean enableSecurity, String... pathPattern) {
 		GroupedOpenApi.Builder builder = GroupedOpenApi.builder()
-				.group(groupName)
+				.group(group)
 				.pathsToMatch(pathPattern)
 				.pathsToExclude(EXCLUDE_PATHS)
 				.packagesToScan(BASE_PACKAGE)
+				.displayName(groupName)
 				.addOpenApiCustomiser(enableSecurity ? schemaAutoRegisterWithSecurity() : schemaAutoRegister());
 
 		return builder.build();

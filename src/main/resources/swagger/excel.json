@@ -1,0 +1,92 @@
+{
+  "post.info": {
+    "excelNm": "엑셀 수정 후 테스트",
+    "excelDataList": [
+      {
+        "orderNo": "202503140001",
+        "productCode": "grape1",
+        "productName": "포도1",
+        "quantity": 30,
+        "price": 3000,
+        "totalAmount": 90000,
+        "orderDate": "20250314",
+        "customerName": "홍주영",
+        "status": "주문입건"
+      },
+      {
+        "orderNo": "202503140002",
+        "productCode": "grape2",
+        "productName": "포도2",
+        "quantity": 30,
+        "price": 3000,
+        "totalAmount": 90000,
+        "orderDate": "20250314",
+        "customerName": "홍주영",
+        "status": "주문입건"
+      },
+      {
+        "orderNo": "202503140003",
+        "productCode": "grape3",
+        "productName": "포도3",
+        "quantity": 30,
+        "price": 3000,
+        "totalAmount": 90000,
+        "orderDate": "20250314",
+        "customerName": "홍주영",
+        "status": "주문입건"
+      },
+      {
+        "orderNo": "202503140004",
+        "productCode": "grape4",
+        "productName": "포도4",
+        "quantity": 30,
+        "price": 3000,
+        "totalAmount": 90000,
+        "orderDate": "20250314",
+        "customerName": "홍주영",
+        "status": "주문입건"
+      },
+      {
+        "orderNo": "202503140005",
+        "productCode": "grape5",
+        "productName": "포도5",
+        "quantity": 30,
+        "price": 3000,
+        "totalAmount": 90000,
+        "orderDate": "20250314",
+        "customerName": "홍주영",
+        "status": "주문입건"
+      },
+      {
+        "orderNo": "202503140006",
+        "productCode": "grape6",
+        "productName": "포도6",
+        "quantity": 30,
+        "price": 3000,
+        "totalAmount": 90000,
+        "orderDate": "20250314",
+        "customerName": "홍주영",
+        "status": "주문입건"
+      }
+    ]
+  },
+  "put.info": {
+    "idx": 14,
+    "excelNm": "엑셀 수정함",
+    "excelDataList": [
+      {
+        "rowIdx": 2,
+        "orderNo": "202503140003_수정",
+        "productCode": "grape_수정",
+        "productName": "포도1111_수정",
+        "quantity": 14,
+        "price": 1400,
+        "totalAmount": 140000,
+        "orderDate": "20250314",
+        "customerName": "홍주영_수정",
+        "status": "주문입건_수정"
+      }
+    ],
+    "deleteDataList" : [4,6]
+  }
+}

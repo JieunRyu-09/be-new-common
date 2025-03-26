@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -102,15 +100,22 @@ public class ExcelService {
 		return true;
 	}
 
-	public List<ExcelInfoDTO> getExcelInfoList (String excelNm, String fromDate, String toDate) throws Exception {
+	public List<Map<String, Object>> getExcelInfoList (String excelNm, String fromDate, String toDate) throws Exception {
 		try {
 			List<ExcelInfo> excelInfoEntityList = null;
 			if (excelNm == null)  excelInfoEntityList = excelInfoRepository.findByPeriod(fromDate, toDate);
 			else				  excelInfoEntityList = excelInfoRepository.findByExcelNmAndPeriod(fromDate, toDate, "%" + excelNm + "%");
 
-			List<ExcelInfoDTO> excelInfoDTOList = new ArrayList<>();
+			List<Map<String, Object>> excelInfoDTOList = new ArrayList<>();
 			excelInfoEntityList.forEach(excelInfo -> {
-				excelInfoDTOList.add(new ExcelInfoDTO(excelInfo));
+				Map<String, Object> excelInfoMap = new LinkedHashMap<>();
+				excelInfoMap.put("idx", 		excelInfo.getIdx());
+				excelInfoMap.put("excelNm", 	excelInfo.getExcelNm());
+				excelInfoMap.put("insDt", 		excelInfo.getInsDt());
+				excelInfoMap.put("insMember", 	excelInfo.getInsMember());
+				excelInfoMap.put("updDt", 		excelInfo.getUpdDt());
+				excelInfoMap.put("updMember", 	excelInfo.getUpdMember());
+				excelInfoDTOList.add(excelInfoMap);
 			});
 			return excelInfoDTOList;
 		}
