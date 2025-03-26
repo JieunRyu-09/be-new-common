@@ -103,7 +103,7 @@ public class NewFileController {
 		}
 	}
 
-	@DeleteMapping(value = "/deleteFile")
+	@DeleteMapping(value = "/info")
 	@Tag(name="파일")
 	@Operation(summary = "파일 삭제", description = "List<Integer> deleteFileList")
 	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx List") @RequestParam List<Integer> deleteFileList) {
