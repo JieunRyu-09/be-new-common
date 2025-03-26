@@ -3,6 +3,7 @@ package kr.co.triphos.member.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -75,7 +76,7 @@ public class NewAuthController {
 		}
 	}
 
-	@GetMapping("/memberId")
+	@GetMapping("/checkId")
 	@Tag(name="사용자 관리")
 	@Operation(summary = "존재하는 ID 조회", description = "사용자 회원가입 시 중복되는 ID 확인")
 	public ResponseEntity<?> checkExistMemberId(@RequestParam String memberId) {
@@ -96,27 +97,22 @@ public class NewAuthController {
 		}
 	}
 
-	@PostMapping("/create")
+	@PostMapping("/member/info")
 	@Tag(name="사용자 관리")
-	@Operation(summary = "사용자 회원가입", description = "")
-	public ResponseEntity<?> createMember(@Parameter(description = "사용자 Id")		@RequestParam String memberId,
-										  @Parameter(description = "사용자 Pw") 		@RequestParam String memberPw,
-										  @Parameter(description = "사용자 이름") 	@RequestParam String memberNm,
-										  @Parameter(description = "사용자 이메일") 	@RequestParam String email,
-										  @Parameter(description = "사용자 핸드폰") 	@RequestParam String phone,
-										  @Parameter(description = "사용자 등급") 	@RequestParam String memberType) {
+	@Operation(
+			summary = "사용자 회원가입",
+			description = "",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(
+							schema = @Schema(hidden = true),
+							examples = @ExampleObject(name = "사용자 회원가입 예시", ref = "#/components/examples/auth.post.member.info")
+					)
+			))
+	public ResponseEntity<?> createMember(@RequestBody MemberDTO memberDTO) {
 
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			MemberDTO memberDTO = MemberDTO.createMember()
-					.memberId(memberId)
-					.memberNm(memberNm)
-					.memberPw(memberPw)
-					.email(email)
-					.phone(phone)
-					.memberType(memberType)
-					.build();
 			boolean result = memberService.createMember(memberDTO);
 			String msg = result ? "사용자를 생성하였습니다." : "사용자 생성에 실패하였습니다.";
 			responseDTO.setSuccess(result);

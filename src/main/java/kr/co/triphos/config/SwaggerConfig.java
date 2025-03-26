@@ -57,7 +57,10 @@ public class SwaggerConfig {
 	}
 
 	@Bean
-	public GroupedOpenApi newMemberGroup() {return createGroup("3. 회원 - 신버전", true, new String[]{"/v1/member/**"});}
+	public GroupedOpenApi newAuthGroup() {return createGroup("3. 인증 - 신버전", true, new String[]{"/v1/auth/**"});}
+
+	@Bean
+	public GroupedOpenApi newMemberGroup() {return createGroup("4. 회원 - 신버전", true, new String[]{"/v1/member/**"});}
 
 	/**
 	 * GroupedOpenApi 설정

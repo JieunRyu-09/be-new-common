@@ -37,6 +37,7 @@ public class SecurityConfiguration {
 					).permitAll()  // swagger 경로 모두 허용
 					.antMatchers("/test/**").permitAll()  		// test 경로는 인증 불필요
 					.antMatchers("/auth/**").permitAll()  		// auth 경로는 인증 불필요(비로그인시 사용)
+					.antMatchers("/v1/auth/**").permitAll()  		// auth 경로는 인증 불필요(비로그인시 사용)
 					.anyRequest().authenticated() 					// 나머지 요청은 인증 필요
 			)
 //			.formLogin(login -> login

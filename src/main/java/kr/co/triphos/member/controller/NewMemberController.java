@@ -214,7 +214,6 @@ public class NewMemberController {
 			summary = "사용자의 메뉴권한 수정",
 			description = "전체 메뉴에 대한 권한 수정",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-					description = "수정할 권한 정보",
 					content = @Content(
 							schema = @Schema(hidden = true),
 							examples = @ExampleObject(name = "사용자정보 수정 예시", ref = "#/components/examples/member.put.menuAuth")
