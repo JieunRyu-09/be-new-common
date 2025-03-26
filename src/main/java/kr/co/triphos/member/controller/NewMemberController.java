@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/member")
+@RequestMapping("/v1/members")
 @RequiredArgsConstructor
 @Log4j2
 public class NewMemberController {
@@ -51,7 +51,7 @@ public class NewMemberController {
 		}
 	}
 
-	@GetMapping(value={"/info/{memberId}", "/info"})
+	@GetMapping(value={"/{memberId}", ""})
 	@Tag(name="사용자 관리", description = "회원 정보 관련 API")
 	@Operation(summary = "사용자정보 조회", description = "")
 	public ResponseEntity<?> updateMember(@Parameter(description = "사용자 ID") @PathVariable(required = false) String memberId) {
@@ -71,7 +71,7 @@ public class NewMemberController {
 		}
 	}
 
-	@PutMapping("/info")
+	@PutMapping("")
 	@Tag(name = "사용자 관리")
 	@Operation(
 			summary = "사용자 정보 수정",
@@ -99,7 +99,7 @@ public class NewMemberController {
 		}
 	}
 
-	@PutMapping("/myInfo")
+	@PutMapping("/my-info")
 	@Tag(name = "사용자 관리")
 	@Operation(
 			summary = "본인 정보 수정",
@@ -127,7 +127,7 @@ public class NewMemberController {
 		}
 	}
 
-	@GetMapping("/menuList")
+	@GetMapping("/menu-list")
 	@Tag(name="사용자 권한", description = "사용자 권한 관련 API")
 	@Operation(summary = "사용자의 메뉴목록 조회", description = "메뉴목록만 조회")
 	public ResponseEntity<?> getMemberMenuList() {
@@ -167,7 +167,7 @@ public class NewMemberController {
 		}
 	}
 
-	@GetMapping(value={"/{memberId}/menuAuth", "/menuAuth"})
+	@GetMapping(value={"/{memberId}/menu-auth", "/menu-auth"})
 	@Tag(name="사용자 권한")
 	@Operation(summary = "사용자의 메뉴권한 조회", description = "회원 권한 관련 API")
 	public ResponseEntity<?> getMemberMenuAuth(@Parameter(description = "사용자 Id")	@PathVariable(required = false) String memberId) {
@@ -187,7 +187,7 @@ public class NewMemberController {
 		}
 	}
 
-	@GetMapping("/menuAuth/{menuId}")
+	@GetMapping("/menu-auth/{menuId}")
 	@Tag(name="사용자 권한")
 	@Operation(summary = "사용자의 메뉴권한 목록조회", description = "회원 권한 관련 API")
 	public ResponseEntity<?> getMemberMenuAuthList(@Parameter(description = "사용자 Id")	@PathVariable(required = false) String memberId,
@@ -208,7 +208,7 @@ public class NewMemberController {
 		}
 	}
 
-	@PutMapping("/menuAuth")
+	@PutMapping("/menu-auth")
 	@Tag(name="사용자 권한", description = "회원 권한 관련 API")
 	@Operation(
 			summary = "사용자의 메뉴권한 수정",

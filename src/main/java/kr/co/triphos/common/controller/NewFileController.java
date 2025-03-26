@@ -20,14 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/file")
+@RequestMapping("/v1/files")
 @RequiredArgsConstructor
 @Log4j2
 public class NewFileController {
 	private final FileService fileService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 
-	@PostMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Tag(name="파일")
 	@Operation(summary = "파일 신규저장", description = "")
 	public ResponseEntity<?> fileSave(@Parameter(description = "파일") @RequestParam("fileList") List<MultipartFile> fileList) {
@@ -48,7 +48,7 @@ public class NewFileController {
 		}
 	}
 
-	@GetMapping(value = "/info")
+	@GetMapping(value = "")
 	@Tag(name="파일")
 	@Operation(summary = "파일 목록조회", description = "")
 	public ResponseEntity<?> getFileList(@Parameter(description = "파일명") @RequestParam(required = false) String fileNm,
@@ -69,7 +69,7 @@ public class NewFileController {
 		}
 	}
 
-	@GetMapping(value = "/info/{fileIdx}/download")
+	@GetMapping(value = "/{fileIdx}/download")
 	@Tag(name="파일")
 	@Operation(summary = "파일 다운로드", description = "")
 	public ResponseEntity<?> downloadFile(@Parameter(description = "파일 idx") @PathVariable Integer fileIdx) {
@@ -103,7 +103,7 @@ public class NewFileController {
 		}
 	}
 
-	@DeleteMapping(value = "/info")
+	@DeleteMapping(value = "")
 	@Tag(name="파일")
 	@Operation(summary = "파일 삭제", description = "List<Integer> deleteFileList")
 	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx List") @RequestParam List<Integer> deleteFileList) {

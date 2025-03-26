@@ -22,14 +22,14 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/v1/excel")
+@RequestMapping("/v1/excels")
 @RequiredArgsConstructor
 @Log4j2
 public class NewExcelController {
 	private final ExcelService excelService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 
-	@PostMapping("/info")
+	@PostMapping("")
 	@Tag(name="엑셀 파일", description = "엑셀파일 관련 API")
 	@Operation(
 			summary = "엑셀 신규저장",
@@ -57,7 +57,7 @@ public class NewExcelController {
 		}
 	}
 
-	@PutMapping("/info")
+	@PutMapping("")
 	@Tag(name="엑셀 파일")
 	@Operation(
 			summary = "저장된 엑셀 수정",
@@ -85,7 +85,7 @@ public class NewExcelController {
 		}
 	}
 
-	@DeleteMapping("/info")
+	@DeleteMapping("")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 삭제",description = "List<integer> deleteExcelList")
 	public ResponseEntity<?> excelDelete(@Parameter(description = "엑셀Idx List") @RequestParam List<Integer> deleteExcelList) {
@@ -110,7 +110,7 @@ public class NewExcelController {
 		}
 	}
 
-	@GetMapping("/info")
+	@GetMapping("")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 파일 목록 조회", description = "")
 	public ResponseEntity<?> getExcelInfoList(@Parameter(description = "엑셀 이름.") @RequestParam(required = false) String excelNm,
@@ -129,7 +129,7 @@ public class NewExcelController {
 		}
 	}
 
-	@GetMapping("/info/{idx}/data")
+	@GetMapping("/{idx}/data")
 	@Tag(name="엑셀 파일")
 	@Operation(summary = "엑셀 파일 데이터 조회", description = "")
 	public ResponseEntity<?> getExcelDataList(@Parameter(description = "엑셀 Idx") @PathVariable int idx) {

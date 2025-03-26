@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/menu")
+@RequestMapping("/v1/menus")
 @RequiredArgsConstructor
 @Log4j2
 public class NewMenuController {
 	private final MenuService menusService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 
-	@PutMapping(value = "/info")
+	@PutMapping(value = "")
 	@Tag(name="메뉴")
 	@Operation(
 			summary = "메뉴정보 수정",
@@ -58,7 +58,7 @@ public class NewMenuController {
 		}
 	}
 
-	@GetMapping(value = "/info")
+	@GetMapping(value = "")
 	@Tag(name="메뉴")
 	@Operation(summary = "메뉴목록 조회", description = "")
 	public ResponseEntity<?> getMenuList() {

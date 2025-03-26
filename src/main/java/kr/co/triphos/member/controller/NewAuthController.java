@@ -76,7 +76,7 @@ public class NewAuthController {
 		}
 	}
 
-	@GetMapping("/checkId")
+	@GetMapping("/check-id")
 	@Tag(name="사용자 관리")
 	@Operation(summary = "존재하는 ID 조회", description = "사용자 회원가입 시 중복되는 ID 확인")
 	public ResponseEntity<?> checkExistMemberId(@RequestParam String memberId) {
@@ -97,7 +97,7 @@ public class NewAuthController {
 		}
 	}
 
-	@PostMapping("/member/info")
+	@PostMapping("/members")
 	@Tag(name="사용자 관리")
 	@Operation(
 			summary = "사용자 회원가입",
