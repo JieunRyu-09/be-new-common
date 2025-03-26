@@ -1,0 +1,20 @@
+{
+  "put.info": [
+    {
+      "mainCd": 0
+      , "sub1Cd": 0
+      , "sub2Cd": 1
+      , "orderBy":  10
+      , "menuTitle": "UI - 수정"
+      , "displayYn": "N"
+    },
+    {
+      "mainCd": 0
+    , "sub1Cd": 0
+    , "sub2Cd": 2
+    , "orderBy":  11
+    , "menuTitle": "그리드 예시 - 수정"
+    , "displayYn": "N"
+    }
+  ]
+}
