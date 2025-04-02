@@ -24,4 +24,6 @@ public class ResponseDTO {
 	public void addData(String key, Object value) {
 		this.data.put(key, value);
 	}
+
+	public void deleteData() {this.data = null;}
 }

@@ -43,34 +43,19 @@ public class SwaggerConfig {
 	private String swaggerDocPath;
 
 	@Bean
-	public GroupedOpenApi authGroup() {return createGroup("001", "1. 인증", false, "/auth/**");}
+	public GroupedOpenApi authGroup() {return createGroup("001", "1. 인증", false, "/v1/auth/**");}
 
 	@Bean
-	public GroupedOpenApi memberGroup() {return createGroup("002", "2. 회원", true, new String[]{"/member/**"});}
+	public GroupedOpenApi memberGroup() {return createGroup("002", "2. 회원", true, new String[]{"/v1/members/**"});}
 
 	@Bean
-	public GroupedOpenApi excelGroup() {return createGroup("003","3. 엑셀", true, new String[]{"/excel/**"});}
+	public GroupedOpenApi excelGroup() {return createGroup("003","3. 엑셀", true, new String[]{"/v1/excels/**"});}
 
 	@Bean
-	public GroupedOpenApi fileGroup() {return createGroup("004","4. 파일", true, new String[]{"/file/**"});}
+	public GroupedOpenApi fileGroup() {return createGroup("004","4. 파일", true, new String[]{"/v1/files/**"});}
 
 	@Bean
-	public GroupedOpenApi menuGroup() {return createGroup("005","5. 메뉴", true, new String[]{"/menu/**"});}
-
-	@Bean
-	public GroupedOpenApi newAuthGroup() {return createGroup("011","1. 인증 - 신버전", true, new String[]{"/v1/auth/**"});}
-
-	@Bean
-	public GroupedOpenApi newMemberGroup() {return createGroup("012","2. 회원 - 신버전", true, new String[]{"/v1/members/**"});}
-
-	@Bean
-	public GroupedOpenApi newExcelGroup() {return createGroup("013","3. 엑셀 - 신버전", true, new String[]{"/v1/excels/**"});}
-
-	@Bean
-	public GroupedOpenApi newFileGroup() {return createGroup("014","4. 파일 - 신버전", true, new String[]{"/v1/files/**"});}
-
-	@Bean
-	public GroupedOpenApi newMenuGroup() {return createGroup("015","5. 메뉴 - 신버전", true, new String[]{"/v1/menus/**"});}
+	public GroupedOpenApi menuGroup() {return createGroup("005","5. 메뉴", true, new String[]{"/v1/menus/**"});}
 
 	@Bean
 	public GroupedOpenApi all() {return createGroup("099","99. 전체", true, "/**");}

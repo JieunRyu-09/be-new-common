@@ -4,6 +4,7 @@ package kr.co.triphos.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import kr.co.triphos.common.dto.ResponseDTO;
+import kr.co.triphos.common.service.RedisService;
 import kr.co.triphos.member.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -23,13 +24,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 @Log4j2
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
+    private final RedisService redisService;
     private final CustomUserDetailsService userDetailsService;
 
     @Override
@@ -53,6 +57,12 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
         try {
             String username = jwtUtil.extractMemberId(token);
+            // redis의 토큰정보와 비교
+            // 중복로그인 방지.
+            Map<Object, Object> redisTokenMap = redisService.getMapData(username);
+            String redisAccessToken = redisTokenMap.get("accessToken").toString();
+            if (!token.equals(redisAccessToken)) throw new RuntimeException("다른곳에서 로그인하여 로그인정보가 만료되었습니다.");
+
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -76,7 +86,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         catch (RuntimeException ex) {
             log.error(ex.getMessage());
-            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "잘못된 토큰정보입니다.");
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
             return;
         }
         catch (Exception ex) {

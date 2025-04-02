@@ -3,14 +3,11 @@ package kr.co.triphos.common.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.triphos.common.dto.ExcelDTO;
-import kr.co.triphos.common.dto.FileDTO;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.common.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,22 +15,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/v1/files")
 @RequiredArgsConstructor
 @Log4j2
 public class FileController {
 	private final FileService fileService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 
-	@PostMapping(value = "/fileSave", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Tag(name="파일")
 	@Operation(summary = "파일 신규저장", description = "")
 	public ResponseEntity<?> fileSave(@Parameter(description = "파일") @RequestParam("fileList") List<MultipartFile> fileList) {
@@ -54,7 +47,7 @@ public class FileController {
 		}
 	}
 
-	@GetMapping(value = "/getFileList")
+	@GetMapping(value = "")
 	@Tag(name="파일")
 	@Operation(summary = "파일 목록조회", description = "")
 	public ResponseEntity<?> getFileList(@Parameter(description = "파일명") @RequestParam(required = false) String fileNm,
@@ -75,10 +68,10 @@ public class FileController {
 		}
 	}
 
-	@GetMapping(value = "/downloadFile")
+	@GetMapping(value = "/{fileIdx}/download")
 	@Tag(name="파일")
 	@Operation(summary = "파일 다운로드", description = "")
-	public ResponseEntity<?> downloadFile(@Parameter(description = "파일 idx") @RequestParam Integer fileIdx) {
+	public ResponseEntity<?> downloadFile(@Parameter(description = "파일 idx") @PathVariable Integer fileIdx) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			HashMap<String, Object> fileData = fileService.downloadFile(fileIdx);
@@ -109,13 +102,13 @@ public class FileController {
 		}
 	}
 
-	@PostMapping(value = "/deleteFile")
+	@DeleteMapping(value = "")
 	@Tag(name="파일")
 	@Operation(summary = "파일 삭제", description = "List<Integer> deleteFileList")
-	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx List") @RequestBody FileDTO fileDTO) {
+	public ResponseEntity<?> deleteFile(@Parameter(description = "파일Idx List") @RequestParam List<Integer> deleteFileList) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			fileService.deleteFile(fileDTO.getDeleteFileList());
+			fileService.deleteFile(deleteFileList);
 			String msg = "파일을 삭제하였습니다";
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg(msg);

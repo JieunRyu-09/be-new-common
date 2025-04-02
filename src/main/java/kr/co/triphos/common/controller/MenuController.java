@@ -2,6 +2,9 @@ package kr.co.triphos.common.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.triphos.common.dto.MenuInfoDTO;
 import kr.co.triphos.common.dto.ResponseDTO;
@@ -15,16 +18,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/menu")
+@RequestMapping("/v1/menus")
 @RequiredArgsConstructor
 @Log4j2
 public class MenuController {
 	private final MenuService menusService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 
-	@PostMapping(value = "/updateMenu")
+	@PutMapping(value = "")
 	@Tag(name="메뉴")
-	@Operation(summary = "메뉴정보 수정", description = "mainCd, sub1Cd, sub2Cd, orderBy, menuTitle, displayYn 필요")
+	@Operation(
+			summary = "메뉴정보 수정",
+			description = "{mainCd, sub1Cd, sub2Cd}로 식별, {orderBy, menuTitle, displayYn} 수정",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(
+							schema = @Schema(hidden = true),
+							examples = @ExampleObject(name = "메뉴정보 수정 예시", ref = "#/components/examples/menu.put.info")
+					)
+			))
 	public ResponseEntity<?> updateMenu(@Parameter(description = "파일") @RequestBody List<MenuInfoDTO> menuInfoDTOList) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
@@ -47,7 +58,7 @@ public class MenuController {
 		}
 	}
 
-	@GetMapping(value = "/getMenuList")
+	@GetMapping(value = "")
 	@Tag(name="메뉴")
 	@Operation(summary = "메뉴목록 조회", description = "")
 	public ResponseEntity<?> getMenuList() {

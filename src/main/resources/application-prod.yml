@@ -9,6 +9,16 @@ spring:
     url: jdbc:mariadb://dev.triphos.co.kr:23306/dev_standard?allowMultiQueries=true
     username: dev_standard
     password: $tri0605!
+  redis:
+    host: 127.0.0.1     # Redis 서버 IP 주소
+    port: 6379          # Redis 포트
+    password: tri0605   # Redis 비밀번호
+    jedis:
+      pool:
+        max-active: 10    # 최대 연결 수
+        max-idle: 5       # 최대 유휴 커넥션 수
+        min-idle: 1       # 최소 유휴 커넥션 수
+        max-wait: 1000    # 커넥션 풀 대기 시간 (ms)
 file:
   upload-dir: E:\_PUBLIC\HOME_DEV\dev-standard-backend\files
 token:
