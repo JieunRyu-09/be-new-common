@@ -27,7 +27,6 @@ public class AuthService {
     private final MenuMemberAuthRepository  menuMemberAuthRepository;
     private final MenuInfoRepository        menuInfoRepository;
 
-
     /**
      * login
      * @param memberId
@@ -61,6 +60,14 @@ public class AuthService {
 
         String username = jwtUtil.extractMemberId(refreshToken);
         return jwtUtil.generateAccessToken(username);
+    }
+
+    public String getMemberIdByRefreshToken(String refreshToken) {
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new RuntimeException("Invalid Refresh Token");
+        }
+
+        return jwtUtil.extractMemberId(refreshToken);
     }
 
     public List<HashMap<String, Object>> getMemberMenuList(String id) {

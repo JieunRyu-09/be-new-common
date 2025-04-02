@@ -16,6 +16,7 @@ import kr.co.triphos.member.service.AuthService;
 import kr.co.triphos.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,9 @@ public class AuthController {
 	private final AuthService authService;
 	private final MemberService memberService;
 	private final RedisService redisService;
-	private final AuthenticationFacadeService authenticationFacadeService;
+
+	@Value("${token.time}")
+	private long tokenTime;
 
 	@PostMapping("/login")
 	@Tag(name="사용자 관리")
@@ -66,7 +69,7 @@ public class AuthController {
 			HashMap<String, String> tokenMap = new HashMap<>();
 			tokenMap.put("accessToken", accessToken);
 			tokenMap.put("refreshToken", refreshToken);
-			redisService.saveMapData(id, tokenMap);
+			redisService.saveMapData(id, tokenMap, tokenTime);
 
 			return ResponseEntity.ok()
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -158,7 +161,7 @@ public class AuthController {
 			String newAccessToken 	= newAccessTokenMap.get("accessToken");
 			String newRefreshToken 	= authService.getRefreshToken(newAccessToken);
 			String expiresIn 		= newAccessTokenMap.get("expirationDate");
-			String memberId			=  authenticationFacadeService.getMemberId();
+			String memberId			=  authService.getMemberIdByRefreshToken(newRefreshToken);
 
 			responseDTO.setSuccess(true);
 			responseDTO.addData("accessToken", newAccessToken);
@@ -170,7 +173,7 @@ public class AuthController {
 			HashMap<String, String> tokenMap = new HashMap<>();
 			tokenMap.put("accessToken", newAccessToken);
 			tokenMap.put("refreshToken", newRefreshToken);
-			redisService.saveMapData(memberId, tokenMap);
+			redisService.saveMapData(memberId, tokenMap, tokenTime);
 
 			return ResponseEntity.ok()
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken)
