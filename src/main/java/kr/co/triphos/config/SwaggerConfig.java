@@ -43,7 +43,7 @@ public class SwaggerConfig {
 	private String swaggerDocPath;
 
 	@Bean
-	public GroupedOpenApi authGroup() {return createGroup("001", "1. 인증", false, "/v1/auth/**");}
+	public GroupedOpenApi authGroup() {return createGroup("001", "1. 인증", true, "/v1/auth/**");}
 
 	@Bean
 	public GroupedOpenApi memberGroup() {return createGroup("002", "2. 회원", true, new String[]{"/v1/members/**"});}

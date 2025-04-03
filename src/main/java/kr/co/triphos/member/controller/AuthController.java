@@ -35,6 +35,7 @@ public class AuthController {
 	private final AuthService authService;
 	private final MemberService memberService;
 	private final RedisService redisService;
+	private final AuthenticationFacadeService authenticationFacadeService;
 
 	@Value("${token.time}")
 	private long tokenTime;
@@ -42,10 +43,6 @@ public class AuthController {
 	@PostMapping("/login")
 	@Tag(name="사용자 관리")
 	@Operation(summary = "사용자 로그인", description = "")
-	@ApiResponse(content = @Content(
-			mediaType = "application/json",
-			schema = @Schema(implementation = ResponseDTO.class)
-	))
 	public ResponseEntity<?> login(@Parameter(description = "사용자Id") @RequestParam String id,
 								   @Parameter(description = "사용자Pw") @RequestParam String password) {
 		ResponseDTO responseDTO = new ResponseDTO();
@@ -74,6 +71,40 @@ public class AuthController {
 			return ResponseEntity.ok()
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
 				.body(responseDTO);
+		}
+		catch (DataAccessException de) {
+			log.error(de.getMessage());
+			responseDTO.deleteData();
+			responseDTO.setMsg("서버현황이 불안정합니다. 잠시 후 다시 시도하여주십시오.");
+			return ResponseEntity.status(408).body(responseDTO);
+		}
+		catch (RuntimeException re) {
+			log.error(re.getMessage());
+			responseDTO.deleteData();
+			responseDTO.setMsg(re.getMessage());
+			return ResponseEntity.status(401).body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex.getMessage());
+			responseDTO.deleteData();
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.status(401).body("Invalid credentials");
+		}
+	}
+
+	@PostMapping("/logout")
+	@Tag(name="사용자 관리")
+	@Operation(summary = "사용자 로그아웃", description = "")
+	public ResponseEntity<?> login() {
+		ResponseDTO responseDTO = new ResponseDTO();
+
+		try {
+			String memberId = authenticationFacadeService.getMemberId();
+			// redis에 저장된 토큰정보 삭제
+			redisService.delData(memberId);
+			responseDTO.setMsg("로그인에 성공하였습니다");
+			responseDTO.setSuccess(true);
+			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (DataAccessException de) {
 			log.error(de.getMessage());
