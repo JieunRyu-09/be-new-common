@@ -19,6 +19,8 @@ spring:
         max-idle: 5       # 최대 유휴 커넥션 수
         min-idle: 1       # 최소 유휴 커넥션 수
         max-wait: 1000    # 커넥션 풀 대기 시간 (ms)
+      test-on-borrow: true
+      test-while-idle: true
 file:
   upload-dir: C:/triphos/files/
 token:
