@@ -66,7 +66,7 @@ public class AuthController {
 			HashMap<String, String> tokenMap = new HashMap<>();
 			tokenMap.put("accessToken", accessToken);
 			tokenMap.put("refreshToken", refreshToken);
-			redisService.saveMapData(id, tokenMap, tokenTime);
+			//redisService.saveMapData(id, tokenMap, tokenTime);
 
 			return ResponseEntity.ok()
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
@@ -101,7 +101,7 @@ public class AuthController {
 		try {
 			String memberId = authenticationFacadeService.getMemberId();
 			// redis에 저장된 토큰정보 삭제
-			redisService.delData(memberId);
+			//redisService.delData(memberId);
 			responseDTO.setMsg("로그인에 성공하였습니다");
 			responseDTO.setSuccess(true);
 			return ResponseEntity.ok().body(responseDTO);
@@ -204,7 +204,7 @@ public class AuthController {
 			HashMap<String, String> tokenMap = new HashMap<>();
 			tokenMap.put("accessToken", newAccessToken);
 			tokenMap.put("refreshToken", newRefreshToken);
-			redisService.saveMapData(memberId, tokenMap, tokenTime);
+			//redisService.saveMapData(memberId, tokenMap, tokenTime);
 
 			return ResponseEntity.ok()
 					.header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken)

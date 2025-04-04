@@ -59,10 +59,10 @@ public class JwtFilter extends OncePerRequestFilter {
             String username = jwtUtil.extractMemberId(token);
             // redis의 토큰정보와 비교
             // 중복로그인 방지.
-            Map<Object, Object> redisTokenMap = redisService.getMapData(username);
-            if (redisTokenMap.isEmpty()) throw new RuntimeException("로그인 정보가 만료되었습니다.");
-            String redisAccessToken = redisTokenMap.get("accessToken").toString();
-            if (!token.equals(redisAccessToken)) throw new RuntimeException("다른곳에서 로그인하여 로그인정보가 만료되었습니다.");
+            //Map<Object, Object> redisTokenMap = redisService.getMapData(username);
+            //if (redisTokenMap.isEmpty()) throw new RuntimeException("로그인 정보가 만료되었습니다.");
+            //String redisAccessToken = redisTokenMap.get("accessToken").toString();
+            //if (!token.equals(redisAccessToken)) throw new RuntimeException("다른곳에서 로그인하여 로그인정보가 만료되었습니다.");
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
