@@ -41,10 +41,9 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
-        // 로그인 요청에 대해서는 토큰 검증을 안함
-        // 요청에 토큰이 있는 경우 로그인도 검증해서 오류가 발생
+        // 해당 경로는 토큰검증 X
         String path = request.getRequestURI();
-        if (path.equals("/auth/login")) {
+        if (path.equals("/auth/login") || path.startsWith("/ws")) {
             chain.doFilter(request, response);
             return;
         }

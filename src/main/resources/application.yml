@@ -23,8 +23,14 @@ spring:
         format_sql: true
         highlight_sql: true # ANSI 코드에 색을 나타낸다
         dialect: org.hibernate.dialect.H2Dialect
+  graphql:
+    cors:
+      allowed-origins: "*"
 logging:
   level:
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.socket: TRACE
     org.hibernate:
       SQL: debug  # 실제 실행되는 SQL
       type: trace  # 바인딩되는 파라미터 값까지 출력

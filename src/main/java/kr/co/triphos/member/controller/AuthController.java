@@ -192,7 +192,7 @@ public class AuthController {
 			String newAccessToken 	= newAccessTokenMap.get("accessToken");
 			String newRefreshToken 	= authService.getRefreshToken(newAccessToken);
 			String expiresIn 		= newAccessTokenMap.get("expirationDate");
-			String memberId			=  authService.getMemberIdByRefreshToken(newRefreshToken);
+			String memberId			=  authService.getMemberIdByToken(newRefreshToken);
 
 			responseDTO.setSuccess(true);
 			responseDTO.addData("accessToken", newAccessToken);

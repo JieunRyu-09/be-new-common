@@ -24,7 +24,7 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
+		http.cors().and()
 			.csrf().disable()
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
@@ -33,7 +33,8 @@ public class SecurityConfig {
 							"/swagger-ui.html",
 							"/swagger-ui/**",
 							"/v3/api-docs/**",  // 보통 기본 경로지만 현재는 '/api-docs'로 바꾸셨으니
-							"/api-docs/**"
+							"/api-docs/**",
+							"/ws/**"
 					).permitAll()  // swagger 경로 모두 허용
 					.antMatchers("/test/**").permitAll()  		// test 경로는 인증 불필요
 					.antMatchers("/v1/auth/login").permitAll()

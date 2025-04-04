@@ -18,7 +18,7 @@ spring:
         max-active: 10    # 최대 연결 수
         max-idle: 5       # 최대 유휴 커넥션 수
         min-idle: 1       # 최소 유휴 커넥션 수
-        max-wait: 1000    # 커넥션 풀 대기 시간 (ms)
+        max-wait: 10000    # 커넥션 풀 대기 시간 (ms)
 file:
   upload-dir: C:/triphos/files/
 token:

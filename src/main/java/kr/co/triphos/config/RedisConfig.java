@@ -1,5 +1,6 @@
 package kr.co.triphos.config;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
+@Log4j2
 public class RedisConfig {
 	@Value("${spring.redis.host}")
 	private String redisHost;
@@ -23,6 +25,9 @@ public class RedisConfig {
 
 	@Bean
 	public JedisConnectionFactory jedisConnectionFactory() {
+		log.info("pw" + redisPassword);
+		log.info("redisPort" + redisPort);
+		log.info("redisHost" + redisHost);
 		RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
 		redisStandaloneConfiguration.setPassword(redisPassword);
 

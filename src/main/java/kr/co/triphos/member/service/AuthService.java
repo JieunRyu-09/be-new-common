@@ -62,7 +62,7 @@ public class AuthService {
         return jwtUtil.generateAccessToken(username);
     }
 
-    public String getMemberIdByRefreshToken(String refreshToken) {
+    public String getMemberIdByToken(String refreshToken) {
         if (!jwtUtil.validateToken(refreshToken)) {
             throw new RuntimeException("Invalid Refresh Token");
         }

@@ -47,11 +47,14 @@ dependencies {
     // swagger
     implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
 
-    // Redis
+    // Redis & Jedis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-    // Jedis
     implementation 'redis.clients:jedis:3.9.0'
+
+    // webSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.security:spring-security-messaging'
 
     /* DB driver */
 //	runtimeOnly 'com.mysql:mysql-connector-j'
