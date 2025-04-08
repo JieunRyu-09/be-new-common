@@ -1,5 +1,12 @@
 {
-  "post.chat-room": {
-      "title" : "채팅방 이름"
+  "post.chat-rooms": {
+      "title" : "채팅방 이름",
+      "inviteMemberIdList": ["kjw", "jin", "scardy14"]
+  },
+  "put.chat-rooms": {
+    "title": "채팅방 이름"
+  },
+  "post.chat-rooms.roomId.members": {
+    "inviteMemberIdList": ["kjw", "jin", "scardy14"]
   }
 }

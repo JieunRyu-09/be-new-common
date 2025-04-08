@@ -5,8 +5,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.triphos.chat.dto.ChatRoomDTO;
+import kr.co.triphos.chat.dto.ChatRoomMemberDTO;
+import kr.co.triphos.chat.entity.ChatRoomMember;
 import kr.co.triphos.chat.service.ChatService;
 import kr.co.triphos.common.dto.ResponseDTO;
+import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.member.dto.MemberDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -19,8 +23,9 @@ import org.springframework.web.bind.annotation.*;
 @Log4j2
 public class ChatController {
 	private final ChatService chatService;
+	private final AuthenticationFacadeService authenticationFacadeService;
 
-	@PostMapping("/chat-room")
+	@PostMapping("/chat-rooms")
 	@Tag(name = "채팅")
 	@Operation(
 			summary = "채팅방 생성",
@@ -28,14 +33,15 @@ public class ChatController {
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
 					content = @Content(
 							schema = @Schema(hidden = true),
-							examples = @ExampleObject(name = "채팅방 생성 예시", ref = "#/components/examples/chat.post.chat-room")
+							examples = @ExampleObject(name = "채팅방 생성 예시", ref = "#/components/examples/chat.post.chat-rooms")
 					)
 			)
 	)
-	public ResponseEntity<?> updateMyInfo(@RequestBody MemberDTO memberDTO) {
+	public ResponseEntity<?> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			boolean res = true;
+			String memberId = authenticationFacadeService.getMemberId();
+			boolean res = chatService.createChatRoom(chatRoomDTO, memberId);
 			String msg = res ? "채팅방을 생성하였습니다" : "채팅방 생성에 실패하였습니다.";
 			responseDTO.setSuccess(res);
 			responseDTO.setMsg(msg);
@@ -43,7 +49,69 @@ public class ChatController {
 		}
 		catch (Exception ex) {
 			log.error(ex);
-			responseDTO.setMsg(ex.getMessage());
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@PutMapping("/chat-rooms/{roomIdx}")
+	@Tag(name = "채팅")
+	@Operation(
+			summary = "채팅방 수정",
+			description = "채팅방을 수정합니다.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(
+							schema = @Schema(hidden = true),
+							examples = @ExampleObject(name = "채팅방 수정 예시", ref = "#/components/examples/chat.put.chat-rooms")
+					)
+			)
+	)
+	public ResponseEntity<?> updateChatRoom(@PathVariable int roomIdx,
+											@RequestBody ChatRoomDTO chatRoomDTO) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			chatRoomDTO.setRoomIdx(roomIdx);
+			String memberId = authenticationFacadeService.getMemberId();
+			boolean res = chatService.updateChatRoom(chatRoomDTO, memberId);
+			String msg = res ? "채팅방을 수정하였습니다" : "채팅방 수정에 실패하였습니다.";
+			responseDTO.setSuccess(res);
+			responseDTO.setMsg(msg);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@PostMapping("/chat-rooms/{roomIdx}/members")
+	@Tag(name = "채팅")
+	@Operation(
+			summary = "채팅방 사용자 초대",
+			description = "채팅방에 사용자를 초대합니다.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(
+							schema = @Schema(hidden = true),
+							examples = @ExampleObject(name = "채팅방 초대 예시", ref = "#/components/examples/chat.post.chat-rooms.roomId.members")
+					)
+			)
+	)
+	public ResponseEntity<?> inviteMember(@PathVariable int roomIdx,
+										  @RequestBody ChatRoomMemberDTO chatRoomMemberDTO) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			String memberId = authenticationFacadeService.getMemberId();
+			chatRoomMemberDTO.setRoomIdx(roomIdx);
+			boolean res = chatService.inviteMember(chatRoomMemberDTO, memberId);
+			String msg = res ? "사용자를 초대하였습니다" : "사용자 초대에 실패하였습니다.";
+			responseDTO.setSuccess(res);
+			responseDTO.setMsg(msg);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
 			return ResponseEntity.internalServerError().body(responseDTO);
 		}
 	}

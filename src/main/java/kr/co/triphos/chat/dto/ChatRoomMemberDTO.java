@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,7 +20,10 @@ import java.time.LocalDateTime;
 public class ChatRoomMemberDTO {
 	private int roomIdx;
 	private String memberId;
+	private String inviteId;
 	private LocalDateTime inviteDt;
 	private LocalDateTime lastReadDt;
 	private int unreadCount;
+
+	private List<String> inviteMemberIdList;
 }

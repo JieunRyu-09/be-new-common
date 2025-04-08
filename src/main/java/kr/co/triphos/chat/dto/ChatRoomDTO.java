@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Log4j2
@@ -18,9 +19,14 @@ import java.time.LocalDateTime;
 public class ChatRoomDTO {
 	private int	roomIdx;
 	private String title;
-	private String createMemberId;
-	private LocalDateTime createDt;
+	private int memberCnt;
+	private String insId;
+	private LocalDateTime insDt;
+	private String updId;
+	private LocalDateTime updDt;
 	private String lastChatMemberId;
 	private String lastChatMsg;
 	private LocalDateTime lastChatDt;
+
+	private List<String> inviteMemberIdList;
 }
