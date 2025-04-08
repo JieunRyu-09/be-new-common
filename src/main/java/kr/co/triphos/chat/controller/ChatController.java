@@ -1,6 +1,7 @@
 package kr.co.triphos.chat.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,6 +17,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/chat")
@@ -54,6 +60,28 @@ public class ChatController {
 		}
 	}
 
+	@GetMapping(value={"/chat-rooms/{roomIdx}/members", "/chat-rooms/members"})
+	@Tag(name = "채팅")
+	@Operation(
+			summary = "채팅방 사용자 조회",
+			description = "채팅방을 생성 시, 혹은 생성된 방에 사용자를 초대할 경우 추가 가능한 사용자 목록 조회."
+	)
+	public ResponseEntity<?> getInvitableMember(@Parameter(description = "채팅방 IDX")	@PathVariable(required = false) Integer roomIdx) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			LinkedList<Map<String, String>> invitableMemberList = chatService.getInvitableMember(roomIdx);
+			responseDTO.addData("memberList", invitableMemberList);
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("초대가능한 사용자 목록 조회 성공");
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
 	@PutMapping("/chat-rooms/{roomIdx}")
 	@Tag(name = "채팅")
 	@Operation(
@@ -66,7 +94,7 @@ public class ChatController {
 					)
 			)
 	)
-	public ResponseEntity<?> updateChatRoom(@PathVariable int roomIdx,
+	public ResponseEntity<?> updateChatRoom(@Parameter(description = "채팅방 IDX") Integer roomIdx,
 											@RequestBody ChatRoomDTO chatRoomDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
@@ -97,7 +125,7 @@ public class ChatController {
 					)
 			)
 	)
-	public ResponseEntity<?> inviteMember(@PathVariable int roomIdx,
+	public ResponseEntity<?> inviteMember(@Parameter(description = "사용자 Id") int roomIdx,
 										  @RequestBody ChatRoomMemberDTO chatRoomMemberDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {

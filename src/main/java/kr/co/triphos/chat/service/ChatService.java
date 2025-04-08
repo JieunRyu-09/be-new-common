@@ -21,14 +21,13 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class ChatService {
+    private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatRoomMsgRepository chatRoomMsgRepository;
@@ -106,6 +105,42 @@ public class ChatService {
         });
         chatRoomMemberRepository.saveAll(chatRoomMemberList);
         return true;
+    }
+
+    public  LinkedList<Map<String, String>> getInvitableMember(Integer roomIdx) {
+        LinkedList<Map<String, String>> invitableMemberList = new LinkedList<>();
+        List<Member> memberList = memberRepository.findByDelYnOrderByMemberNmAsc("N");
+        List<ChatRoomMember> chatRoomMemberList = chatRoomMemberRepository.findByPkRoomIdx(roomIdx);
+
+        if (roomIdx == null) {
+            // 방번호 없는경우, 최초 생성인 경우 모든 사용자 초대가능
+            memberList.forEach(member -> {
+                Map<String, String> memberInfo = new HashMap<>();
+                memberInfo.put("memberId", member.getMemberId());
+                memberInfo.put("memberNm", member.getMemberNm());
+                invitableMemberList.push(memberInfo);
+            });
+        }
+        else {
+            // 방번호가 없는 경우 이미 초대된 사용자 제외하고 보여주기
+            List<String> existMemberList = new ArrayList<>();
+            // 이미 초대된 사용자 목록
+            chatRoomMemberList.forEach(existMember -> {
+                existMemberList.add(existMember.getPk().getMemberId());
+            });
+            // 이미 초대된 사용자는 제외하고 나머지를 초대가능한 사용자 목록에 추가
+            memberList.forEach(member -> {
+                String memberId = member.getMemberId();
+                String memberNm = member.getMemberNm();
+                if (!existMemberList.contains(memberId)) {
+                    Map<String, String> memberInfo = new HashMap<>();
+                    memberInfo.put("memberId", memberId);
+                    memberInfo.put("memberNm", memberNm);
+                    invitableMemberList.push(memberInfo);
+                }
+            });
+        }
+        return invitableMemberList;
     }
 
 }
