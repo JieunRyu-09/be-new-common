@@ -1,22 +1,19 @@
 package kr.co.triphos.chat.service;
 
+import kr.co.triphos.chat.dao.ChatDAO;
 import kr.co.triphos.chat.dto.ChatRoomDTO;
+import kr.co.triphos.chat.dto.ChatRoomInfoDTO;
 import kr.co.triphos.chat.dto.ChatRoomMemberDTO;
 import kr.co.triphos.chat.entity.ChatRoom;
 import kr.co.triphos.chat.entity.ChatRoomMember;
 import kr.co.triphos.chat.repository.ChatRoomMemberRepository;
 import kr.co.triphos.chat.repository.ChatRoomMsgRepository;
 import kr.co.triphos.chat.repository.ChatRoomRepository;
-import kr.co.triphos.common.entity.MenuInfo;
-import kr.co.triphos.common.repository.MenuInfoRepository;
-import kr.co.triphos.config.JwtUtil;
 import kr.co.triphos.member.entity.Member;
-import kr.co.triphos.member.entity.MenuMemberAuth;
 import kr.co.triphos.member.repository.MemberRepository;
-import kr.co.triphos.member.repository.MenuMemberAuthRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -27,10 +24,13 @@ import java.util.*;
 @RequiredArgsConstructor
 @Log4j2
 public class ChatService {
+    private final ChatDAO chatDAO;
+
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatRoomMsgRepository chatRoomMsgRepository;
+
 
     @Transactional
     public boolean createChatRoom(ChatRoomDTO chatRoomDTO, String memberId) throws Exception {
@@ -81,7 +81,7 @@ public class ChatService {
     }
 
     @Transactional
-    public boolean inviteMember(ChatRoomMemberDTO chatRoomMemberDTO, String inviteId) {
+    public boolean inviteMember(ChatRoomMemberDTO chatRoomMemberDTO, String inviteId) throws Exception{
         List<ChatRoomMember> chatRoomMemberList = new ArrayList<>();
         LocalDateTime nowDate = LocalDateTime.now();
         int roomIdx = chatRoomMemberDTO.getRoomIdx();
@@ -107,7 +107,7 @@ public class ChatService {
         return true;
     }
 
-    public  LinkedList<Map<String, String>> getInvitableMember(Integer roomIdx) {
+    public LinkedList<Map<String, String>> getInvitableMember(Integer roomIdx) throws Exception{
         LinkedList<Map<String, String>> invitableMemberList = new LinkedList<>();
         List<Member> memberList = memberRepository.findByDelYnOrderByMemberNmAsc("N");
         List<ChatRoomMember> chatRoomMemberList = chatRoomMemberRepository.findByPkRoomIdx(roomIdx);
@@ -143,4 +143,7 @@ public class ChatService {
         return invitableMemberList;
     }
 
+    public List<ChatRoomInfoDTO> getChatRoomList(String memberId) throws Exception {
+		return chatDAO.getChatRoomList(memberId);
+    }
 }

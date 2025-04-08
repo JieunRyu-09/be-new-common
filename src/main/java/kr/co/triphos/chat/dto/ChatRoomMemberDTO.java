@@ -20,6 +20,7 @@ import java.util.List;
 public class ChatRoomMemberDTO {
 	private int roomIdx;
 	private String memberId;
+	private String delYn;
 	private String inviteId;
 	private LocalDateTime inviteDt;
 	private LocalDateTime lastReadDt;

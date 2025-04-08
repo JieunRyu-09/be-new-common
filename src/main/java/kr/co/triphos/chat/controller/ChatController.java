@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.triphos.chat.dto.ChatRoomDTO;
+import kr.co.triphos.chat.dto.ChatRoomInfoDTO;
 import kr.co.triphos.chat.dto.ChatRoomMemberDTO;
 import kr.co.triphos.chat.entity.ChatRoomMember;
 import kr.co.triphos.chat.service.ChatService;
@@ -63,7 +64,7 @@ public class ChatController {
 	@GetMapping(value={"/chat-rooms/{roomIdx}/members", "/chat-rooms/members"})
 	@Tag(name = "채팅")
 	@Operation(
-			summary = "채팅방 사용자 조회",
+			summary = "채팅방 초대가능 사용자 조회",
 			description = "채팅방을 생성 시, 혹은 생성된 방에 사용자를 초대할 경우 추가 가능한 사용자 목록 조회."
 	)
 	public ResponseEntity<?> getInvitableMember(@Parameter(description = "채팅방 IDX")	@PathVariable(required = false) Integer roomIdx) {
@@ -144,6 +145,27 @@ public class ChatController {
 		}
 	}
 
-
+	@GetMapping("/members/chat-rooms")
+	@Tag(name = "채팅")
+	@Operation(
+			summary = "사용자의 채팅방 목록 조회",
+			description = "현재 사용자가 참가해있는 채팅방 목록을 조회."
+	)
+	public ResponseEntity<?> getChatRoomList() {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			String memberId = authenticationFacadeService.getMemberId();
+			List<ChatRoomInfoDTO> chatRoomList = chatService.getChatRoomList(memberId);
+			responseDTO.addData("chatRoomList", chatRoomList);
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("채팅방 목록 조회");
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
 
 }

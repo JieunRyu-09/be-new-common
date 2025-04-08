@@ -21,6 +21,8 @@ public class ChatRoomMember {
 	@EmbeddedId
 	private ChatRoomMemberPK pk;
 	@NotNull
+	private String delYn;
+	@NotNull
 	private String inviteId;
 	@NotNull
 	private LocalDateTime inviteDt;
@@ -36,5 +38,6 @@ public class ChatRoomMember {
 		this.inviteId = inviteId;
 		this.inviteDt = LocalDateTime.now();
 		this.unreadCount = 0;
+		this.delYn = "N";
 	}
 }
