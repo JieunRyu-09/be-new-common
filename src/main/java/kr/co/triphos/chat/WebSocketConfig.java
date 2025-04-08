@@ -1,4 +1,4 @@
-package kr.co.triphos.chatting;
+package kr.co.triphos.chat;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

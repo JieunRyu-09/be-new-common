@@ -28,9 +28,9 @@ spring:
       allowed-origins: "*"
 logging:
   level:
-    org.springframework.web: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web.socket: TRACE
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.springframework.web.socket: WARN
     org.hibernate:
       SQL: debug  # 실제 실행되는 SQL
       type: trace  # 바인딩되는 파라미터 값까지 출력
