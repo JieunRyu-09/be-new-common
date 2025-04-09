@@ -23,7 +23,6 @@ public class ChatWebSocketController {
 
 
 	@MessageMapping("/chat/{roomIdx}")
-
 	public ChatMessageDTO sendMessage(@DestinationVariable int roomIdx, ChatMessageDTO chatMessageDTO, Principal principal) {
 		try {
 			String memberId = principal.getName();

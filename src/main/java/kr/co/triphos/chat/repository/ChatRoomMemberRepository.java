@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, Long> {
 	List<ChatRoomMember> findByPkRoomIdx(Integer roomIdx);
+
+	List<ChatRoomMember> findByPkRoomIdxAndDelYn(Integer roomIdx, String delYn);
 }
