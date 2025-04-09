@@ -15,6 +15,8 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
@@ -24,13 +26,9 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 @Log4j2
 public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
-	@Lazy
-	@Autowired
-	private SimpMessagingTemplate messagingTemplate;
 
 	private final AuthService authService;
-	private final UserDetailsService userDetailsService;
-	private final JwtFilter jwtFilter;
+
 	private final ObjectMapper objectMapper;
 
 	@Override
@@ -43,8 +41,10 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 			sendErrorToClient(accessor.getSessionId(), "토큰정보가 없습니다.", 403);
 			return null; // 메시지를 막음
 		}
-
-		return message;
+		String token = authHeader.substring(7);
+		Authentication auth = authService.getAuthenticationByToken(token);
+		accessor.setUser(auth);
+		return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
 	}
 
 	private void sendErrorToClient(String sessionId, String msg, int errorCode) {

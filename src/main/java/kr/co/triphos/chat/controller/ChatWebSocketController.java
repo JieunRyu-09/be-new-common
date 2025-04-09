@@ -1,19 +1,39 @@
 package kr.co.triphos.chat.controller;
 
 import kr.co.triphos.chat.dto.ChatMessageDTO;
+import kr.co.triphos.chat.service.ChatWebSocketService;
+import kr.co.triphos.common.service.AuthenticationFacadeService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-@Controller
-public class ChatWebSocketController {
+import java.security.Principal;
 
-	@MessageMapping("/chat") // 클라이언트가 "/app/chat"으로 메시지 전송하면 실행됨
-	@SendTo("/topic/messages") // 모든 구독자에게 메시지를 브로드캐스트
-	public ChatMessageDTO sendMessage(ChatMessageDTO chatMessageDTO) {
+@Controller
+@RequiredArgsConstructor
+@Log4j2
+public class ChatWebSocketController {
+	private final ChatWebSocketService chatWebSocketService;
+
+
+	@MessageMapping("/chat/{roomIdx}")
+
+	public ChatMessageDTO sendMessage(@DestinationVariable int roomIdx, ChatMessageDTO chatMessageDTO, Principal principal) {
+		try {
+			String memberId = principal.getName();
+			chatWebSocketService.receiveMessage(memberId, roomIdx, chatMessageDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex.getMessage());
+		}
 		System.out.println("📩 받은 메시지: " + chatMessageDTO.getContent());
-		return chatMessageDTO; // 메시지를 그대로 클라이언트에게 전송
+		return chatMessageDTO;
 	}
 
 	@MessageMapping("/chat.addUser")

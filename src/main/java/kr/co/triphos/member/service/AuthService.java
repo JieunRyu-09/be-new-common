@@ -9,6 +9,9 @@ import kr.co.triphos.common.repository.MenuInfoRepository;
 import kr.co.triphos.member.repository.MenuMemberAuthRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,7 @@ import java.util.List;
 public class AuthService {
     private final JwtUtil               jwtUtil;
     private final PasswordEncoder       passwordEncoder;
+    private final UserDetailsService userDetailsService;
 
     private final MemberRepository          memberRepository;
     private final MenuMemberAuthRepository  menuMemberAuthRepository;
@@ -62,12 +66,20 @@ public class AuthService {
         return jwtUtil.generateAccessToken(username);
     }
 
-    public String getMemberIdByToken(String refreshToken) {
-        if (!jwtUtil.validateToken(refreshToken)) {
+    public String getMemberIdByToken(String token) {
+        if (!jwtUtil.validateToken(token)) {
             throw new RuntimeException("Invalid Refresh Token");
         }
+        return jwtUtil.extractMemberId(token);
+    }
 
-        return jwtUtil.extractMemberId(refreshToken);
+    public UsernamePasswordAuthenticationToken getAuthenticationByToken(String token) {
+        if (!jwtUtil.validateToken(token)) {
+            throw new RuntimeException("Invalid Refresh Token");
+        }
+        String memberId = getMemberIdByToken(token);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(memberId);
+		return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
     public List<HashMap<String, Object>> getMemberMenuList(String id) {

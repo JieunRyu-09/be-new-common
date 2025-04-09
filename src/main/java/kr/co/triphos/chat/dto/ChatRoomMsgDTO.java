@@ -21,5 +21,5 @@ public class ChatRoomMsgDTO {
 	private String content;
 	private String messageType;
 	private LocalDateTime insDt;
-	private Boolean delYn;
+	private String delYn;
 }

@@ -1,14 +1,9 @@
 package kr.co.triphos.chat.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -20,11 +15,26 @@ import java.time.LocalDateTime;
 @Table(name = "chat_room_msg")
 public class ChatRoomMsg {
 	@Id
-	private int msgIdx;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer msgIdx;
+
 	private int roomIdx;
 	private String memberId;
 	private String content;
 	private String messageType;
 	private LocalDateTime insDt;
-	private Boolean delYn;
+	private String delYn;
+
+	@Builder(builderClassName = "createTextChatRoomMsg", builderMethodName = "createTextChatRoomMsg")
+	public ChatRoomMsg(int roomIdx,
+					   @NonNull String memberId,
+					   @NonNull String content) {
+		this.roomIdx = roomIdx;
+		this.memberId = memberId;
+		this.content = content;
+		this.messageType = "TEXT";
+		this.insDt = LocalDateTime.now();
+		this.delYn = "N";
+
+	}
 }

@@ -34,4 +34,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void configureClientInboundChannel(org.springframework.messaging.simp.config.ChannelRegistration registration) {
 		registration.interceptors(stompInterceptor); // ✅ STOMP 인터셉터 등록
 	}
+
 }
