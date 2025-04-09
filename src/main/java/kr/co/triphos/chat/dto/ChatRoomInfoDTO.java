@@ -14,8 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoomInfoDTO {
-	private int	roomIdx;
-	private String title;
-	private int memberCnt;
-	private String lastChatMsg;
+	private int		roomIdx;
+	private String 	title;
+	private int 	memberCnt;
+	private String 	lastChatMsg;
+	private int 	unreadCount;
 }

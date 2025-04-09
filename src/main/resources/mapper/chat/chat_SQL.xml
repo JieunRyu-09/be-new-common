@@ -11,7 +11,8 @@
          SELECT T1.ROOM_IDX,
                 T1.TITLE,
                 T1.MEMBER_CNT,
-                T1.LAST_CHAT_MSG
+                T1.LAST_CHAT_MSG,
+                T2.UNREAD_COUNT
            FROM chat_room           T1,
                 chat_room_member    T2
           WHERE T1.ROOM_IDX     = T2.ROOM_IDX
