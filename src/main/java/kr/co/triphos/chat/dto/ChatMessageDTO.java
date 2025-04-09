@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 public class ChatMessageDTO {
 	private String sender;
 	private String content;
-	private MessageType type;
+	private MessageType type = MessageType.TEXT;
 
 	public enum MessageType {
-		CHAT, JOIN, LEAVE
+		TEXT, JOIN, LEAVE, FILE, IMG
 	}
 }

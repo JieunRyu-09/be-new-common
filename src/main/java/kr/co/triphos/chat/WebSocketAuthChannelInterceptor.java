@@ -38,13 +38,19 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 		// jwt Token 존재여부 검사
 		String authHeader = accessor.getFirstNativeHeader("Authorization");
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			sendErrorToClient(accessor.getSessionId(), "토큰정보가 없습니다.", 403);
-			return null; // 메시지를 막음
+			return message;
 		}
-		String token = authHeader.substring(7);
-		Authentication auth = authService.getAuthenticationByToken(token);
-		accessor.setUser(auth);
-		return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
+		else {
+			String token = authHeader.substring(7);
+			Authentication auth = authService.getAuthenticationByToken(token);
+			accessor.setUser(auth);
+			return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
+		}
+		//if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+		//	sendErrorToClient(accessor.getSessionId(), "토큰정보가 없습니다.", 403);
+		//	return null; // 메시지를 막음
+		//}
+
 	}
 
 	private void sendErrorToClient(String sessionId, String msg, int errorCode) {

@@ -41,6 +41,11 @@ public class ChatWebSocketService {
         String content = chatMessageDTO.getContent();
         LocalDateTime nowDate = LocalDateTime.now();
 
+        // 메세지 전송자 설정
+        String memberNm = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("잘못된 사용자입니다.")).getMemberNm();
+        chatMessageDTO.setSender(memberNm);
+
         ChatRoomMsg chatRoomMsg = ChatRoomMsg.createTextChatRoomMsg()
                 .roomIdx(roomIdx)
                 .memberId(memberId)
