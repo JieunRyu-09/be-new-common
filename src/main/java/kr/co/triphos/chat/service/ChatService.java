@@ -1,11 +1,13 @@
 package kr.co.triphos.chat.service;
 
 import kr.co.triphos.chat.dao.ChatDAO;
+import kr.co.triphos.chat.dto.ChatMessageDTO;
 import kr.co.triphos.chat.dto.ChatRoomDTO;
 import kr.co.triphos.chat.dto.ChatRoomInfoDTO;
 import kr.co.triphos.chat.dto.ChatRoomMemberDTO;
 import kr.co.triphos.chat.entity.ChatRoom;
 import kr.co.triphos.chat.entity.ChatRoomMember;
+import kr.co.triphos.chat.entity.ChatRoomMsg;
 import kr.co.triphos.chat.repository.ChatRoomMemberRepository;
 import kr.co.triphos.chat.repository.ChatRoomMsgRepository;
 import kr.co.triphos.chat.repository.ChatRoomRepository;
@@ -14,6 +16,8 @@ import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -145,5 +149,12 @@ public class ChatService {
 
     public List<ChatRoomInfoDTO> getChatRoomList(String memberId) throws Exception {
 		return chatDAO.getChatRoomList(memberId);
+    }
+
+    public List<ChatMessageDTO> getChatMessages(int roomIdx, int page) throws Exception {
+        int pageSize = 20;
+        int startIdx = pageSize * (page - 1);
+
+        return chatDAO.getChatMessages(roomIdx, startIdx, pageSize);
     }
 }

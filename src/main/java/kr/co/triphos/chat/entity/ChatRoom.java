@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity(name = "ChatRoom")
 @Log4j2
-@Table(name = "chat_room")
+@Table(name = "ch_chat_room")
 public class ChatRoom {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

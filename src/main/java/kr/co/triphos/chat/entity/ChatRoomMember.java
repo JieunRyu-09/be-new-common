@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity(name = "ChatRoomMember")
 @Log4j2
-@Table(name = "chat_room_member")
+@Table(name = "ch_chat_room_member")
 public class ChatRoomMember {
 	@EmbeddedId
 	private ChatRoomMemberPK pk;

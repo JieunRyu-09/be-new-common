@@ -9,6 +9,7 @@ import kr.co.triphos.chat.repository.ChatRoomMemberRepository;
 import kr.co.triphos.chat.repository.ChatRoomMsgRepository;
 import kr.co.triphos.chat.repository.ChatRoomRepository;
 import kr.co.triphos.common.service.RedisService;
+import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -41,9 +42,10 @@ public class ChatWebSocketService {
         LocalDateTime nowDate = LocalDateTime.now();
 
         // 메세지 전송자 설정
-        String memberNm = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new RuntimeException("잘못된 사용자입니다.")).getMemberNm();
-        chatMessageDTO.setSender(memberNm);
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("잘못된 사용자입니다."));
+        chatMessageDTO.setMemberId(member.getMemberId());
+        chatMessageDTO.setMemberNm(member.getMemberNm());
 
         ChatRoomMsg chatRoomMsg = ChatRoomMsg.createTextChatRoomMsg()
                 .roomIdx(roomIdx)

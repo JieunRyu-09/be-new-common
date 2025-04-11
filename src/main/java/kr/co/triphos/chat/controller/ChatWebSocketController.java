@@ -38,7 +38,7 @@ public class ChatWebSocketController {
 	@MessageMapping("/chat.addUser")
 	@SendTo("/topic/public")
 	public ChatMessageDTO addUser(@Payload ChatMessageDTO chatMessageDTO) {
-		chatMessageDTO.setContent(chatMessageDTO.getSender() + " 님이 입장하셨습니다.");
+		chatMessageDTO.setContent(chatMessageDTO.getMemberNm() + " 님이 입장하셨습니다.");
 		return chatMessageDTO;
 	}
 

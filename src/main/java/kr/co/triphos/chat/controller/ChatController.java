@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.triphos.chat.dto.ChatMessageDTO;
 import kr.co.triphos.chat.dto.ChatRoomDTO;
 import kr.co.triphos.chat.dto.ChatRoomInfoDTO;
 import kr.co.triphos.chat.dto.ChatRoomMemberDTO;
@@ -61,28 +62,6 @@ public class ChatController {
 		}
 	}
 
-	@GetMapping(value={"/chat-rooms/{roomIdx}/members", "/chat-rooms/members"})
-	@Tag(name = "채팅")
-	@Operation(
-			summary = "채팅방 초대가능 사용자 조회",
-			description = "채팅방을 생성 시, 혹은 생성된 방에 사용자를 초대할 경우 추가 가능한 사용자 목록 조회."
-	)
-	public ResponseEntity<?> getInvitableMember(@Parameter(description = "채팅방 IDX")	@PathVariable(required = false) Integer roomIdx) {
-		ResponseDTO responseDTO = new ResponseDTO();
-		try {
-			LinkedList<Map<String, String>> invitableMemberList = chatService.getInvitableMember(roomIdx);
-			responseDTO.addData("memberList", invitableMemberList);
-			responseDTO.setSuccess(true);
-			responseDTO.setMsg("초대가능한 사용자 목록 조회 성공");
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		catch (Exception ex) {
-			log.error(ex);
-			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
-			return ResponseEntity.internalServerError().body(responseDTO);
-		}
-	}
-
 	@PutMapping("/chat-rooms/{roomIdx}")
 	@Tag(name = "채팅")
 	@Operation(
@@ -105,6 +84,28 @@ public class ChatController {
 			String msg = res ? "채팅방을 수정하였습니다" : "채팅방 수정에 실패하였습니다.";
 			responseDTO.setSuccess(res);
 			responseDTO.setMsg(msg);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@GetMapping(value={"/chat-rooms/{roomIdx}/invitable", "/chat-rooms/invitable"})
+	@Tag(name = "채팅")
+	@Operation(
+			summary = "채팅방 초대가능 사용자 조회",
+			description = "채팅방을 생성 시, 혹은 생성된 방에 사용자를 초대할 경우 추가 가능한 사용자 목록 조회."
+	)
+	public ResponseEntity<?> getInvitableMember(@Parameter(description = "채팅방 IDX")	@PathVariable(required = false) Integer roomIdx) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			LinkedList<Map<String, String>> invitableMemberList = chatService.getInvitableMember(roomIdx);
+			responseDTO.addData("memberList", invitableMemberList);
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("초대가능한 사용자 목록 조회 성공");
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {
@@ -159,6 +160,29 @@ public class ChatController {
 			responseDTO.addData("chatRoomList", chatRoomList);
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg("채팅방 목록 조회");
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@GetMapping("/chat-rooms/{roomIdx}/chat-messages")
+	@Tag(name = "채팅")
+	@Operation(
+			summary = "채팅방의 채팅조회",
+			description = "현재 사용자가 참가해있는 채팅방 목록을 조회."
+	)
+	public ResponseEntity<?> getChatMessages(@PathVariable int roomIdx,
+											 @RequestParam int page) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			List<ChatMessageDTO> chatMessageList = chatService.getChatMessages(roomIdx, page);
+			responseDTO.addData("chatMessageList", chatMessageList);
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("채팅방의 채팅내역 조회");
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {
