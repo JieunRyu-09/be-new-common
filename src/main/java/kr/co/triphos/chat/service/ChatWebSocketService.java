@@ -2,6 +2,7 @@ package kr.co.triphos.chat.service;
 
 import kr.co.triphos.chat.dao.ChatDAO;
 import kr.co.triphos.chat.dto.ChatMessageDTO;
+import kr.co.triphos.chat.dto.ChatRoomInfoDTO;
 import kr.co.triphos.chat.entity.ChatRoom;
 import kr.co.triphos.chat.entity.ChatRoomMember;
 import kr.co.triphos.chat.entity.ChatRoomMsg;
@@ -63,8 +64,16 @@ public class ChatWebSocketService {
         chatRoom.setLastChatMsg(content);
         chatRoomRepository.save(chatRoom);
 
-        // 채팅방 맴버별 안읽은 메세지 수 증가
-        updateChatRoomMemberUnreadCount(roomIdx);
+        ChatRoomInfoDTO chatRoomInfoDTO = ChatRoomInfoDTO.createChatRoomInfo()
+                .roomIdx(roomIdx)
+                .title(chatRoom.getTitle())
+                .memberCnt(chatRoom.getMemberCnt())
+                .lastChatMsg(chatRoom.getLastChatMsg())
+                .unreadCount(0)
+                .build();
+
+        // 채팅방 맴버별 안읽은 메세지 수 증가 및 채팅목록 send
+        updateChatRoomMemberUnreadCount(roomIdx, chatRoomInfoDTO);
 
         // 채팅방의 멤버들에게 메세지 전송
         messagingTemplate.convertAndSend("/topic/chat/" + roomIdx, chatMessageDTO);
@@ -72,7 +81,7 @@ public class ChatWebSocketService {
         return true;
     }
 
-    public void updateChatRoomMemberUnreadCount(int roomIdx) throws Exception {
+    public void updateChatRoomMemberUnreadCount(int roomIdx, ChatRoomInfoDTO chatRoomInfoDTO) throws Exception {
         // 해당 채팅방에서 나가지 않은 사람만 조회
         List<ChatRoomMember> chatRoomMemberList = chatRoomMemberRepository.findByPkRoomIdxAndDelYn(roomIdx, "N");
         // 추후 안읽은 메세지수 업데이트할 사람 목록
@@ -87,10 +96,15 @@ public class ChatWebSocketService {
             // 사용자가 구독중인 roomIdx랑 현재 메세지가 전송된 방의 roomIdx랑 일치하지 않는다면
             // 안읽은 메세지 수 증가
             if (participateRoomIdx != roomIdx) {
-                int beforeUnreadCount = chatRoomMember.getUnreadCount();
-                chatRoomMember.setUnreadCount(beforeUnreadCount + 1);
+                int unreadCount = chatRoomMember.getUnreadCount() + 1;
+                chatRoomMember.setUnreadCount(unreadCount);
                 updateChatRoomMemberList.add(chatRoomMember);
+                // 채팅방 채널에 안읽은 메세지 수 설정
+                chatRoomInfoDTO.setUnreadCount(unreadCount);
             }
+
+            // 채팅방 채널에 발송
+            messagingTemplate.convertAndSend("/topic/chat/notify/" + memberId, chatRoomInfoDTO);
         });
 
         // 업데이트 해야될 사람이 있으면 업데이트
