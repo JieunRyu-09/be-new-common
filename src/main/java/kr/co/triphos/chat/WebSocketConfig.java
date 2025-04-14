@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
 		// 클라이언트가 메시지를 받을 수 있는 경로 설정
-		config.enableSimpleBroker("/topic", "queue");
+		config.enableSimpleBroker("/topic", "/queue");
 
 		// 클라이언트에서 메시지를 보낼 때 사용하는 prefix
 		config.setApplicationDestinationPrefixes("/app");

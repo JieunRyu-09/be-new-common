@@ -14,8 +14,12 @@ import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpSession;
+import org.springframework.messaging.simp.user.SimpSubscription;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
@@ -38,9 +42,6 @@ public class ChatWebSocketService {
     private final ChatRoomMsgRepository chatRoomMsgRepository;
 
     private final RedisService redisService;
-
-    private SimpUserRegistry simpUserRegistry;
-
 
     @Transactional
     public boolean receiveMessage(String memberId, int roomIdx, ChatMessageDTO chatMessageDTO) throws Exception{
@@ -108,8 +109,6 @@ public class ChatWebSocketService {
                 chatRoomInfoDTO.setUnreadCount(unreadCount);
             }
 
-
-            // 채팅방 채널에 발송
             messagingTemplate.convertAndSendToUser(memberId,"/queue/unread", chatRoomInfoDTO);
         });
 

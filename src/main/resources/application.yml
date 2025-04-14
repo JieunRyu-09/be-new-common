@@ -17,7 +17,7 @@ spring:
     restart:
       enabled: false
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -32,8 +32,8 @@ logging:
     org.springframework.security: WARN
     org.springframework.web.socket: WARN
     org.hibernate:
-      SQL: debug  # 실제 실행되는 SQL
-      type: trace  # 바인딩되는 파라미터 값까지 출력
+      SQL: WARN  # 실제 실행되는 SQL
+      type: WARN  # 바인딩되는 파라미터 값까지 출력
 mybatis:
   configuration:
     map-underscore-to-camel-case: true

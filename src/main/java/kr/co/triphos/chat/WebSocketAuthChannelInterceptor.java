@@ -14,10 +14,8 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 
 @Component
 @RequiredArgsConstructor
@@ -37,11 +35,15 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 			return message;
 		}
 
-		// 인증정보 저장
 		String token = authHeader.substring(7);
 		Authentication auth = authService.getAuthenticationByToken(token);
 		String memberId = authService.getMemberIdByToken(token);
-		accessor.setUser(auth);
+		// 인증정보 저장
+		if (!StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
+
+			accessor.setUser(auth);
+		}
+
 
 		// 구독할 경우 redis에 엔드포인드 | memberId로 정보 저장
 		// 구독중(읽고있는중)인 채팅방의 경우 안읽은 메세지 수 증가 안하기 위함
@@ -52,8 +54,14 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 			}
 			String[] parts = destination.split("/");
 			String roomIdx = parts[parts.length - 1];
-			redisService.delData(memberId + "chatRoom");
-			redisService.saveData(memberId + "chatRoom", roomIdx);
+			try {
+				Integer.parseInt(roomIdx);
+				redisService.delData(memberId + "chatRoom");
+				redisService.saveData(memberId + "chatRoom", roomIdx);
+			}
+			catch (Exception ignored) {
+
+			}
 		}
 		return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
 	}
