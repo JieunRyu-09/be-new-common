@@ -14,8 +14,10 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 
 @Component
 @RequiredArgsConstructor
@@ -54,13 +56,6 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 			redisService.saveData(memberId + "chatRoom", roomIdx);
 		}
 		return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
-
-
-		//if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-		//	sendErrorToClient(accessor.getSessionId(), "토큰정보가 없습니다.", 403);
-		//	return null; // 메시지를 막음
-		//}
-
 	}
 
 	private void sendErrorToClient(String sessionId, String msg, int errorCode) {
