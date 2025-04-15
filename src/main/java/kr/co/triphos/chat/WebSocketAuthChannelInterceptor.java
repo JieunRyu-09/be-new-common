@@ -1,11 +1,14 @@
 package kr.co.triphos.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.triphos.chat.service.ChatWebSocketService;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.service.RedisService;
 import kr.co.triphos.member.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -24,6 +27,12 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 	private final AuthService authService;
 	private final ObjectMapper objectMapper;
 	private final RedisService redisService;
+	private ChatWebSocketService chatWebSocketService;
+
+	@Autowired
+	public void setChatWebSocketService(@Lazy ChatWebSocketService chatWebSocketService) {
+		this.chatWebSocketService = chatWebSocketService;
+	}
 
 	@Override
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -40,7 +49,6 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 		String memberId = authService.getMemberIdByToken(token);
 		// 인증정보 저장
 		if (!StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
-
 			accessor.setUser(auth);
 		}
 
@@ -52,15 +60,17 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 			if (destination == null || destination.isEmpty()) {
 				return null;
 			}
-			String[] parts = destination.split("/");
-			String roomIdx = parts[parts.length - 1];
-			try {
-				Integer.parseInt(roomIdx);
-				redisService.delData(memberId + "chatRoom");
-				redisService.saveData(memberId + "chatRoom", roomIdx);
-			}
-			catch (Exception ignored) {
-
+			if (destination.matches("^/topic/chat/\\d+$")) {
+				try {
+					String[] parts = destination.split("/");
+					String roomIdx = parts[parts.length - 1];
+					redisService.delData(memberId + "chatRoom");
+					redisService.saveData(memberId + "chatRoom", roomIdx);
+					chatWebSocketService.setUnreadCount(memberId, Integer.parseInt(roomIdx));
+				}
+				catch (Exception ex) {
+					log.error(ex);
+				}
 			}
 		}
 		return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());

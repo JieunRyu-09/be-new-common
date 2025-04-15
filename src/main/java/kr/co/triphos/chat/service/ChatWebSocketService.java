@@ -6,6 +6,7 @@ import kr.co.triphos.chat.dto.ChatRoomInfoDTO;
 import kr.co.triphos.chat.entity.ChatRoom;
 import kr.co.triphos.chat.entity.ChatRoomMember;
 import kr.co.triphos.chat.entity.ChatRoomMsg;
+import kr.co.triphos.chat.entity.pk.ChatRoomMemberPK;
 import kr.co.triphos.chat.repository.ChatRoomMemberRepository;
 import kr.co.triphos.chat.repository.ChatRoomMsgRepository;
 import kr.co.triphos.chat.repository.ChatRoomRepository;
@@ -14,14 +15,7 @@ import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.user.SimpSession;
-import org.springframework.messaging.simp.user.SimpSubscription;
-import org.springframework.messaging.simp.user.SimpUser;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -33,9 +27,7 @@ import java.util.*;
 @Log4j2
 public class ChatWebSocketService {
     private final ChatDAO chatDAO;
-
     private final SimpMessagingTemplate messagingTemplate;
-
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
@@ -53,6 +45,7 @@ public class ChatWebSocketService {
                 .orElseThrow(() -> new RuntimeException("잘못된 사용자입니다."));
         chatMessageDTO.setMemberId(member.getMemberId());
         chatMessageDTO.setMemberNm(member.getMemberNm());
+        chatMessageDTO.setSendTime(nowDate);
 
         ChatRoomMsg chatRoomMsg = ChatRoomMsg.createTextChatRoomMsg()
                 .roomIdx(roomIdx)
@@ -83,7 +76,6 @@ public class ChatWebSocketService {
 
         // 채팅방의 멤버들에게 메세지 전송
         messagingTemplate.convertAndSend("/topic/chat/" + roomIdx, chatMessageDTO);
-        //messagingTemplate.convertAndSend("/topic/chat-room-list/" + roomIdx, chatMessageDTO);
         return true;
     }
 
@@ -107,15 +99,38 @@ public class ChatWebSocketService {
                 updateChatRoomMemberList.add(chatRoomMember);
                 // 채팅방 채널에 안읽은 메세지 수 설정
                 chatRoomInfoDTO.setUnreadCount(unreadCount);
+            } else {
+                chatRoomInfoDTO.setUnreadCount(0);
             }
 
-            messagingTemplate.convertAndSendToUser(memberId,"/queue/unread", chatRoomInfoDTO);
+            messagingTemplate.convertAndSendToUser(memberId, "/queue/unread", chatRoomInfoDTO);
         });
 
         // 업데이트 해야될 사람이 있으면 업데이트
         if (!updateChatRoomMemberList.isEmpty()) {
             chatRoomMemberRepository.saveAll(updateChatRoomMemberList);
         }
+    }
+
+    public void setUnreadCount(String memberId, int roomIdx) throws Exception {
+        ChatRoomMemberPK pk = new ChatRoomMemberPK(roomIdx, memberId);
+        // 채팅방 정보와 사용자의 채팅방 정보 조회
+        ChatRoom chatRoom = chatRoomRepository.findByRoomIdx(roomIdx).orElseThrow(() -> new RuntimeException("잘못된 채팅방 정보입니다."));
+        ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByPk(pk);
+
+        // 사용자의 채팅방 정보의 안읽은 메세지 수 0으로 저장
+        chatRoomMember.setUnreadCount(0);
+        chatRoomMemberRepository.save(chatRoomMember);
+
+        // 사용자의 채팅방 정보 최신화 broadcast
+        ChatRoomInfoDTO chatRoomInfoDTO = ChatRoomInfoDTO.createChatRoomInfo()
+                .roomIdx(roomIdx)
+                .title(chatRoom.getTitle())
+                .memberCnt(chatRoom.getMemberCnt())
+                .lastChatMsg(chatRoom.getLastChatMsg())
+                .unreadCount(0)
+                .build();
+        messagingTemplate.convertAndSendToUser(memberId, "/queue/unread", chatRoomInfoDTO);
     }
 
 }
