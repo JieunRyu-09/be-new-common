@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
@@ -28,7 +29,11 @@ public class JwtUtil {
      */
     @Value("${token.time}")
     private long ACCESS_TOKEN_VALIDITY;
+    private long TEMP_TOKEN_VALIDITY = 1000 * 30;
     private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 7; // 7일
+    private final String HEADER_STRING = "Authorization";
+    private final String TOKEN_PREFIX = "Bearer ";
+
 
     @PostConstruct
     public void init() {
@@ -39,6 +44,23 @@ public class JwtUtil {
     public HashMap<String, String> generateAccessToken(String memberID) {
         HashMap<String, String> resultMap = new HashMap<>();
         Date expirationDate = new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String accessToken = Jwts.builder()
+                .setSubject(memberID)
+                .setIssuedAt(new Date())
+                .setExpiration(expirationDate)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        resultMap.put("accessToken", accessToken);
+        resultMap.put("expirationDate", sdf.format(expirationDate));
+        return resultMap;
+    }
+
+    // 임시 Access Token 생성
+    public HashMap<String, String> generateTempAccessToken(String memberID) {
+        HashMap<String, String> resultMap = new HashMap<>();
+        Date expirationDate = new Date(System.currentTimeMillis() + TEMP_TOKEN_VALIDITY);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String accessToken = Jwts.builder()
                 .setSubject(memberID)

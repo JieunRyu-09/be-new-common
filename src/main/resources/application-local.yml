@@ -10,8 +10,8 @@ spring:
     username: dev_standard
     password: $tri0605!
   redis:
-    host: 211.253.9.200  # Redis 서버 IP 주소
-    port: 6379           # Redis 포트
+    host: vpn.triphos.co.kr  # Redis 서버 IP 주소
+    port: 46379           # Redis 포트
     password: tri0605    # Redis 비밀번호
     jedis:
       pool:

@@ -66,6 +66,10 @@ public class AuthService {
         return jwtUtil.generateAccessToken(username);
     }
 
+    public HashMap<String, String> getTempAccessToken(String memberId) {
+        return jwtUtil.generateTempAccessToken(memberId);
+    }
+
     public String getMemberIdByToken(String token) {
         if (!jwtUtil.validateToken(token)) {
             throw new RuntimeException("Invalid Refresh Token");

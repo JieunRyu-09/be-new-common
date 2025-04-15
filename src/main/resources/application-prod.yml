@@ -20,6 +20,6 @@ spring:
         min-idle: 1       # 최소 유휴 커넥션 수
         max-wait: 1000    # 커넥션 풀 대기 시간 (ms)
 file:
-  upload-dir: E:\_PUBLIC\HOME_DEV\dev-standard-backend\files
+  upload-dir: D:\DEV_STANDARD\backend\files
 token:
     time: 60000 #1000 * 60
