@@ -28,11 +28,12 @@ public class ChatRoomMsg {
 	@Builder(builderClassName = "createTextChatRoomMsg", builderMethodName = "createTextChatRoomMsg")
 	public ChatRoomMsg(int roomIdx,
 					   @NonNull String memberId,
-					   @NonNull String content) {
+					   @NonNull String content,
+					   String messageType) {
 		this.roomIdx = roomIdx;
 		this.memberId = memberId;
 		this.content = content;
-		this.messageType = "TEXT";
+		this.messageType = messageType;
 		this.insDt = LocalDateTime.now();
 		this.delYn = "N";
 

@@ -21,5 +21,7 @@ spring:
         max-wait: 1000    # 커넥션 풀 대기 시간 (ms)
 file:
   upload-dir: D:\DEV_STANDARD\backend\files
+chat:
+  upload-dir: D:\DEV_STANDARD\backend\chat\files
 token:
     time: 60000 #1000 * 60

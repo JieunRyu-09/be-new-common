@@ -20,6 +20,10 @@ public class ChatMessageDTO {
 	private MessageType type = MessageType.TEXT;
 	private LocalDateTime sendTime;
 
+	private int fileIdx;
+	private String fileUrl;
+	private String fileName;
+
 	public enum MessageType {
 		TEXT, JOIN, LEAVE, FILE, IMG
 	}

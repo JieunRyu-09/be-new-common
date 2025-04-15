@@ -26,50 +26,49 @@
 
 <hr>
 
-<h3>📬 구독 채널</h3>
 <div class="subscription">
     <label>📬 Subscribe 채널 1 (예: /topic/chat/1)</label>
     <input type="text" id="subscribeDest1" value="/topic/chat/1">
     <button onclick="subscribe(1)">Subscribe 1</button>
+    <button onclick="unsubscribe(1)">Unsubscribe 1</button>
 </div>
 <div class="subscription">
     <label>📬 Subscribe 채널 2 (예: /topic/chat/2)</label>
     <input type="text" id="subscribeDest2" value="/topic/chat/2">
     <button onclick="subscribe(2)">Subscribe 2</button>
+    <button onclick="unsubscribe(2)">Unsubscribe 2</button>
 </div>
 <div class="subscription">
     <label>📬 Subscribe 채널 3 (예: /topic/chat/3)</label>
     <input type="text" id="subscribeDest3" value="/topic/chat/3">
     <button onclick="subscribe(3)">Subscribe 3</button>
+    <button onclick="unsubscribe(3)">Unsubscribe 3</button>
 </div>
 <div class="subscription">
     <label>📬 Subscribe 채널 4 (예: 채팅방 목록 수신, /user/queue/unread)</label>
     <input type="text" id="subscribeDest4" value="/user/queue/unread">
     <button onclick="subscribe(4)">Subscribe 4</button>
+    <button onclick="unsubscribe(4)">Unsubscribe 4</button>
 </div>
 
-<hr>
-
-<label>📤 Send 주소 (예: /app/chat/1)</label>
-<input type="text" id="sendDest" value="/app/chat/1">
-
-<label>✉️ 보낼 메시지 (JSON 형식)</label>
-<textarea id="sendBody">{ "content": "Hello"}</textarea>
-
-<button onclick="send()">Send</button>
-
-<hr>
+<!-- ... 생략 ... -->
 
 <h3>📥 수신 메시지 및 로그</h3>
 <div id="logs"></div>
+<button onclick="clearLogs()">🧹 로그 지우기</button>
 
 <script>
 	let client = null;
+	const subscriptions = {}; // 채널 번호별 구독 저장
 
 	function log(msg) {
 		const logDiv = document.getElementById("logs");
 		logDiv.textContent += msg + "\n";
 		logDiv.scrollTop = logDiv.scrollHeight;
+	}
+
+	function clearLogs() {
+		document.getElementById("logs").textContent = "";
 	}
 
 	function connect() {
@@ -90,19 +89,31 @@
 		);
 	}
 
-	// Subscribe 함수 수정 - 구독을 각각 다른 채널에 대해 처리
 	function subscribe(channelNumber) {
 		const destination = document.getElementById(`subscribeDest${channelNumber}`).value;
 		const token = document.getElementById("authHeader").value;
 
-		client.subscribe(
+		const subscription = client.subscribe(
 			destination,
 			function (message) {
 				log(`📩 채널 ${channelNumber} 수신됨: ` + message.body);
 			},
 			{ Authorization: token }
 		);
+
+		subscriptions[channelNumber] = subscription;
 		log(`🔔 채널 ${channelNumber} 구독 요청: ` + destination);
+	}
+
+	function unsubscribe(channelNumber) {
+		const subscription = subscriptions[channelNumber];
+		if (subscription) {
+			subscription.unsubscribe();
+			log(`🔕 채널 ${channelNumber} 구독 해제`);
+			delete subscriptions[channelNumber];
+		} else {
+			log(`⚠️ 채널 ${channelNumber}는 현재 구독 중이 아닙니다.`);
+		}
 	}
 
 	function send() {
@@ -119,5 +130,4 @@
 	}
 </script>
 
-</body>
-</html>
+<!-- ... 아래 HTML 마감 태그 유지 ... -->

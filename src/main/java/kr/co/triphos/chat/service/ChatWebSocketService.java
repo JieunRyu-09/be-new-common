@@ -51,6 +51,7 @@ public class ChatWebSocketService {
                 .roomIdx(roomIdx)
                 .memberId(memberId)
                 .content(content)
+                .messageType(chatMessageDTO.getType().toString())
                 .build();
         // 메세지 저장
         chatRoomMsgRepository.save(chatRoomMsg);

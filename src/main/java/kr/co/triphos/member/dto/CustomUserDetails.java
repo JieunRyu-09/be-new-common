@@ -18,7 +18,7 @@ import static java.lang.reflect.Modifier.STATIC;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomUserDetailsDTO implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 	private String 	memberId;
 	private String 	memberNm;
 	private String 	memberPw;
@@ -47,7 +47,7 @@ public class CustomUserDetailsDTO implements UserDetails {
 	private boolean credentialsNonExpired;
 	private boolean enabled;
 
-	public CustomUserDetailsDTO(Member member) {
+	public CustomUserDetails(Member member) {
 		try {
 			Field[] dtoFields = member.getClass().getDeclaredFields(); // MemberEntity의 모든 필드 가져오기
 			Field[] entityFields = this.getClass().getDeclaredFields(); // CustomUserDetails의 모든 필드 가져오기
@@ -75,7 +75,7 @@ public class CustomUserDetailsDTO implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return Collections.singletonList(new SimpleGrantedAuthority(authority));
+		return Collections.emptyList();
 	}
 
 	@Override

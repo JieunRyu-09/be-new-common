@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.service.RedisService;
+import kr.co.triphos.member.dto.CustomUserDetails;
 import kr.co.triphos.member.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -97,9 +98,9 @@ public class JwtFilter extends OncePerRequestFilter {
         if (!token.equals(redisAccessToken)) throw new RuntimeException("다른곳에서 로그인하여 로그인정보가 만료되었습니다.");
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            CustomUserDetails customUserDetails = userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
         return true;

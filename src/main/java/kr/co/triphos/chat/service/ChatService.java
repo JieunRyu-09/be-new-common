@@ -5,35 +5,47 @@ import kr.co.triphos.chat.dto.ChatMessageDTO;
 import kr.co.triphos.chat.dto.ChatRoomDTO;
 import kr.co.triphos.chat.dto.ChatRoomInfoDTO;
 import kr.co.triphos.chat.dto.ChatRoomMemberDTO;
+import kr.co.triphos.chat.entity.ChatFileInfo;
 import kr.co.triphos.chat.entity.ChatRoom;
 import kr.co.triphos.chat.entity.ChatRoomMember;
-import kr.co.triphos.chat.entity.ChatRoomMsg;
+import kr.co.triphos.chat.repository.ChatFileInfoRepository;
 import kr.co.triphos.chat.repository.ChatRoomMemberRepository;
-import kr.co.triphos.chat.repository.ChatRoomMsgRepository;
 import kr.co.triphos.chat.repository.ChatRoomRepository;
+import kr.co.triphos.common.entity.FileInfo;
+import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class ChatService {
+    @Value("${chat.upload-dir}")
+    private String rootPath;
+
     private final ChatDAO chatDAO;
 
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
-    private final ChatRoomMsgRepository chatRoomMsgRepository;
+    private final ChatFileInfoRepository chatFileInfoRepository;
+
+    private final ChatWebSocketService chatWebSocketService;
+    private final AuthenticationFacadeService authenticationFacadeService;
 
 
     @Transactional
@@ -156,5 +168,76 @@ public class ChatService {
         int startIdx = pageSize * (page - 1);
 
         return chatDAO.getChatMessages(roomIdx, startIdx, pageSize);
+    }
+
+    @Transactional
+    public boolean fileSave (int roomIdx, List<MultipartFile> fileList, String memberId) throws Exception {
+        // 파일경로 선언
+        LocalDateTime nowDate 	= LocalDateTime.now();
+        String yearMonth 		= nowDate.format(DateTimeFormatter.ofPattern("yyyyMM"));
+
+        // 파일 개별 저장
+        fileList.forEach(fileItem -> {
+            try {
+                String contentType = fileItem.getContentType();
+                String fileType = contentType.startsWith("image/") ? "IMG" : "FILE";
+                long fileSize = fileItem.getSize();
+                String realFileNm = fileItem.getOriginalFilename();
+                if (realFileNm == null) throw new RuntimeException("잘못된 파일정보입니다.");
+
+                // FileInfo Entity 생성
+                ChatFileInfo chatFileInfo = ChatFileInfo.builder()
+                        .roomIdx(roomIdx)
+                        .fileType(fileType)
+                        .filePath("temp")
+                        .fileNm("temp")
+                        .realFileNm(realFileNm)
+                        .fileSize(fileSize)
+                        .insDt(nowDate)
+                        .insMemberId(memberId)
+                        .build();
+                // FileInfo Entity 저장 및 저장하면서 생긴 IDX 조회
+                // 조회한 IDX로 추후 파일명 등 설정
+                chatFileInfoRepository.save(chatFileInfo);
+                chatFileInfoRepository.flush();
+                Integer idx = chatFileInfo.getFileIdx();
+                if (idx == null) throw new RuntimeException("파일 저장 실패.");
+
+                // 확장자, 파일경로 등 파일정보 설정
+                // 경로 체크 후 없으면 경로까지 생성
+                String fileExtender = realFileNm.substring(realFileNm.lastIndexOf("."));
+                String fileName = yearMonth + "_" + idx + fileExtender;
+                String shortPath = "/" + yearMonth + "/";
+                Path filePath = Paths.get(rootPath + shortPath + fileName);
+                Path existPath = Paths.get(rootPath + shortPath);
+                if (!Files.exists(existPath)) Files.createDirectories(existPath);
+                // 파일 저장(출력)
+                fileItem.transferTo(filePath.toFile());
+                // 파일 경로 및 파일명 정보 저장
+                chatFileInfo.setFileNm(fileName);
+                chatFileInfo.setFilePath(existPath.toString());
+                chatFileInfoRepository.save(chatFileInfo);
+                chatFileInfoRepository.flush();
+
+                // 채팅메세지 전송에 필요한 파라미터 생성
+                int fileIdx = chatFileInfo.getFileIdx();
+                String memberNm = authenticationFacadeService.getMemberNm();
+                ChatMessageDTO.MessageType messageType = fileType == "IMG" ? ChatMessageDTO.MessageType.IMG : ChatMessageDTO.MessageType.FILE;
+
+                // 채팅메세지 객체 생성
+                ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
+                chatMessageDTO.setFileIdx(fileIdx);
+                chatMessageDTO.setFileUrl(filePath.toString());
+                chatMessageDTO.setFileName(realFileNm);
+                chatMessageDTO.setType(messageType);
+                chatMessageDTO.setContent(String.valueOf(fileIdx));
+
+                // 채팅메세지 전송 로직 실행
+                chatWebSocketService.receiveMessage(memberId, roomIdx, chatMessageDTO);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return true;
     }
 }

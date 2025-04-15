@@ -1,5 +1,6 @@
 package kr.co.triphos.member.service;
 
+import kr.co.triphos.member.dto.CustomUserDetails;
 import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 	private final MemberRepository memberRepository;
 
 	@Override
-	public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
+	public CustomUserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
 		Member member = memberRepository.findByMemberId(memberId)
 				.orElseThrow(() -> new UsernameNotFoundException("잘못된 회원정보입니다."));
 
-		return new org.springframework.security.core.userdetails.User(
-				member.getMemberId(),
-				member.getMemberPw(),
-				Collections.emptyList() // 권한 추가 가능
-		);
+		return new CustomUserDetails(member);
 	}
 }
