@@ -195,7 +195,7 @@ public class ChatController {
 
 	@PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Tag(name="파일")
-	@Operation(summary = "파일 신규저장", description = "")
+	@Operation(summary = "채팅방 파일 전송", description = "채팅방에 파일을 전송")
 	public ResponseEntity<?> chatFilesSave(@Parameter(description = "RoomIdx") 			@RequestParam int roomIdx,
 									  	   @Parameter(description = "파일") 				@RequestParam("fileList") List<MultipartFile> fileList,
 										   @Parameter(description = "묶음 파일 여부") 	@RequestParam String bundleYn) {
@@ -225,7 +225,7 @@ public class ChatController {
 
 	@GetMapping(value = "/files/{fileIdx}/download")
 	@Tag(name="파일")
-	@Operation(summary = "파일 다운로드", description = "")
+	@Operation(summary = "채팅방 파일 다운로드", description = "채팅방의 파일을 다운로드")
 	public ResponseEntity<?> downloadFile(@Parameter(description = "파일 idx") @PathVariable Integer fileIdx) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
