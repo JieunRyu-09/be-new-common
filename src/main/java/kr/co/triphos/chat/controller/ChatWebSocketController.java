@@ -3,6 +3,7 @@ package kr.co.triphos.chat.controller;
 import kr.co.triphos.chat.dto.ChatMessageDTO;
 import kr.co.triphos.chat.service.ChatWebSocketService;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
+import kr.co.triphos.member.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
@@ -12,6 +13,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
@@ -26,7 +28,8 @@ public class ChatWebSocketController {
 	@MessageMapping("/chat/{roomIdx}")
 	public ChatMessageDTO sendMessage(@DestinationVariable int roomIdx, ChatMessageDTO chatMessageDTO, Principal principal) {
 		try {
-			String memberId = principal.getName();
+			CustomUserDetails customUserDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
+			String memberId = customUserDetails.getMemberId();
 			chatWebSocketService.receiveMessage(memberId, roomIdx, chatMessageDTO);
 		}
 		catch (Exception ex) {

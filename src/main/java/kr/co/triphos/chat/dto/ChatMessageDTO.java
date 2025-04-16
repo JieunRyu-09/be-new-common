@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor  // 기본 생성자 추가 (롬복 사용 시)
@@ -19,10 +20,11 @@ public class ChatMessageDTO {
 	private String content;
 	private MessageType type = MessageType.TEXT;
 	private LocalDateTime sendTime;
+	private String bundleYn;
 
-	private int fileIdx;
-	private String fileUrl;
-	private String fileName;
+	private List<Integer> fileIdx;
+	private List<String> fileUrl;
+	private List<String> fileName;
 
 	public enum MessageType {
 		TEXT, JOIN, LEAVE, FILE, IMG

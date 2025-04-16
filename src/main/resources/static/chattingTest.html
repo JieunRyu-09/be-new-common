@@ -17,7 +17,7 @@
 <h2>🧪 STOMP WebSocket 테스트 페이지</h2>
 
 <label>🔗 WebSocket 주소</label>
-<input type="text" id="wsUrl" value="ws://localhost:8081/ws">
+<input type="text" id="wsUrl" value="ws://localhost:8081/ws?token=">
 
 <label>🔐 Authorization (예: Bearer eyJ...)</label>
 <input type="text" id="authHeader" value="Bearer ">
@@ -26,30 +26,32 @@
 
 <hr>
 
-<div class="subscription">
-    <label>📬 Subscribe 채널 1 (예: /topic/chat/1)</label>
-    <input type="text" id="subscribeDest1" value="/topic/chat/1">
-    <button onclick="subscribe(1)">Subscribe 1</button>
-    <button onclick="unsubscribe(1)">Unsubscribe 1</button>
+<div style="display: flex; gap: 20px">
+    <div class="subscription" style="flex: 1">
+        <label>📬 채팅방 채널 (예: /topic/chat/1)</label>
+        <input type="text" id="subscribeDest1" value="/topic/chat/1">
+        <button onclick="subscribe(1)">Subscribe 1</button>
+        <button onclick="unsubscribe(1)">Unsubscribe 1</button>
+    </div>
+    <div class="subscription"  style="flex: 1">
+        <label>📬 Subscribe 채널 4 (예: 채팅방 목록 수신, /user/queue/unread)</label>
+        <input type="text" id="subscribeDest4" value="/user/queue/unread">
+        <button onclick="subscribe(4)">Subscribe 4</button>
+        <button onclick="unsubscribe(4)">Unsubscribe 4</button>
+    </div>
 </div>
-<div class="subscription">
-    <label>📬 Subscribe 채널 2 (예: /topic/chat/2)</label>
-    <input type="text" id="subscribeDest2" value="/topic/chat/2">
-    <button onclick="subscribe(2)">Subscribe 2</button>
-    <button onclick="unsubscribe(2)">Unsubscribe 2</button>
-</div>
-<div class="subscription">
-    <label>📬 Subscribe 채널 3 (예: /topic/chat/3)</label>
-    <input type="text" id="subscribeDest3" value="/topic/chat/3">
-    <button onclick="subscribe(3)">Subscribe 3</button>
-    <button onclick="unsubscribe(3)">Unsubscribe 3</button>
-</div>
-<div class="subscription">
-    <label>📬 Subscribe 채널 4 (예: 채팅방 목록 수신, /user/queue/unread)</label>
-    <input type="text" id="subscribeDest4" value="/user/queue/unread">
-    <button onclick="subscribe(4)">Subscribe 4</button>
-    <button onclick="unsubscribe(4)">Unsubscribe 4</button>
-</div>
+
+<hr>
+
+<label>📤 Send 주소 (예: /app/chat/1)</label>
+<input type="text" id="sendDest" value="/app/chat/1">
+
+<label>✉️ 보낼 메시지 (JSON 형식)</label>
+<textarea id="sendBody">{ "content": "Hello"}</textarea>
+
+<button onclick="send()">Send</button>
+
+<hr>
 
 <!-- ... 생략 ... -->
 

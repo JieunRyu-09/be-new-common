@@ -197,14 +197,22 @@ public class ChatController {
 	@PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Tag(name="파일")
 	@Operation(summary = "파일 신규저장", description = "")
-	public ResponseEntity<?> chatFileSave(@Parameter(description = "RoomIdx") @RequestParam int roomIdx,
-									  	  @Parameter(description = "파일") @RequestParam("fileList") List<MultipartFile> fileList) {
+	public ResponseEntity<?> chatFilesSave(@Parameter(description = "RoomIdx") 			@RequestParam int roomIdx,
+									  	   @Parameter(description = "파일") 				@RequestParam("fileList") List<MultipartFile> fileList,
+										   @Parameter(description = "묶음 파일 여부") 	@RequestParam String bundleYn) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			if (fileList.isEmpty()) throw new RuntimeException("파일을 업로드 후 진행하여주십시오.");
 
 			String memberId = authenticationFacadeService.getMemberId();
-			boolean res = chatService.fileSave(roomIdx, fileList, memberId);
+			boolean res = false;
+
+			if ("Y".equals(bundleYn)) {
+				res = chatService.chatBundleFilesSave(roomIdx, fileList, memberId);
+			}
+			else {
+				res = chatService.chatFilesSave(roomIdx, fileList, memberId);
+			}
 			String msg = res ? "파일을 저장하였습니다." : "파일저장에 실패하였습니다.";
 			responseDTO.setSuccess(res);
 			responseDTO.setMsg(msg);
@@ -215,5 +223,4 @@ public class ChatController {
 			return ResponseEntity.internalServerError().body(responseDTO);
 		}
 	}
-
 }

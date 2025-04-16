@@ -23,6 +23,7 @@ public class ChatFileInfo {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer			fileIdx;
 	private Integer			roomIdx;
+	private Integer			msgIdx;
 	private String 			fileType;
 	private String 			filePath;
 	private String 			fileNm;

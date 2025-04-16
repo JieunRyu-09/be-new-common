@@ -22,6 +22,7 @@ public class ChatRoomMsg {
 	private String memberId;
 	private String content;
 	private String messageType;
+	private String bundleYn;
 	private LocalDateTime insDt;
 	private String delYn;
 
@@ -34,8 +35,23 @@ public class ChatRoomMsg {
 		this.memberId = memberId;
 		this.content = content;
 		this.messageType = messageType;
+		this.bundleYn = "N";
 		this.insDt = LocalDateTime.now();
 		this.delYn = "N";
+	}
 
+	@Builder(builderClassName = "createFilesChatRoomMsg", builderMethodName = "createFilesChatRoomMsg")
+	public ChatRoomMsg(int roomIdx,
+					   @NonNull String memberId,
+					   @NonNull String content,
+					   String messageType,
+					   String bundleYn) {
+		this.roomIdx = roomIdx;
+		this.memberId = memberId;
+		this.content = content;
+		this.messageType = messageType;
+		this.bundleYn = bundleYn;
+		this.insDt = LocalDateTime.now();
+		this.delYn = "N";
 	}
 }

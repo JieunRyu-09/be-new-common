@@ -36,7 +36,7 @@ public class ChatWebSocketService {
     private final RedisService redisService;
 
     @Transactional
-    public boolean receiveMessage(String memberId, int roomIdx, ChatMessageDTO chatMessageDTO) throws Exception{
+    public void receiveMessage(String memberId, int roomIdx, ChatMessageDTO chatMessageDTO) throws Exception{
         String content = chatMessageDTO.getContent();
         LocalDateTime nowDate = LocalDateTime.now();
 
@@ -46,6 +46,7 @@ public class ChatWebSocketService {
         chatMessageDTO.setMemberId(member.getMemberId());
         chatMessageDTO.setMemberNm(member.getMemberNm());
         chatMessageDTO.setSendTime(nowDate);
+        chatMessageDTO.setBundleYn("N");
 
         ChatRoomMsg chatRoomMsg = ChatRoomMsg.createTextChatRoomMsg()
                 .roomIdx(roomIdx)
@@ -77,9 +78,56 @@ public class ChatWebSocketService {
 
         // 채팅방의 멤버들에게 메세지 전송
         messagingTemplate.convertAndSend("/topic/chat/" + roomIdx, chatMessageDTO);
-        return true;
     }
 
+    @Transactional
+    public Map<String, Object> receiveFilesMessage(String memberId, int roomIdx, String contentType, String bundleYn) throws Exception{
+        Map<String, Object> returnData = new HashMap<>();
+        LocalDateTime nowDate = LocalDateTime.now();
+
+        String messageType = contentType.startsWith("image/") ? "IMG" : "FILE";
+        String content = null;
+
+        if (bundleYn.equals("Y")) content = "묶음파일을 보냈습니다.";
+        else if (messageType.equals("IMG")) content = "이미지를 보냈습니다";
+        else content = "파일을 보냈습니다.";
+
+
+        ChatRoomMsg chatRoomMsg = ChatRoomMsg.createFilesChatRoomMsg()
+                .roomIdx(roomIdx)
+                .memberId(memberId)
+                .content(content)
+                .messageType(messageType)
+                .bundleYn(bundleYn)
+                .build();
+        // 메세지 저장
+        chatRoomMsgRepository.save(chatRoomMsg);
+        chatRoomMsgRepository.flush();
+        int msgIdx = chatRoomMsg.getMsgIdx();
+
+        // 채팅방 정보 업데이트 (메세지 정보 업데이트)
+        ChatRoom chatRoom = chatRoomRepository.findByRoomIdx(roomIdx)
+                .orElseThrow(() -> new RuntimeException("잘못된 채팅방 정보입니다."));
+        chatRoom.setLastChatMemberId(memberId);
+        chatRoom.setLastChatDt(nowDate);
+        chatRoom.setLastChatMsg(content);
+        chatRoomRepository.save(chatRoom);
+
+        ChatRoomInfoDTO chatRoomInfoDTO = ChatRoomInfoDTO.createChatRoomInfo()
+                .roomIdx(roomIdx)
+                .title(chatRoom.getTitle())
+                .memberCnt(chatRoom.getMemberCnt())
+                .lastChatMsg(chatRoom.getLastChatMsg())
+                .unreadCount(0)
+                .build();
+        returnData.put("chatRoomInfoDTO", chatRoomInfoDTO);
+        returnData.put("msgIdx", msgIdx);
+        returnData.put("content", content);
+        returnData.put("messageType", messageType);
+        return returnData;
+    }
+
+    @Transactional
     public void updateChatRoomMemberUnreadCount(int roomIdx, ChatRoomInfoDTO chatRoomInfoDTO) throws Exception {
         // 해당 채팅방에서 나가지 않은 사람만 조회
         List<ChatRoomMember> chatRoomMemberList = chatRoomMemberRepository.findByPkRoomIdxAndDelYn(roomIdx, "N");
@@ -103,8 +151,7 @@ public class ChatWebSocketService {
             } else {
                 chatRoomInfoDTO.setUnreadCount(0);
             }
-
-            messagingTemplate.convertAndSendToUser(memberId, "/queue/unread", chatRoomInfoDTO);
+            sendToUser(memberId, "/queue/unread", chatRoomInfoDTO);
         });
 
         // 업데이트 해야될 사람이 있으면 업데이트
@@ -113,6 +160,7 @@ public class ChatWebSocketService {
         }
     }
 
+    @Transactional
     public void setUnreadCount(String memberId, int roomIdx) throws Exception {
         ChatRoomMemberPK pk = new ChatRoomMemberPK(roomIdx, memberId);
         // 채팅방 정보와 사용자의 채팅방 정보 조회
@@ -131,7 +179,15 @@ public class ChatWebSocketService {
                 .lastChatMsg(chatRoom.getLastChatMsg())
                 .unreadCount(0)
                 .build();
-        messagingTemplate.convertAndSendToUser(memberId, "/queue/unread", chatRoomInfoDTO);
+        sendToUser(memberId, "/queue/unread", chatRoomInfoDTO);
+    }
+
+    public void sendToChannel(String destination, Object object) {
+        messagingTemplate.convertAndSend(destination, object);
+    }
+
+    public void sendToUser(String memberId, String destination, Object object) {
+        messagingTemplate.convertAndSendToUser(memberId, destination, object);
     }
 
 }
