@@ -10,4 +10,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatFileInfoRepository extends JpaRepository<ChatFileInfo, Long> {
+	Optional<ChatFileInfo> findByFileIdx(int fileIdx);
 }

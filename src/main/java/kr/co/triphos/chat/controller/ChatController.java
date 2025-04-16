@@ -17,15 +17,14 @@ import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.member.dto.MemberDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/v1/chat")
@@ -219,6 +218,40 @@ public class ChatController {
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (Exception ex) {
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@GetMapping(value = "/files/{fileIdx}/download")
+	@Tag(name="파일")
+	@Operation(summary = "파일 다운로드", description = "")
+	public ResponseEntity<?> downloadFile(@Parameter(description = "파일 idx") @PathVariable Integer fileIdx) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			HashMap<String, Object> fileData = chatService.downloadFile(fileIdx);
+
+			String encodedFileName = fileData.get("encodedFileName").toString();
+			InputStreamResource resource = (InputStreamResource) fileData.get("resource");
+			String fileSize = fileData.get("fileSize").toString();
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName);
+			headers.add(HttpHeaders.CONTENT_LENGTH, fileSize);  // 파일 크기 지정
+
+			// 다운로드 시 원본 파일명 유지
+			return ResponseEntity.ok()
+					.headers(headers)
+					.contentType(MediaType.APPLICATION_OCTET_STREAM)
+					.body(resource);
+		}
+		catch (RuntimeException ex) {
+			log.error(ex);
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex.toString());
 			responseDTO.setMsg(ex.getMessage());
 			return ResponseEntity.internalServerError().body(responseDTO);
 		}

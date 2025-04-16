@@ -19,11 +19,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -329,5 +333,30 @@ public class ChatService {
         returnData.put("realFileNm", realFileNm);
 
         return returnData;
+    }
+
+    public HashMap<String, Object> downloadFile (Integer fileIdx) throws Exception {
+        HashMap<String, Object> fileData = new HashMap<>();
+        ChatFileInfo fileInfo = chatFileInfoRepository.findByFileIdx(fileIdx).orElseThrow(() -> new RuntimeException("잘못된 파일정보입니다"));
+
+        String realFileNm 	= fileInfo.getRealFileNm();
+        String filePath		= fileInfo.getFilePath();
+        String fileName		= fileInfo.getFileNm();
+        String encodedFileName = URLEncoder.encode(realFileNm, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+
+        File file = new File(filePath, fileName);
+        if (!file.exists() || !file.isFile()) {
+            throw new RuntimeException("잘못된 파일정보입니다. 파일을 업로드한 환경을 확인하여주십시오.");
+        }
+        InputStreamResource resource = new InputStreamResource(Files.newInputStream(file.toPath()));
+        long fileSize = file.length();
+        if (fileSize == 0) {
+            throw new RuntimeException("파일용량이 없습니다. 파일을 업로드한 환경을 확인하여주십시오.");
+        }
+
+        fileData.put("encodedFileName", encodedFileName);
+        fileData.put("resource", resource);
+        fileData.put("fileSize", fileSize);
+        return fileData;
     }
 }
