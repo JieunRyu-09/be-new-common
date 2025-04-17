@@ -10,9 +10,11 @@ import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.member.dto.MemberDTO;
 import kr.co.triphos.member.dto.MenuMemberAuthDTO;
+import kr.co.triphos.member.service.AuthService;
 import kr.co.triphos.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,7 @@ import java.util.List;
 public class MemberController {
 	private final MemberService memberService;
 	private final AuthenticationFacadeService authFacadeService;
+	private final AuthService authService;
 
 	@GetMapping("/token")
 	@Tag(name = "JWT 토큰")
@@ -46,6 +49,35 @@ public class MemberController {
 			log.error(ex);
 			responseDTO.setMsg(ex.getMessage());
 			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@PostMapping("/temp")
+	@Tag(name="JWT 토큰")
+	@Operation(summary = "단기토큰 발행", description = "채팅 connection 등에 사용할 단기 인증토큰 발행")
+	public ResponseEntity<?> getTempAccessToken() {
+		ResponseDTO responseDTO = new ResponseDTO();
+
+		try {
+			String memberId = authFacadeService.getMemberId();
+			HashMap<String, String> tempAccessTokenMap = authService.getTempAccessToken(memberId);
+			responseDTO.setSuccess(true);
+			String tempAccessToken 	= tempAccessTokenMap.get("accessToken");
+			String expiresIn 	= tempAccessTokenMap.get("expirationDate");
+			responseDTO.addData("tempAccessToken", tempAccessToken);
+			responseDTO.addData("expiresIn", expiresIn);
+
+			responseDTO.setMsg("임시토큰을 발행하였습니다.");
+
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (DataAccessException de) {
+			log.error(de.getMessage());
+			responseDTO.setMsg("서버현황이 불안정합니다. 잠시 후 다시 시도하여주십시오.");
+			return ResponseEntity.status(408).body(responseDTO);
+		}
+		catch (Exception ex) {
+			return ResponseEntity.status(401).body(ex.getMessage());
 		}
 	}
 
