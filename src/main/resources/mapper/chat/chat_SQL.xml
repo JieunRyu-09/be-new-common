@@ -25,17 +25,34 @@
             getChatMessages
             채팅방 채팅내역 조회
          */
-         SELECT T1.MEMBER_ID,
-                T2.MEMBER_NM,
-                T1.CONTENT,
-                T1.MESSAGE_TYPE,
-                DATE_FORMAT(T1.INS_DT, '%Y-%m-%d %H:%i:%s') AS sendTime
-           FROM ch_chat_room_msg    T1,
-                mm_member_info      T2
-          WHERE T1.MEMBER_ID    = T2.MEMBER_ID
-            AND T1.ROOM_IDX     = #{roomIdx}
-          ORDER BY MSG_IDX DESC
-          LIMIT #{startIdx}, #{pageSize}
+         SELECT R1.MSG_IDX,
+                R1.MEMBER_ID,
+                R1.MEMBER_NM,
+                R1.CONTENT,
+                R1.MESSAGE_TYPE,
+                R1.SEND_TIME,
+                R1.BUNDLE_YN,
+                CONCAT('[',GROUP_CONCAT(R2.FILE_IDX), ']') AS FILE_IDX,
+                CONCAT('[',GROUP_CONCAT(R2.FILE_NM), ']') AS FILE_NM,
+                CONCAT('[',GROUP_CONCAT(R2.FILE_PATH), ']') AS FILE_PATH
+           FROM (SELECT T1.MSG_IDX,
+                        T1.MEMBER_ID,
+                        T2.MEMBER_NM,
+                        T1.CONTENT,
+                        T1.MESSAGE_TYPE,
+                        DATE_FORMAT(T1.INS_DT, '%Y-%m-%d %H:%i:%s') AS SEND_TIME,
+                        T1.BUNDLE_YN
+                   FROM ch_chat_room_msg    T1,
+                        mm_member_info      T2
+                  WHERE T1.MEMBER_ID    = T2.MEMBER_ID
+                    AND T1.ROOM_IDX     = 1
+                  ORDER BY MSG_IDX DESC
+                  LIMIT 20
+                 OFFSET 10
+                ) R1
+                LEFT JOIN ch_chat_file_info R2 ON R1.MSG_IDX = R2.MSG_IDX
+          WHERE R1.MSG_IDX
+          GROUP BY  MSG_IDX, MEMBER_ID, MEMBER_NM, CONTENT, MESSAGE_TYPE, SEND_TIME, BUNDLE_YN
     </select>
 
 </mapper>
