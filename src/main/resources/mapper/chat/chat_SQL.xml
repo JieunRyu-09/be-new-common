@@ -20,7 +20,7 @@
             AND T2.DEL_YN       = 'N'
     </select>
 
-    <select id="getChatMessages" parameterType="hashMap" resultType="hashMap">
+    <select id="getChatMessages" parameterType="hashMap" resultType="chatMessageDTO">
          /*
             getChatMessages
             채팅방 채팅내역 조회
@@ -45,10 +45,12 @@
                    FROM ch_chat_room_msg    T1,
                         mm_member_info      T2
                   WHERE T1.MEMBER_ID    = T2.MEMBER_ID
-                    AND T1.ROOM_IDX     = 1
+                    AND T1.ROOM_IDX     = #{roomIdx}
                   ORDER BY MSG_IDX DESC
-                  LIMIT 20
-                 OFFSET 10
+                  LIMIT #{pageSize}
+                <if test="startIdx != null and startIdx != ''">
+                    OFFSET #{strarIdx}
+                </if>
                 ) R1
                 LEFT JOIN ch_chat_file_info R2 ON R1.MSG_IDX = R2.MSG_IDX
           WHERE R1.MSG_IDX
