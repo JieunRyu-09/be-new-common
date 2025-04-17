@@ -24,4 +24,4 @@ file:
 chat:
   upload-dir: D:\DEV_STANDARD\backend\chat\files
 token:
-    time: 60000 #1000 * 60
+    time: 600000 #1000 * 60 * 10
