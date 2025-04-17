@@ -13,6 +13,7 @@ import kr.co.triphos.chat.repository.ChatRoomMemberRepository;
 import kr.co.triphos.chat.repository.ChatRoomRepository;
 import kr.co.triphos.common.entity.FileInfo;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
+import kr.co.triphos.common.service.RedisService;
 import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,8 @@ public class ChatService {
 
     private final ChatWebSocketService chatWebSocketService;
     private final AuthenticationFacadeService authenticationFacadeService;
+
+    private final RedisService redisService;
 
 
     @Transactional
@@ -168,11 +171,14 @@ public class ChatService {
 		return chatDAO.getChatRoomList(memberId);
     }
 
-    public List<ChatMessageDTO> getChatMessages(int roomIdx, int page) throws Exception {
+    public List<ChatMessageDTO> getChatMessages(int roomIdx, String memberId) throws Exception {
         int pageSize = 20;
-        int startIdx = pageSize * (page - 1);
+        int startIdx = Integer.parseInt(redisService.getData("chat:" + memberId+ ":" + roomIdx + "msg_idx"));
 
-        return chatDAO.getChatMessages(roomIdx, startIdx, pageSize);
+        List<ChatMessageDTO> chatMessageDTOList = chatDAO.getChatMessages(roomIdx, startIdx, pageSize);
+        //redisService.saveData("chat:" + memberId+ ":" + roomIdx + "msg_idx", 1);
+
+        return chatMessageDTOList;
     }
 
     @Transactional
@@ -226,7 +232,7 @@ public class ChatService {
     }
 
     @Transactional
-    public boolean chatBundleFilesSave (int roomIdx, List<MultipartFile> fileList, String memberId) throws Exception {
+    public boolean chatBundleFilesSave (int roomIdx, List<MultipartFile> fileList, String memberId, String messageType) throws Exception {
         /**
          * 채팅 메세지 데이터 생성(broadcasting X) => msgIdx얻기 위함
          * 파일 저장
@@ -238,10 +244,9 @@ public class ChatService {
         LocalDateTime nowDate = LocalDateTime.now();
 
         // 채팅 데이터 취득
-        String contentType = "image/";
+        String contentType = messageType.equals("IMG") ? "image/" : "file/";
         Map<String, Object> chatDataMap = chatWebSocketService.receiveFilesMessage(memberId, roomIdx, contentType, "Y");
         int msgIdx = Integer.parseInt(chatDataMap.get("msgIdx").toString());
-        String messageType = chatDataMap.get("messageType").toString();
         String content = chatDataMap.get("content").toString();
         ChatRoomInfoDTO chatRoomInfoDTO = (ChatRoomInfoDTO) chatDataMap.get("chatRoomInfoDTO");
 

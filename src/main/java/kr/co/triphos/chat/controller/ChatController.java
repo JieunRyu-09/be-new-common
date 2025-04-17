@@ -176,11 +176,12 @@ public class ChatController {
 			summary = "채팅방의 채팅조회",
 			description = "현재 사용자가 참가해있는 채팅방 목록을 조회."
 	)
-	public ResponseEntity<?> getChatMessages(@PathVariable int roomIdx,
-											 @RequestParam int page) {
+	// scardy 채팅메세지
+	public ResponseEntity<?> getChatMessages(@PathVariable int roomIdx) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			List<ChatMessageDTO> chatMessageList = chatService.getChatMessages(roomIdx, page);
+			String memberId = authenticationFacadeService.getMemberId();
+			List<ChatMessageDTO> chatMessageList = chatService.getChatMessages(roomIdx, memberId);
 			responseDTO.addData("chatMessageList", chatMessageList);
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg("채팅방의 채팅내역 조회");
@@ -198,7 +199,8 @@ public class ChatController {
 	@Operation(summary = "채팅방 파일 전송", description = "채팅방에 파일을 전송")
 	public ResponseEntity<?> chatFilesSave(@Parameter(description = "RoomIdx") 			@RequestParam int roomIdx,
 									  	   @Parameter(description = "파일") 				@RequestParam("fileList") List<MultipartFile> fileList,
-										   @Parameter(description = "묶음 파일 여부") 	@RequestParam String bundleYn) {
+										   @Parameter(description = "묶음 파일 여부") 	@RequestParam String bundleYn,
+										   @Parameter(description = "타입(FILE/IMG)")	@RequestParam(required = false) String messageType) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			if (fileList.isEmpty()) throw new RuntimeException("파일을 업로드 후 진행하여주십시오.");
@@ -207,7 +209,7 @@ public class ChatController {
 			boolean res = false;
 
 			if ("Y".equals(bundleYn)) {
-				res = chatService.chatBundleFilesSave(roomIdx, fileList, memberId);
+				res = chatService.chatBundleFilesSave(roomIdx, fileList, memberId, messageType);
 			}
 			else {
 				res = chatService.chatFilesSave(roomIdx, fileList, memberId);
