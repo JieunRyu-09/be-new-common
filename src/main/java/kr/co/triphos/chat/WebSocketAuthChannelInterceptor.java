@@ -35,27 +35,34 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 	}
 
 	@Override
+	// TODO scardy 기능동작 이후 리팩터링 작업 진행 예정
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
 		// jwt Token 존재여부 검사
 		String authHeader = accessor.getFirstNativeHeader("Authorization");
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			return message;
+		StompCommand command = accessor.getCommand();
+
+		// 구독해제는 헤더에 토큰을 안보냄.
+		// sessionId로 작업
+		if (StompCommand.UNSUBSCRIBE.equals(command)) {
+			String sessionId = accessor.getSessionId();
+			String memberId = redisService.getData("chat:sesseionId:" + sessionId);
+			int roomIdx = Integer.parseInt(redisService.getData(memberId + ":chatRoom"));
+
+			redisService.delData(memberId + ":chatRoom");
+			redisService.delData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
+			redisService.delData("chat:sesseionId:" + sessionId);
+			return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
 		}
 
 		String token = authHeader.substring(7);
 		Authentication auth = authService.getAuthenticationByToken(token);
 		String memberId = authService.getMemberIdByToken(token);
-		// 인증정보 저장
-		if (!StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
-			accessor.setUser(auth);
-		}
-
 
 		// 구독할 경우 redis에 엔드포인드 | memberId로 정보 저장
 		// 구독중(읽고있는중)인 채팅방의 경우 안읽은 메세지 수 증가 안하기 위함
-		if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
+		if (StompCommand.SUBSCRIBE.equals(command)) {
 			String destination = accessor.getDestination();
 			if (destination == null || destination.isEmpty()) {
 				return null;
@@ -64,29 +71,14 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 				try {
 					String[] parts = destination.split("/");
 					String roomIdx = parts[parts.length - 1];
-					redisService.delData(memberId + "chatRoom");
-					redisService.saveData(memberId + "chatRoom", roomIdx);
+					String sessionId = accessor.getSessionId();
+					redisService.delData(memberId + ":chatRoom");
+					redisService.saveData(memberId + ":chatRoom", roomIdx);
+					redisService.saveData("chat:sesseionId:" + sessionId, memberId);
 					chatWebSocketService.setUnreadCount(memberId, Integer.parseInt(roomIdx));
 				}
 				catch (Exception ex) {
 					log.error(ex);
-				}
-			}
-		} else if (StompCommand.UNSUBSCRIBE.equals(accessor.getCommand())) {
-			String destination = accessor.getDestination();
-			if (destination == null || destination.isEmpty()) {
-				return null;
-			}
-			if (destination.matches("^/topic/chat/\\d+$")) {
-				try {
-					String[] parts = destination.split("/");
-					String roomIdx = parts[parts.length - 1];
-					// 구독 해제 시 처리할 작업 (예: Redis에서 제거)
-					redisService.delData(memberId + "chatRoom");
-					redisService.delData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
-				}
-				catch (Exception ex) {
-					log.error("Error during unsubscribe: ", ex);
 				}
 			}
 		}

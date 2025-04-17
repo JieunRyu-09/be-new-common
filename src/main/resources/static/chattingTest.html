@@ -109,8 +109,12 @@
 
 	function unsubscribe(channelNumber) {
 		const subscription = subscriptions[channelNumber];
+		const token = document.getElementById("authHeader").value;
+
 		if (subscription) {
-			subscription.unsubscribe();
+			subscription.unsubscribe({
+				headers: { Authorization: token }  // 👈 헤더 추가
+			});
 			log(`🔕 채널 ${channelNumber} 구독 해제`);
 			delete subscriptions[channelNumber];
 		} else {

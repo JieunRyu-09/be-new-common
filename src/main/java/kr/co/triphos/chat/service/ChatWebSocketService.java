@@ -160,7 +160,7 @@ public class ChatWebSocketService {
         chatRoomMemberList.forEach(chatRoomMember -> {
             // redis에서 사용자의 구독중인 roomIdx 조회
             String memberId = chatRoomMember.getPk().getMemberId();
-            String redisValue = redisService.getData(memberId + "chatRoom");
+            String redisValue = redisService.getData(memberId + ":chatRoom");
             int participateRoomIdx = (redisValue != null) ? Integer.parseInt(redisValue) : -1; // 기본값 -1 사용
 
             // 사용자가 구독중인 roomIdx랑 현재 메세지가 전송된 방의 roomIdx랑 일치하지 않는다면
