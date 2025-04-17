@@ -67,18 +67,14 @@ public class ChatWebSocketService {
         chatRoom.setLastChatMsg(content);
         chatRoomRepository.save(chatRoom);
 
-        List<String >participantIds = new ArrayList<>();
-        chatRoomMemberRepository.findByPkRoomIdxAndDelYn(roomIdx, "N").forEach(chatRoomMember -> {
-            participantIds.add(chatRoomMember.getPk().getMemberId());
-        });
-
         ChatRoomInfoDTO chatRoomInfoDTO = ChatRoomInfoDTO.createChatRoomInfo()
                 .roomIdx(roomIdx)
                 .title(chatRoom.getTitle())
-                .participantIds(participantIds)
+                .chatRoomType(chatRoom.getChatRoomType())
+                .memberCnt(chatRoom.getMemberCnt())
                 .lastChatMsg(chatRoom.getLastChatMsg())
                 .unreadMessageCount(0)
-                .timestamp(chatRoom.getLastChatDt())
+                .lastChatDt(nowDate)
                 .build();
 
         // 채팅방 맴버별 안읽은 메세지 수 증가 및 채팅목록 send
@@ -125,17 +121,12 @@ public class ChatWebSocketService {
         chatRoom.setLastChatMsg(content);
         chatRoomRepository.save(chatRoom);
 
-        List<String >participantIds = new ArrayList<>();
-        chatRoomMemberRepository.findByPkRoomIdxAndDelYn(roomIdx, "N").forEach(chatRoomMember -> {
-            participantIds.add(chatRoomMember.getPk().getMemberId());
-        });
-
         ChatRoomInfoDTO chatRoomInfoDTO = ChatRoomInfoDTO.createChatRoomInfo()
                 .roomIdx(roomIdx)
                 .title(chatRoom.getTitle())
-                .participantIds(participantIds)
+                .memberCnt(chatRoom.getMemberCnt())
                 .lastChatMsg(chatRoom.getLastChatMsg())
-                .timestamp(chatRoom.getLastChatDt())
+                .lastChatDt(nowDate)
                 .unreadMessageCount(0)
                 .build();
         returnData.put("chatRoomInfoDTO", chatRoomInfoDTO);
@@ -202,9 +193,9 @@ public class ChatWebSocketService {
         ChatRoomInfoDTO chatRoomInfoDTO = ChatRoomInfoDTO.createChatRoomInfo()
                 .roomIdx(roomIdx)
                 .title(chatRoom.getTitle())
-                .participantIds(participantIds)
+                .memberCnt(chatRoom.getMemberCnt())
                 .lastChatMsg(chatRoom.getLastChatMsg())
-                .timestamp(chatRoom.getLastChatDt())
+                .lastChatDt(chatRoom.getLastChatDt())
                 .unreadMessageCount(0)
                 .build();
         sendToUser(memberId, "/queue/unread", chatRoomInfoDTO);

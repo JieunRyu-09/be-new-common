@@ -19,6 +19,7 @@ import java.util.List;
 public class ChatRoomDTO {
 	private int	roomIdx;
 	private String title;
+	private String chatRoomType;
 	private int memberCnt;
 	private String insId;
 	private LocalDateTime insDt;

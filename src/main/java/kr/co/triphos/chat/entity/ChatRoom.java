@@ -25,6 +25,8 @@ public class ChatRoom {
 	private String insId;
 	@NotNull
 	private LocalDateTime insDt;
+	@NotNull
+	private String chatRoomType;
 	private String updId;
 	private LocalDateTime updDt;
 	private String lastChatMemberId;
@@ -34,10 +36,12 @@ public class ChatRoom {
 	@Builder(builderClassName = "createChatRoom", builderMethodName = "createChatRoom")
 	public ChatRoom(@NonNull String memberId,
 					@NonNull String title,
+					@NonNull String chatRoomType,
 					int memberCnt) {
 		this.title	= title;
 		this.insId	= memberId;
 		this.memberCnt = memberCnt;
+		this.chatRoomType = chatRoomType;
 		this.insDt	= LocalDateTime.now();
 	}
 }

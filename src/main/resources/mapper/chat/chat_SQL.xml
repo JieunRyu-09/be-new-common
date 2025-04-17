@@ -3,16 +3,18 @@
 
 <mapper namespace="chat">
 
-    <select id="getChatRoomList" parameterType="String" resultType="hashMap">
+    <select id="getChatRoomList" parameterType="String" resultType="kr.co.triphos.chat.dto.ChatRoomInfoDTO">
          /*
             getChatRoomList
             사용자의 채팅방 목록 조회
          */
          SELECT T1.ROOM_IDX
                 , T1.TITLE
+                , T1.CHAT_ROOM_TYPE
                 , T1.MEMBER_CNT
                 , T1.LAST_CHAT_MSG
-                , T2.UNREAD_COUNT
+                , T2.UNREAD_COUNT AS unreadMessageCount
+                , T1.LAST_CHAT_DT
            FROM ch_chat_room           T1,
                 ch_chat_room_member    T2
           WHERE T1.ROOM_IDX     = T2.ROOM_IDX

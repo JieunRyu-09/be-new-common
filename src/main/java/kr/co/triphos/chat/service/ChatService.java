@@ -65,6 +65,7 @@ public class ChatService {
         ChatRoom chatRoom = ChatRoom.createChatRoom()
                 .memberId(memberId)
                 .title(chatRoomDTO.getTitle())
+                .chatRoomType(chatRoomDTO.getChatRoomType())
                 .memberCnt(memberCnt)
                 .build();
         chatRoomRepository.save(chatRoom);

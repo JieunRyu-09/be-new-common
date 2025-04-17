@@ -14,23 +14,26 @@ import java.util.List;
 public class ChatRoomInfoDTO {
 	private int		roomIdx;
 	private String 	title;
-	private List<String> participantIds;
+	private String  chatRoomType;
+	private int 	memberCnt;
 	private String 	lastChatMsg;
 	private int 	unreadMessageCount;
-	private LocalDateTime 	timestamp;
+	private LocalDateTime 	lastChatDt;
 
 	@Builder(builderClassName = "createChatRoomInfo", builderMethodName = "createChatRoomInfo")
 	public ChatRoomInfoDTO(int roomIdx,
 						   String title,
-						   List<String> participantIds,
+						   String chatRoomType,
+						   int memberCnt,
 						   String lastChatMsg,
 						   int unreadMessageCount,
-						   LocalDateTime timestamp) {
+						   LocalDateTime lastChatDt) {
 		this.roomIdx 				= roomIdx;
 		this.title 					= title;
-		this.participantIds 		= participantIds;
+		this.chatRoomType			= chatRoomType;
+		this.memberCnt 				= memberCnt;
 		this.lastChatMsg 			= lastChatMsg;
 		this.unreadMessageCount 	= unreadMessageCount;
-		this.timestamp				= timestamp;
+		this.lastChatDt				= lastChatDt;
 	}
 }
