@@ -42,19 +42,32 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 		// jwt Token 존재여부 검사
 		String authHeader = accessor.getFirstNativeHeader("Authorization");
 		StompCommand command = accessor.getCommand();
+		String destination = accessor.getDestination();
 
 		// 구독해제는 헤더에 토큰을 안보냄.
 		// sessionId로 작업
 		if (StompCommand.UNSUBSCRIBE.equals(command)) {
-			String sessionId = accessor.getSessionId();
-			String memberId = redisService.getData("chat:sesseionId:" + sessionId);
-			int roomIdx = Integer.parseInt(redisService.getData(memberId + ":chatRoom"));
+			try {
+				String sessionId = accessor.getSessionId();
+				String memberId = redisService.getData("chat:sessionId:" + sessionId);
+				int roomIdx = Integer.parseInt(redisService.getData(memberId + ":chatRoom"));
 
-			redisService.delData(memberId + ":chatRoom");
-			redisService.delData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
-			redisService.delData("chat:sesseionId:" + sessionId);
-			return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
+				redisService.delData(memberId + ":chatRoom");
+				redisService.delData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
+				redisService.delData("chat:sessionId:" + sessionId);
+			}
+			catch (Exception ex) {
+				log.error(ex.getMessage());
+			}
+
+			return message;
 		}
+
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			return message;
+		}
+
+
 
 		String token = authHeader.substring(7);
 		Authentication auth = authService.getAuthenticationByToken(token);
@@ -63,7 +76,6 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 		// 구독할 경우 redis에 엔드포인드 | memberId로 정보 저장
 		// 구독중(읽고있는중)인 채팅방의 경우 안읽은 메세지 수 증가 안하기 위함
 		if (StompCommand.SUBSCRIBE.equals(command)) {
-			String destination = accessor.getDestination();
 			if (destination == null || destination.isEmpty()) {
 				return null;
 			}
@@ -74,7 +86,7 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 					String sessionId = accessor.getSessionId();
 					redisService.delData(memberId + ":chatRoom");
 					redisService.saveData(memberId + ":chatRoom", roomIdx);
-					redisService.saveData("chat:sesseionId:" + sessionId, memberId);
+					redisService.saveData("chat:sessionId:" + sessionId, memberId);
 					chatWebSocketService.setUnreadCount(memberId, Integer.parseInt(roomIdx));
 				}
 				catch (Exception ex) {
