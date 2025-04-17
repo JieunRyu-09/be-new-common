@@ -20,21 +20,12 @@
             AND T2.DEL_YN       = 'N'
     </select>
 
-    <select id="getChatMessages" parameterType="hashMap" resultType="chatMessageDTO">
+    <select id="getChatMessages" parameterType="hashMap" resultType="kr.co.triphos.chat.dto.ChatMessageDTO">
          /*
             getChatMessages
             채팅방 채팅내역 조회
          */
-         SELECT R1.MSG_IDX,
-                R1.MEMBER_ID,
-                R1.MEMBER_NM,
-                R1.CONTENT,
-                R1.MESSAGE_TYPE,
-                R1.SEND_TIME,
-                R1.BUNDLE_YN,
-                CONCAT('[',GROUP_CONCAT(R2.FILE_IDX), ']') AS FILE_IDX,
-                CONCAT('[',GROUP_CONCAT(R2.FILE_NM), ']') AS FILE_NM,
-                CONCAT('[',GROUP_CONCAT(R2.FILE_PATH), ']') AS FILE_PATH
+         SELECT R1.*
            FROM (SELECT T1.MSG_IDX,
                         T1.MEMBER_ID,
                         T2.MEMBER_NM,
@@ -46,15 +37,13 @@
                         mm_member_info      T2
                   WHERE T1.MEMBER_ID    = T2.MEMBER_ID
                     AND T1.ROOM_IDX     = #{roomIdx}
+        <if test="startIdx != null and startIdx != ''">
+                    AND MSG_IDX &lt; #{startIdx}
+        </if>
                   ORDER BY MSG_IDX DESC
                   LIMIT #{pageSize}
-                <if test="startIdx != null and startIdx != ''">
-                    OFFSET #{strarIdx}
-                </if>
                 ) R1
-                LEFT JOIN ch_chat_file_info R2 ON R1.MSG_IDX = R2.MSG_IDX
-          WHERE R1.MSG_IDX
-          GROUP BY  MSG_IDX, MEMBER_ID, MEMBER_NM, CONTENT, MESSAGE_TYPE, SEND_TIME, BUNDLE_YN
+         ORDER BY R1.MSG_IDX ASC
     </select>
 
 </mapper>

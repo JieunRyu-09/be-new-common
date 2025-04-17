@@ -72,7 +72,25 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 					log.error(ex);
 				}
 			}
+		} else if (StompCommand.UNSUBSCRIBE.equals(accessor.getCommand())) {
+			String destination = accessor.getDestination();
+			if (destination == null || destination.isEmpty()) {
+				return null;
+			}
+			if (destination.matches("^/topic/chat/\\d+$")) {
+				try {
+					String[] parts = destination.split("/");
+					String roomIdx = parts[parts.length - 1];
+					// 구독 해제 시 처리할 작업 (예: Redis에서 제거)
+					redisService.delData(memberId + "chatRoom");
+					redisService.delData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
+				}
+				catch (Exception ex) {
+					log.error("Error during unsubscribe: ", ex);
+				}
+			}
 		}
+
 		return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
 	}
 

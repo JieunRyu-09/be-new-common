@@ -28,6 +28,7 @@ spring:
       allowed-origins: "*"
 logging:
   level:
+    org.mybatis: INFO
     org.springframework.web: WARN
     org.springframework.security: WARN
     org.springframework.web.socket: WARN

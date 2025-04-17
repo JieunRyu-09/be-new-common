@@ -25,7 +25,7 @@ public class ChatMessageDTO {
 	private LocalDateTime sendTime;
 	private String bundleYn;
 
-	private List<Integer> fileIdx;
+	private List<String> fileIdx;
 	private List<String> fileUrl;
 	private List<String> fileName;
 

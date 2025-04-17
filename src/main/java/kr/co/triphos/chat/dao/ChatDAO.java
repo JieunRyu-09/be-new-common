@@ -8,6 +8,8 @@ import kr.co.triphos.chat.dto.ChatRoomInfoDTO;
 
 import java.util.*;
 
+import static java.lang.Math.E;
+
 @Repository("chatDAO")
 @Log4j2
 public class ChatDAO extends AbstractDAO {
@@ -19,7 +21,7 @@ public class ChatDAO extends AbstractDAO {
 	}
 
 	/** 채팅방 채팅내역 조회 */
-	public List<ChatMessageDTO> getChatMessages(int roomIdx, String startIdx, int pageSize) throws Exception {
+	public List<ChatMessageDTO> getChatMessages(int roomIdx, Integer startIdx, int pageSize) throws Exception {
 		Map<String, Object> dto = new HashMap<>();
 		dto.put("roomIdx", roomIdx);
 		dto.put("startIdx", startIdx);

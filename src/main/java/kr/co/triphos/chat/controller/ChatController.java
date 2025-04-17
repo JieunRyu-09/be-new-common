@@ -35,32 +35,6 @@ public class ChatController {
 	private final ChatService chatService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 
-	@PostMapping("/web-hook")
-	@Tag(name = "채팅")
-	@Operation(
-			summary = "채팅방 생성",
-			description = "채팅방을 생성합니다.",
-			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-					content = @Content(
-							schema = @Schema(hidden = true),
-							examples = @ExampleObject(name = "채팅방 생성 예시", ref = "#/components/examples/chat.post.chat-rooms")
-					)
-			)
-	)
-	public ResponseEntity<?> webhookTest(@RequestBody WebhookDTO webhookDTO) {
-		ResponseDTO responseDTO = new ResponseDTO();
-		try {
-			log.info("WEB HOOK 도착함");
-			log.info(webhookDTO);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		catch (Exception ex) {
-			log.error(ex);
-			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
-			return ResponseEntity.internalServerError().body(responseDTO);
-		}
-	}
-
 	@PostMapping("/chat-rooms")
 	@Tag(name = "채팅")
 	@Operation(

@@ -173,10 +173,12 @@ public class ChatService {
 
     public List<ChatMessageDTO> getChatMessages(int roomIdx, String memberId) throws Exception {
         int pageSize = 20;
-        String startIdx = redisService.getData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
+        String redisValue = redisService.getData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
+        Integer startIdx = redisValue == null ? null : Integer.parseInt(redisValue);
 
         List<ChatMessageDTO> chatMessageDTOList = chatDAO.getChatMessages(roomIdx, startIdx, pageSize);
         String readIdx = String.valueOf(chatMessageDTOList.get(0).getMsgIdx());
+        redisService.delData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
         redisService.saveData("chat:" + memberId+ ":" + roomIdx + "msg_idx", readIdx);
 
         return chatMessageDTOList;
@@ -209,7 +211,7 @@ public class ChatService {
                 Map<String, Object> fileDataMap = saveFile(roomIdx, msgIdx, memberId, nowDate, fileItem);
                 String filePath = fileDataMap.get("filePath").toString().replace("\\", "/");
                 String realFileNm = fileDataMap.get("realFileNm").toString();
-                int fileIdx = Integer.parseInt(fileDataMap.get("fileIdx").toString());
+                String fileIdx = fileDataMap.get("fileIdx").toString();
 
                 // 채팅메세지 객체 생성
                 ChatMessageDTO chatMessageDTO = ChatMessageDTO.builder()
@@ -251,7 +253,7 @@ public class ChatService {
         String content = chatDataMap.get("content").toString();
         ChatRoomInfoDTO chatRoomInfoDTO = (ChatRoomInfoDTO) chatDataMap.get("chatRoomInfoDTO");
 
-        List<Integer> fileIdxList = new ArrayList<>();
+        List<String> fileIdxList = new ArrayList<>();
         List<String> filePathList = new ArrayList<>();
         List<String> fileNameList = new ArrayList<>();
 
@@ -262,7 +264,7 @@ public class ChatService {
                 Map<String, Object> fileDataMap = saveFile(roomIdx, msgIdx, memberId, nowDate, fileItem);
                 String filePath = fileDataMap.get("filePath").toString().replace("\\", "/");
                 String realFileNm = fileDataMap.get("realFileNm").toString();
-                int fileIdx = Integer.parseInt(fileDataMap.get("fileIdx").toString());
+                String fileIdx = fileDataMap.get("fileIdx").toString();
 
                 fileIdxList.add(fileIdx);
                 filePathList.add(filePath);
