@@ -37,10 +37,7 @@ public class SecurityConfig {
 							"/ws/**"
 					).permitAll()  // swagger 경로 모두 허용
 					.antMatchers("/test/**").permitAll()  		// test 경로는 인증 불필요
-					.antMatchers("/v1/auth/login").permitAll()
-					.antMatchers("/v1/auth/check-id").permitAll()
-					.antMatchers("/v1/auth/members").permitAll()
-					.antMatchers("/v1/auth/refresh").permitAll()
+					.antMatchers("/v1/auth/**").permitAll()
 					.anyRequest().authenticated() 					// 나머지 요청은 인증 필요
 			)
 //			.formLogin(login -> login

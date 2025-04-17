@@ -220,33 +220,4 @@ public class AuthController {
 			return ResponseEntity.status(401).body(ex.getMessage());
 		}
 	}
-
-	@PostMapping("/temp")
-	@Tag(name="JWT 토큰")
-	@Operation(summary = "단기토큰 발행", description = "채팅 connection 등에 사용할 단기 인증토큰 발행")
-	public ResponseEntity<?> getTempAccessToken() {
-		ResponseDTO responseDTO = new ResponseDTO();
-
-		try {
-			String memberId = authenticationFacadeService.getMemberId();
-			HashMap<String, String> tempAccessTokenMap = authService.getTempAccessToken(memberId);
-			responseDTO.setSuccess(true);
-			String tempAccessToken 	= tempAccessTokenMap.get("accessToken");
-			String expiresIn 	= tempAccessTokenMap.get("expirationDate");
-			responseDTO.addData("tempAccessToken", tempAccessToken);
-			responseDTO.addData("expiresIn", expiresIn);
-
-			responseDTO.setMsg("임시토큰을 발행하였습니다.");
-
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		catch (DataAccessException de) {
-			log.error(de.getMessage());
-			responseDTO.setMsg("서버현황이 불안정합니다. 잠시 후 다시 시도하여주십시오.");
-			return ResponseEntity.status(408).body(responseDTO);
-		}
-		catch (Exception ex) {
-			return ResponseEntity.status(401).body(ex.getMessage());
-		}
-	}
 }
