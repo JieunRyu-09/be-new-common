@@ -201,7 +201,7 @@ public class ChatController {
 	public ResponseEntity<?> chatFilesSave(@Parameter(description = "RoomIdx") 			@RequestParam int roomIdx,
 									  	   @Parameter(description = "파일") 				@RequestParam("fileList") List<MultipartFile> fileList,
 										   @Parameter(description = "묶음 파일 여부") 	@RequestParam String bundleYn,
-										   @Parameter(description = "타입(FILE/IMG)")	@RequestParam(required = false) String messageType) {
+										   @Parameter(description = "타입(FILE/IMG)")	@RequestParam String messageType) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			if (fileList.isEmpty()) throw new RuntimeException("파일을 업로드 후 진행하여주십시오.");
@@ -213,7 +213,7 @@ public class ChatController {
 				res = chatService.chatBundleFilesSave(roomIdx, fileList, memberId, messageType);
 			}
 			else {
-				res = chatService.chatFilesSave(roomIdx, fileList, memberId);
+				res = chatService.chatFilesSave(roomIdx, fileList, memberId, messageType);
 			}
 			String msg = res ? "파일을 저장하였습니다." : "파일저장에 실패하였습니다.";
 			responseDTO.setSuccess(res);

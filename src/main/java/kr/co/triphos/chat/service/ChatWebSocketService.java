@@ -56,6 +56,8 @@ public class ChatWebSocketService {
                 .build();
         // 메세지 저장
         chatRoomMsgRepository.save(chatRoomMsg);
+        chatRoomMsgRepository.flush();
+        chatMessageDTO.setMsgIdx(chatRoomMsg.getMsgIdx());
 
         // 채팅방 정보 업데이트 (메세지 정보 업데이트)
         ChatRoom chatRoom = chatRoomRepository.findByRoomIdx(roomIdx)
@@ -65,12 +67,18 @@ public class ChatWebSocketService {
         chatRoom.setLastChatMsg(content);
         chatRoomRepository.save(chatRoom);
 
+        List<String >participantIds = new ArrayList<>();
+        chatRoomMemberRepository.findByPkRoomIdxAndDelYn(roomIdx, "N").forEach(chatRoomMember -> {
+            participantIds.add(chatRoomMember.getPk().getMemberId());
+        });
+
         ChatRoomInfoDTO chatRoomInfoDTO = ChatRoomInfoDTO.createChatRoomInfo()
                 .roomIdx(roomIdx)
                 .title(chatRoom.getTitle())
-                .memberCnt(chatRoom.getMemberCnt())
+                .participantIds(participantIds)
                 .lastChatMsg(chatRoom.getLastChatMsg())
-                .unreadCount(0)
+                .unreadMessageCount(0)
+                .timestamp(chatRoom.getLastChatDt())
                 .build();
 
         // 채팅방 맴버별 안읽은 메세지 수 증가 및 채팅목록 send
@@ -81,16 +89,20 @@ public class ChatWebSocketService {
     }
 
     @Transactional
-    public Map<String, Object> receiveFilesMessage(String memberId, int roomIdx, String contentType, String bundleYn) throws Exception{
+    public Map<String, Object> receiveFilesMessage(String memberId, int roomIdx, String messageType, String bundleYn) throws Exception{
         Map<String, Object> returnData = new HashMap<>();
         LocalDateTime nowDate = LocalDateTime.now();
 
-        String messageType = contentType.startsWith("image/") ? "IMG" : "FILE";
         String content = null;
 
-        if (bundleYn.equals("Y")) content = "묶음파일을 보냈습니다.";
-        else if (messageType.equals("IMG")) content = "이미지를 보냈습니다";
-        else content = "파일을 보냈습니다.";
+        if (bundleYn.equals("Y")) {
+            if (messageType.equals("IMG")) content = "묶음이미지를 보냈습니다";
+            else content = "묶음파일을 보냈습니다.";
+        }
+        else {
+            if (messageType.equals("IMG")) content = "이미지를 보냈습니다";
+            else content = "파일을 보냈습니다.";
+        }
 
 
         ChatRoomMsg chatRoomMsg = ChatRoomMsg.createFilesChatRoomMsg()
@@ -113,12 +125,18 @@ public class ChatWebSocketService {
         chatRoom.setLastChatMsg(content);
         chatRoomRepository.save(chatRoom);
 
+        List<String >participantIds = new ArrayList<>();
+        chatRoomMemberRepository.findByPkRoomIdxAndDelYn(roomIdx, "N").forEach(chatRoomMember -> {
+            participantIds.add(chatRoomMember.getPk().getMemberId());
+        });
+
         ChatRoomInfoDTO chatRoomInfoDTO = ChatRoomInfoDTO.createChatRoomInfo()
                 .roomIdx(roomIdx)
                 .title(chatRoom.getTitle())
-                .memberCnt(chatRoom.getMemberCnt())
+                .participantIds(participantIds)
                 .lastChatMsg(chatRoom.getLastChatMsg())
-                .unreadCount(0)
+                .timestamp(chatRoom.getLastChatDt())
+                .unreadMessageCount(0)
                 .build();
         returnData.put("chatRoomInfoDTO", chatRoomInfoDTO);
         returnData.put("msgIdx", msgIdx);
@@ -131,6 +149,11 @@ public class ChatWebSocketService {
     public void updateChatRoomMemberUnreadCount(int roomIdx, ChatRoomInfoDTO chatRoomInfoDTO) throws Exception {
         // 해당 채팅방에서 나가지 않은 사람만 조회
         List<ChatRoomMember> chatRoomMemberList = chatRoomMemberRepository.findByPkRoomIdxAndDelYn(roomIdx, "N");
+
+        List<String >participantIds = new ArrayList<>();
+        chatRoomMemberList.forEach(chatRoomMember -> {
+            participantIds.add(chatRoomMember.getPk().getMemberId());
+        });
         // 추후 안읽은 메세지수 업데이트할 사람 목록
         List<ChatRoomMember> updateChatRoomMemberList = new ArrayList<>();
 
@@ -147,9 +170,9 @@ public class ChatWebSocketService {
                 chatRoomMember.setUnreadCount(unreadCount);
                 updateChatRoomMemberList.add(chatRoomMember);
                 // 채팅방 채널에 안읽은 메세지 수 설정
-                chatRoomInfoDTO.setUnreadCount(unreadCount);
+                chatRoomInfoDTO.setUnreadMessageCount(unreadCount);
             } else {
-                chatRoomInfoDTO.setUnreadCount(0);
+                chatRoomInfoDTO.setUnreadMessageCount(0);
             }
             sendToUser(memberId, "/queue/unread", chatRoomInfoDTO);
         });
@@ -165,6 +188,10 @@ public class ChatWebSocketService {
         ChatRoomMemberPK pk = new ChatRoomMemberPK(roomIdx, memberId);
         // 채팅방 정보와 사용자의 채팅방 정보 조회
         ChatRoom chatRoom = chatRoomRepository.findByRoomIdx(roomIdx).orElseThrow(() -> new RuntimeException("잘못된 채팅방 정보입니다."));
+        List<String >participantIds = new ArrayList<>();
+        chatRoomMemberRepository.findByPkRoomIdxAndDelYn(roomIdx, "N").forEach(chatRoomMember -> {
+            participantIds.add(chatRoomMember.getPk().getMemberId());
+        });
         ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByPk(pk);
 
         // 사용자의 채팅방 정보의 안읽은 메세지 수 0으로 저장
@@ -175,9 +202,10 @@ public class ChatWebSocketService {
         ChatRoomInfoDTO chatRoomInfoDTO = ChatRoomInfoDTO.createChatRoomInfo()
                 .roomIdx(roomIdx)
                 .title(chatRoom.getTitle())
-                .memberCnt(chatRoom.getMemberCnt())
+                .participantIds(participantIds)
                 .lastChatMsg(chatRoom.getLastChatMsg())
-                .unreadCount(0)
+                .timestamp(chatRoom.getLastChatDt())
+                .unreadMessageCount(0)
                 .build();
         sendToUser(memberId, "/queue/unread", chatRoomInfoDTO);
     }

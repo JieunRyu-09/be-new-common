@@ -15,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor  // 기본 생성자 추가 (롬복 사용 시)
 @AllArgsConstructor
 @Builder
-@Alias("chatMessageDTO")
 public class ChatMessageDTO {
 	private int msgIdx;
 	private String memberId;
@@ -23,11 +22,7 @@ public class ChatMessageDTO {
 	private String content;
 	private MessageType type = MessageType.TEXT;
 	private LocalDateTime sendTime;
-	private String bundleYn;
-
-	private List<String> fileIdx;
-	private List<String> fileUrl;
-	private List<String> fileName;
+	private String bundleYn = "N";
 
 	public enum MessageType {
 		TEXT, JOIN, LEAVE, FILE, IMG

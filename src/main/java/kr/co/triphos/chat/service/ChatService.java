@@ -185,7 +185,7 @@ public class ChatService {
     }
 
     @Transactional
-    public boolean chatFilesSave (int roomIdx, List<MultipartFile> fileList, String memberId) throws Exception {
+    public boolean chatFilesSave (int roomIdx, List<MultipartFile> fileList, String memberId, String messageType) throws Exception {
         /**
          * 채팅 메세지 데이터 생성(broadcasting X) => msgIdx얻기 위함
          * 파일 저장
@@ -199,11 +199,9 @@ public class ChatService {
         // 파일 개별 저장
         fileList.forEach(fileItem -> {
             try {
-                String contentType = fileItem.getContentType();
                 // 채팅 데이터 취득
-                Map<String, Object> chatDataMap = chatWebSocketService.receiveFilesMessage(memberId, roomIdx, contentType, "N");
+                Map<String, Object> chatDataMap = chatWebSocketService.receiveFilesMessage(memberId, roomIdx, messageType, "N");
                 int msgIdx = Integer.parseInt(chatDataMap.get("msgIdx").toString());
-                String messageType = chatDataMap.get("messageType").toString();
                 String content = chatDataMap.get("content").toString();
                 ChatRoomInfoDTO chatRoomInfoDTO = (ChatRoomInfoDTO) chatDataMap.get("chatRoomInfoDTO");
 
@@ -215,13 +213,12 @@ public class ChatService {
 
                 // 채팅메세지 객체 생성
                 ChatMessageDTO chatMessageDTO = ChatMessageDTO.builder()
-                        .fileIdx(Collections.singletonList(fileIdx))
-                        .fileUrl(Collections.singletonList(filePath.toString()))
-                        .fileName(Collections.singletonList(realFileNm))
                         .type(ChatMessageDTO.MessageType.valueOf(messageType))
                         .content(content)
                         .memberId(memberId)
                         .memberNm(memberNm)
+                        .bundleYn("N")
+                        .msgIdx(msgIdx)
                         .sendTime(LocalDateTime.now())
                         .build();
 
@@ -247,8 +244,7 @@ public class ChatService {
         LocalDateTime nowDate = LocalDateTime.now();
 
         // 채팅 데이터 취득
-        String contentType = messageType.equals("IMG") ? "image/" : "file/";
-        Map<String, Object> chatDataMap = chatWebSocketService.receiveFilesMessage(memberId, roomIdx, contentType, "Y");
+        Map<String, Object> chatDataMap = chatWebSocketService.receiveFilesMessage(memberId, roomIdx, messageType, "Y");
         int msgIdx = Integer.parseInt(chatDataMap.get("msgIdx").toString());
         String content = chatDataMap.get("content").toString();
         ChatRoomInfoDTO chatRoomInfoDTO = (ChatRoomInfoDTO) chatDataMap.get("chatRoomInfoDTO");
@@ -276,14 +272,13 @@ public class ChatService {
         // 전송할 메세지 데이터 생성
         // 채팅메세지 객체 생성
         ChatMessageDTO chatMessageDTO = ChatMessageDTO.builder()
-                .fileIdx(fileIdxList)
-                .fileUrl(filePathList)
-                .fileName(fileNameList)
+                .msgIdx(msgIdx)
                 .type(ChatMessageDTO.MessageType.valueOf(messageType))
                 .content(content)
                 .memberId(memberId)
                 .memberNm(memberNm)
                 .sendTime(LocalDateTime.now())
+                .bundleYn("Y")
                 .build();
         chatWebSocketService.sendToChannel("/topic/chat/" + roomIdx, chatMessageDTO);
         chatWebSocketService.updateChatRoomMemberUnreadCount(roomIdx, chatRoomInfoDTO);
