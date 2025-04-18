@@ -29,4 +29,13 @@ public class ChatDAO extends AbstractDAO {
 		return selectList(_queryNamespace + "getChatMessages", dto);
 	}
 
+	/** 입력한 사용자가 공통으로 참여해있는 채팅방 조회 */
+	public List<ChatRoomInfoDTO> getCommonChatRooms(String memberId, List<String> memberIdList) throws Exception {
+		Map<String, Object> dto = new HashMap<>();
+		dto.put("memberId", memberId);
+		dto.put("memberIdList", memberIdList);
+		dto.put("memberCnt", memberIdList.size());
+		return selectList(_queryNamespace + "getCommonChatRooms", dto);
+	}
+
 }

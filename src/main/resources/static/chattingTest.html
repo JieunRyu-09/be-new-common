@@ -112,9 +112,7 @@
 		const token = document.getElementById("authHeader").value;
 
 		if (subscription) {
-			subscription.unsubscribe({
-				headers: { Authorization: token }  // 👈 헤더 추가
-			});
+			subscription.unsubscribe({ Authorization: token });
 			log(`🔕 채널 ${channelNumber} 구독 해제`);
 			delete subscriptions[channelNumber];
 		} else {

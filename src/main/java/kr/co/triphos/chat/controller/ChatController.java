@@ -35,8 +35,32 @@ public class ChatController {
 	private final ChatService chatService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 
+	@GetMapping("/common-chat-rooms")
+	@Tag(name = "채팅방")
+	@Operation(
+			summary = "공통채팅방 조회",
+			description = "입력한 사용자의 id를 기반으로 공통으로 참여하고있는 채팅방을 조회"
+	)
+	public ResponseEntity<?> getCommonChatRooms(@Parameter(description = "채팅방 IDX") @RequestParam(required = false) List<String> memberIdList) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			String memberId = authenticationFacadeService.getMemberId();
+			memberIdList.add(memberId);
+			List<ChatRoomInfoDTO> chatRoomList = chatService.getCommonChatRooms(memberId, memberIdList);
+			responseDTO.addData("chatRoomList", chatRoomList);
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("공통참여중인 채팅방 조회");
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
 	@PostMapping("/chat-rooms")
-	@Tag(name = "채팅")
+	@Tag(name = "채팅방")
 	@Operation(
 			summary = "채팅방 생성",
 			description = "채팅방을 생성합니다.",
@@ -65,7 +89,7 @@ public class ChatController {
 	}
 
 	@PutMapping("/chat-rooms/{roomIdx}")
-	@Tag(name = "채팅")
+	@Tag(name = "채팅방")
 	@Operation(
 			summary = "채팅방 수정",
 			description = "채팅방을 수정합니다.",
@@ -95,8 +119,31 @@ public class ChatController {
 		}
 	}
 
+	@GetMapping("/members/chat-rooms")
+	@Tag(name = "채팅방")
+	@Operation(
+			summary = "사용자의 채팅방 목록 조회",
+			description = "현재 사용자가 참가해있는 채팅방 목록을 조회."
+	)
+	public ResponseEntity<?> getChatRoomList() {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			String memberId = authenticationFacadeService.getMemberId();
+			List<ChatRoomInfoDTO> chatRoomList = chatService.getChatRoomList(memberId);
+			responseDTO.addData("chatRoomList", chatRoomList);
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("채팅방 목록 조회");
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
 	@GetMapping(value={"/chat-rooms/{roomIdx}/invitable", "/chat-rooms/invitable"})
-	@Tag(name = "채팅")
+	@Tag(name = "사용자")
 	@Operation(
 			summary = "채팅방 초대가능 사용자 조회",
 			description = "채팅방을 생성 시, 혹은 생성된 방에 사용자를 초대할 경우 추가 가능한 사용자 목록 조회."
@@ -118,7 +165,7 @@ public class ChatController {
 	}
 
 	@PostMapping("/chat-rooms/{roomIdx}/members")
-	@Tag(name = "채팅")
+	@Tag(name = "사용자")
 	@Operation(
 			summary = "채팅방 사용자 초대",
 			description = "채팅방에 사용자를 초대합니다.",
@@ -148,36 +195,12 @@ public class ChatController {
 		}
 	}
 
-	@GetMapping("/members/chat-rooms")
-	@Tag(name = "채팅")
-	@Operation(
-			summary = "사용자의 채팅방 목록 조회",
-			description = "현재 사용자가 참가해있는 채팅방 목록을 조회."
-	)
-	public ResponseEntity<?> getChatRoomList() {
-		ResponseDTO responseDTO = new ResponseDTO();
-		try {
-			String memberId = authenticationFacadeService.getMemberId();
-			List<ChatRoomInfoDTO> chatRoomList = chatService.getChatRoomList(memberId);
-			responseDTO.addData("chatRoomList", chatRoomList);
-			responseDTO.setSuccess(true);
-			responseDTO.setMsg("채팅방 목록 조회");
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		catch (Exception ex) {
-			log.error(ex);
-			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
-			return ResponseEntity.internalServerError().body(responseDTO);
-		}
-	}
-
 	@GetMapping("/chat-rooms/{roomIdx}/chat-messages")
-	@Tag(name = "채팅")
+	@Tag(name = "채팅 메세지")
 	@Operation(
 			summary = "채팅방의 채팅조회",
 			description = "현재 사용자가 참가해있는 채팅방 목록을 조회."
 	)
-	// scardy 채팅메세지
 	public ResponseEntity<?> getChatMessages(@PathVariable int roomIdx) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {

@@ -48,4 +48,33 @@
          ORDER BY R1.MSG_IDX ASC
     </select>
 
+    <select id="getCommonChatRooms" parameterType="hashMap" resultType="kr.co.triphos.chat.dto.ChatRoomInfoDTO">
+         /*
+             getCommonChatRooms
+             입력한 사용자가 공통으로 참여해있는 채팅방 조회
+         */
+         SELECT T1.ROOM_IDX
+                , T1.TITLE
+                , T1.CHAT_ROOM_TYPE
+                , T1.MEMBER_CNT
+                , T1.LAST_CHAT_MSG
+                , T2.UNREAD_COUNT AS unreadMessageCount
+                , T1.LAST_CHAT_DT
+           FROM ch_chat_room           T1,
+                ch_chat_room_member    T2
+          WHERE T1.ROOM_IDX     = T2.ROOM_IDX
+            AND T2.MEMBER_ID    = #{memberId}
+            AND T2.DEL_YN       = 'N'
+            AND T1.ROOM_IDX IN ( SELECT ROOM_IDX
+                                   FROM ch_chat_room_member
+                                  WHERE MEMBER_ID IN
+                                 <foreach collection="memberIdList" item="searchMemberId" open="(" separator="," close=")">
+                                     #{searchMemberId}
+                                 </foreach>
+                                    AND DEL_YN = 'N'
+                                  GROUP BY ROOM_IDX
+                                 HAVING COUNT(1) = #{memberCnt}
+                                )
+    </select>
+
 </mapper>

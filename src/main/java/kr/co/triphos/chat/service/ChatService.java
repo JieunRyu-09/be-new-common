@@ -55,6 +55,10 @@ public class ChatService {
 
     private final RedisService redisService;
 
+    public List<ChatRoomInfoDTO> getCommonChatRooms(String memberId, List<String> memberIdList) throws Exception {
+        List<ChatRoomInfoDTO> chatRoomInfoDTOList = chatDAO.getCommonChatRooms(memberId, memberIdList);
+        return chatRoomInfoDTOList;
+    }
 
     @Transactional
     public boolean createChatRoom(ChatRoomDTO chatRoomDTO, String memberId) throws Exception {
