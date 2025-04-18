@@ -178,13 +178,16 @@ public class ChatService {
 
     public List<ChatMessageDTO> getChatMessages(int roomIdx, String memberId) throws Exception {
         int pageSize = 20;
-        String redisValue = redisService.getData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
+        String redisValue = redisService.getData("chat:" + memberId+ ":roomIdx:" + roomIdx + ":msg_idx");
         Integer startIdx = redisValue == null ? null : Integer.parseInt(redisValue);
 
         List<ChatMessageDTO> chatMessageDTOList = chatDAO.getChatMessages(roomIdx, startIdx, pageSize);
-        String readIdx = String.valueOf(chatMessageDTOList.get(0).getMsgIdx());
-        redisService.delData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
-        redisService.saveData("chat:" + memberId+ ":" + roomIdx + "msg_idx", readIdx);
+        String readIdx = chatMessageDTOList.size() == 0 ? redisValue : String.valueOf(chatMessageDTOList.get(0).getMsgIdx());
+        redisService.delData("chat:" + memberId+ ":roomIdx:" + roomIdx + ":msg_idx");
+
+        if (readIdx != null) {
+            redisService.saveData("chat:" + memberId+ ":roomIdx:" + roomIdx + ":msg_idx", readIdx);
+        }
 
         return chatMessageDTOList;
     }

@@ -53,7 +53,7 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 				int roomIdx = Integer.parseInt(redisService.getData(memberId + ":chatRoom"));
 
 				redisService.delData(memberId + ":chatRoom");
-				redisService.delData("chat:" + memberId+ ":" + roomIdx + "msg_idx");
+				redisService.delData("chat:" + memberId+ ":roomIdx:" + roomIdx + ":msg_idx");
 				redisService.delData("chat:sessionId:" + sessionId);
 			}
 			catch (Exception ex) {
