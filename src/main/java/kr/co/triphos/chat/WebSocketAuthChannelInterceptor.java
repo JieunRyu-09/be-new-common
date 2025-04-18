@@ -54,7 +54,6 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
 				redisService.delData(memberId + ":chatRoom");
 				redisService.delData("chat:" + memberId+ ":roomIdx:" + roomIdx + ":msg_idx");
-				redisService.delData("chat:sessionId:" + sessionId);
 			}
 			catch (Exception ex) {
 				log.error(ex.getMessage());
@@ -83,10 +82,8 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 				try {
 					String[] parts = destination.split("/");
 					String roomIdx = parts[parts.length - 1];
-					String sessionId = accessor.getSessionId();
 					redisService.delData(memberId + ":chatRoom");
 					redisService.saveData(memberId + ":chatRoom", roomIdx);
-					redisService.saveData("chat:sessionId:" + sessionId, memberId);
 					chatWebSocketService.setUnreadCount(memberId, Integer.parseInt(roomIdx));
 				}
 				catch (Exception ex) {

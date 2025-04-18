@@ -58,3 +58,6 @@ springdoc:
       enabled: true
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+chat:
+  unread-chat-room: "/queue/unread"
+  send-msg: "/topic/chat/"

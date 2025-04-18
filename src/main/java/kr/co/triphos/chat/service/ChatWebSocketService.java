@@ -14,7 +14,9 @@ import kr.co.triphos.common.service.RedisService;
 import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +36,12 @@ public class ChatWebSocketService {
     private final ChatRoomMsgRepository chatRoomMsgRepository;
 
     private final RedisService redisService;
+    
+    @Value("${chat.unread-chat-room}")
+    String UNREAD_CHAT_ROOM_URL;
+
+    @Value("${chat.send-msg}")
+    String SEND_MSG_URL;
 
     @Transactional
     public void receiveMessage(String memberId, int roomIdx, ChatMessageDTO chatMessageDTO) throws Exception{
@@ -81,7 +89,7 @@ public class ChatWebSocketService {
         updateChatRoomMemberUnreadCount(roomIdx, chatRoomInfoDTO);
 
         // 채팅방의 멤버들에게 메세지 전송
-        messagingTemplate.convertAndSend("/topic/chat/" + roomIdx, chatMessageDTO);
+        messagingTemplate.convertAndSend(SEND_MSG_URL + roomIdx, chatMessageDTO);
     }
 
     @Transactional
@@ -148,6 +156,10 @@ public class ChatWebSocketService {
         // 추후 안읽은 메세지수 업데이트할 사람 목록
         List<ChatRoomMember> updateChatRoomMemberList = new ArrayList<>();
 
+        /**
+         * scardy
+         * 대규모 B2C로 개발될 경우, 채팅방 채널을 
+         */
         chatRoomMemberList.forEach(chatRoomMember -> {
             // redis에서 사용자의 구독중인 roomIdx 조회
             String memberId = chatRoomMember.getPk().getMemberId();
@@ -165,7 +177,7 @@ public class ChatWebSocketService {
             } else {
                 chatRoomInfoDTO.setUnreadMessageCount(0);
             }
-            sendToUser(memberId, "/queue/unread", chatRoomInfoDTO);
+            sendToUser(memberId, UNREAD_CHAT_ROOM_URL, chatRoomInfoDTO);
         });
 
         // 업데이트 해야될 사람이 있으면 업데이트
@@ -198,7 +210,7 @@ public class ChatWebSocketService {
                 .lastChatDt(chatRoom.getLastChatDt())
                 .unreadMessageCount(0)
                 .build();
-        sendToUser(memberId, "/queue/unread", chatRoomInfoDTO);
+        sendToUser(memberId, UNREAD_CHAT_ROOM_URL, chatRoomInfoDTO);
     }
 
     public void sendToChannel(String destination, Object object) {
