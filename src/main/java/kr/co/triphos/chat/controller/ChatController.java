@@ -39,9 +39,9 @@ public class ChatController {
 	@Tag(name = "채팅방")
 	@Operation(
 			summary = "공통채팅방 조회",
-			description = "입력한 사용자의 id를 기반으로 공통으로 참여하고있는 채팅방을 조회"
+			description = "입력한 사용자의 id를 기반으로 공통으로 참여하고있는 채팅방을 조회<br>조회 시 자기 자신 자동 포함"
 	)
-	public ResponseEntity<?> getCommonChatRooms(@Parameter(description = "채팅방 IDX") @RequestParam(required = false) List<String> memberIdList) {
+	public ResponseEntity<?> getCommonChatRooms(@Parameter(description = "사용자 ID") @RequestParam(required = false) List<String> memberIdList) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			String memberId = authenticationFacadeService.getMemberId();
