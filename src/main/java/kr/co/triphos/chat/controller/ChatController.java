@@ -283,30 +283,4 @@ public class ChatController {
 			return ResponseEntity.internalServerError().body(responseDTO);
 		}
 	}
-
-	@PostMapping(value = "/unsubscribe")
-	@Tag(name="채팅방")
-	@Operation(summary = "채팅방 구독해제", description = "채팅방 구독 해제")
-	public ResponseEntity<?> unsubscribe(@Parameter(description = "구독해제 url") @RequestParam List<String> unsubscribeUrlList) {
-		ResponseDTO responseDTO = new ResponseDTO();
-
-		if (unsubscribeUrlList == null || unsubscribeUrlList.isEmpty()) {
-			responseDTO.setSuccess(false);
-			responseDTO.setMsg("구독해제 할 채널이 없습니다.");
-			return ResponseEntity.ok().body(responseDTO);
-		}
-
-		try {
-			String memberId = authenticationFacadeService.getMemberId();
-			boolean res = chatService.unsubscribe(memberId, unsubscribeUrlList);
-			String msg = res ? "파일을 저장하였습니다." : "파일저장에 실패하였습니다.";
-			responseDTO.setSuccess(res);
-			responseDTO.setMsg(msg);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		catch (Exception ex) {
-			responseDTO.setMsg(ex.getMessage());
-			return ResponseEntity.internalServerError().body(responseDTO);
-		}
-	}
 }

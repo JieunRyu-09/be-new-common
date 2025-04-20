@@ -373,27 +373,4 @@ public class ChatService {
         fileData.put("fileSize", fileSize);
         return fileData;
     }
-
-    public boolean unsubscribe (String memberId, List<String> unsubscribeUrlList) throws Exception {
-        /** scardy
-         * unsubscribe 처리 총괄
-         * 현재는 채팅방 구독 해제시에만 로직 동작
-         * 추후 필요 시 case 추가
-         */
-        unsubscribeUrlList.forEach(unsubscribeUrl -> {
-            boolean isChat = unsubscribeUrl.matches("^/topic/chat/\\d+$");
-            if (isChat) {
-                String[] parts = unsubscribeUrl.split("/");
-                String roomIdx = parts[parts.length - 1];
-            }
-
-        });
-
-        int roomIdx = Integer.parseInt(redisService.getData(memberId + ":chatRoom"));
-
-        redisService.delData(memberId + ":chatRoom");
-        redisService.delData("chat:" + memberId+ ":roomIdx:" + roomIdx + ":msg_idx");
-
-        return true;
-    }
 }
