@@ -78,18 +78,20 @@
 		const token = document.getElementById("authHeader").value;
 
 		const socket = new WebSocket(wsUrl);
-		client = Stomp.over(socket);
+		const client = Stomp.over(socket);
 
-		client.connect(
-			{ Authorization: token },
-			function (frame) {
-				log("✅ Connected: " + frame);
-			},
-			function (error) {
-				log("❌ Connection error: " + error);
-			}
-		);
+		// 'Authorization' 헤더를 두 번째 인수로 전달
+		const connectHeaders = {
+			Authorization: `Bearer ${token}`  // JWT 토큰을 Authorization 헤더에 추가
+		};
+
+		client.connect(connectHeaders, function (frame) {
+			console.log("✅ Connected: " + frame);
+		}, function (error) {
+			console.log("❌ Connection error: " + error);
+		});
 	}
+
 
 	function subscribe(channelNumber) {
 		const destination = document.getElementById(`subscribeDest${channelNumber}`).value;
