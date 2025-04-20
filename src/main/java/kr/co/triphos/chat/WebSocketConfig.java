@@ -2,6 +2,7 @@ package kr.co.triphos.chat;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -39,7 +40,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	}
 
 	@Override
-	public void configureClientInboundChannel(org.springframework.messaging.simp.config.ChannelRegistration registration) {
+	public void configureClientInboundChannel(ChannelRegistration registration) {
 		registration.interceptors(stompInterceptor); // ✅ STOMP 인터셉터 등록
 	}
 

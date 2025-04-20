@@ -16,9 +16,13 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -35,63 +39,40 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 	}
 
 	@Override
-	// TODO scardy 기능동작 이후 리팩터링 작업 진행 예정
+	// TODO scardy 보안로직 추가 필요
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
 		// jwt Token 존재여부 검사
 		String authHeader = accessor.getFirstNativeHeader("Authorization");
-		StompCommand command = accessor.getCommand();
-		String destination = accessor.getDestination();
-
-		// 구독해제는 헤더에 토큰을 안보냄.
-		// sessionId로 작업
-		if (StompCommand.UNSUBSCRIBE.equals(command)) {
-			try {
-				String sessionId = accessor.getSessionId();
-				String memberId = redisService.getData("chat:sessionId:" + sessionId);
-				int roomIdx = Integer.parseInt(redisService.getData(memberId + ":chatRoom"));
-
-				redisService.delData(memberId + ":chatRoom");
-				redisService.delData("chat:" + memberId+ ":roomIdx:" + roomIdx + ":msg_idx");
-				redisService.delData("chat:sessionId:" + sessionId);
-			}
-			catch (Exception ex) {
-				log.error(ex.getMessage());
-			}
-
-			return message;
-		}
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			return message;
 		}
 
-
-
 		String token = authHeader.substring(7);
 		Authentication auth = authService.getAuthenticationByToken(token);
 		String memberId = authService.getMemberIdByToken(token);
 
-		// 구독할 경우 redis에 엔드포인드 | memberId로 정보 저장
-		// 구독중(읽고있는중)인 채팅방의 경우 안읽은 메세지 수 증가 안하기 위함
-		if (StompCommand.SUBSCRIBE.equals(command)) {
-			if (destination == null || destination.isEmpty()) {
-				return null;
-			}
-			if (destination.matches("^/topic/chat/\\d+$")) {
-				try {
-					String[] parts = destination.split("/");
-					String roomIdx = parts[parts.length - 1];
-					String sessionId = accessor.getSessionId();
-					redisService.delData(memberId + ":chatRoom");
-					redisService.saveData(memberId + ":chatRoom", roomIdx);
-					redisService.saveData("chat:sessionId:" + sessionId, memberId);
-					chatWebSocketService.setUnreadCount(memberId, Integer.parseInt(roomIdx));
+
+
+		Authentication authentication = authService.getAuthenticationByToken(token);
+
+		// Principal 설정 (이후 Controller에서 사용 가능)
+		accessor.setUser(authentication);
+
+		if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+			try {
+				accessor.setUser(authentication);
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+				Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
+				if (sessionAttributes != null) {
+					sessionAttributes.put("auth", authentication);
 				}
-				catch (Exception ex) {
-					log.error(ex);
-				}
+				accessor.setUser(new StompPrincipal(memberId));
+			} catch (Exception e) {
+				log.error("❌ STOMP 인증 실패 :: {}", e.getMessage());
+				throw new IllegalArgumentException("CONNECT 실패: 인증 불가");
 			}
 		}
 

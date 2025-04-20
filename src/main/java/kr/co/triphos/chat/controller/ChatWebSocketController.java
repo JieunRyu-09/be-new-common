@@ -14,6 +14,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
@@ -28,11 +29,13 @@ public class ChatWebSocketController {
 	@MessageMapping("/chat/{roomIdx}")
 	public ChatMessageDTO sendMessage(@DestinationVariable int roomIdx, ChatMessageDTO chatMessageDTO, Principal principal) {
 		try {
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			CustomUserDetails customUserDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
 			String memberId = customUserDetails.getMemberId();
 			chatWebSocketService.receiveMessage(memberId, roomIdx, chatMessageDTO);
 		}
 		catch (Exception ex) {
+			log.info("CUSTOMUSER :: " + (CustomUserDetails) ((Authentication) principal).getPrincipal());
 			log.error(ex.getMessage());
 		}
 		System.out.println("📩 받은 메시지: " + chatMessageDTO.getContent());
