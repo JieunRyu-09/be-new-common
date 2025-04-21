@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 public class OrganizationDTO {
-
+	private Integer organizationIdx;
 	private String organizationId;        // 조직 ID (ex: "1-2-1")
 	private String organizationName;      // 조직명
 	private int level;                    // 조직 단계
@@ -23,11 +23,12 @@ public class OrganizationDTO {
 	private String selfKey;
 
 	public OrganizationDTO(Organization entity) {
-		this.organizationName = entity.getOrganizationNm();
-		this.level = entity.getLevel();
-		this.selfKey = buildKey(entity.getDepth1(), entity.getDepth2(), entity.getDepth3(), entity.getDepth4(), entity.getDepth5());
-		this.parentKey = buildParentKey(entity);
-		this.organizationId = this.selfKey; // 핵심: organizationId를 selfKey로 설정
+		this.organizationIdx	= entity.getOrganizationIdx();
+		this.organizationName 	= entity.getOrganizationNm();
+		this.level 				= entity.getLevel();
+		this.selfKey 			= buildKey(entity.getDepth1(), entity.getDepth2(), entity.getDepth3(), entity.getDepth4(), entity.getDepth5());
+		this.parentKey 			= buildParentKey(entity);
+		this.organizationId 	= this.selfKey;
 	}
 
 	private String buildKey(Integer d1, Integer d2, Integer d3, Integer d4, Integer d5) {

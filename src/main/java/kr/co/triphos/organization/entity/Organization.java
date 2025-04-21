@@ -26,7 +26,7 @@ import static java.lang.reflect.Modifier.STATIC;
 public class Organization {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer	organizationId;
+	private Integer	organizationIdx;
 
 	@Column(name = "DEPTH_1")
 	private Integer depth1;
