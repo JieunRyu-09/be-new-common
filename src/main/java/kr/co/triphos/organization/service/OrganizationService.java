@@ -7,6 +7,7 @@ import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.entity.MenuMemberAuth;
 import kr.co.triphos.member.repository.MemberRepository;
 import kr.co.triphos.member.repository.MenuMemberAuthRepository;
+import kr.co.triphos.organization.dao.OrganizationDAO;
 import kr.co.triphos.organization.dto.OrganizationDTO;
 import kr.co.triphos.organization.entity.Organization;
 import kr.co.triphos.organization.repository.OrganizationRepository;
@@ -33,6 +34,8 @@ import java.util.stream.Collectors;
 public class OrganizationService {
 	private final OrganizationRepository organizationRepository;
 	private final PositionRepository positionRepository;
+
+	private final OrganizationDAO organizationDAO;
 
 	public List<OrganizationDTO> getOrganization() throws Exception{
 		List<Organization> entities = organizationRepository.findByUseYn("Y", Sort.by("level", "depth1", "depth2", "depth3", "depth4", "depth5"));
@@ -62,30 +65,8 @@ public class OrganizationService {
 		return roots;
 	}
 
-	public List<OrganizationDTO> buildTree(List<OrganizationDTO> flatList) {
-		Map<String, OrganizationDTO> map = new HashMap<>();
-		List<OrganizationDTO> rootList = new ArrayList<>();
-
-		// 1. 먼저 모든 노드를 map에 넣음
-		for (OrganizationDTO dto : flatList) {
-			map.put(dto.getSelfKey(), dto);
-		}
-
-		// 2. 부모와 자식 관계 구성
-		for (OrganizationDTO dto : flatList) {
-			String parentKey = dto.getParentKey();
-			if (parentKey == null) {
-				// 루트 노드
-				rootList.add(dto);
-			} else {
-				OrganizationDTO parent = map.get(parentKey);
-				if (parent != null) {
-					parent.getChildren().add(dto);
-				}
-			}
-		}
-
-		return rootList;
+	public List<HashMap<String, Object>> getOrganizationMember (int organizationIdx, String includeAllYn) throws Exception {
+		return organizationDAO.getOrganizationMember(organizationIdx, includeAllYn);
 	}
 
 

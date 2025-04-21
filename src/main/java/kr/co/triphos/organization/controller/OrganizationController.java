@@ -53,4 +53,29 @@ public class OrganizationController {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@GetMapping("/members")
+	@Tag(name = "사용자")
+	@Operation(summary = "조직도의 사용자 정보 조회", description = "")
+	public ResponseEntity<?> getOrganizationMember (@Parameter(description = "조직도 IDX") @RequestParam int organizationIdx,
+											  	    @Parameter(description = "하위 조직 멤버 포함여부") @RequestParam(required = false) String includeAllYn) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			if (!"Y".equals(includeAllYn)) includeAllYn = "N";
+
+			List<HashMap<String, Object>> memberList = organizationService.getOrganizationMember(organizationIdx, includeAllYn);
+
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("조직의 사용자 조회");
+			responseDTO.addData("memberList", memberList);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (RuntimeException ex) {
+			log.error(ex);
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
