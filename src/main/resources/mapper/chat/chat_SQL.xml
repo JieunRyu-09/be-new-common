@@ -80,7 +80,7 @@
     <select id="getOrganizationMember" parameterType="hashMap" resultType="hashMap">
          /*
             getOrganizationMember
-            조직의 사용자 조회
+            조직도를 통해 채팅방에 초대가능한 사람 조회
          */
          SELECT T1.MEMBER_ID            AS memberId
                 , T1.MEMBER_NM          AS memberName
@@ -91,9 +91,7 @@
                 LEFT  JOIN sy_position_info     T2   ON T1.POSITION_IDX     = T2.POSITION_IDX
                 INNER JOIN sy_organization_info T3   ON T1.ORGANIZATION_IDX = T3.ORGANIZATION_IDX
                 LEFT  JOIN ch_chat_room_member  T4   ON T1.MEMBER_ID        = T4.MEMBER_ID
-                                                <if test="roomIdx != null and roomIdx != ''">
                                                     AND T4.ROOM_IDX         = #{roomIdx}
-                                                </if>
           WHERE T1.DEL_YN != 'Y'
             AND T3.ORGANIZATION_IDX IN (SELECT ORGANIZATION_IDX
                                           FROM sy_organization_info
@@ -109,6 +107,7 @@
                                            AND ORGANIZATION_IDX = #{organizationIdx}
                                        </otherwise>
                                    </choose>)
+          ORDER BY T1.POSITION_IDX ASC
     </select>
 
 </mapper>

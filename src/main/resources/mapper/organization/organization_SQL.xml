@@ -30,6 +30,7 @@
                                            AND ORGANIZATION_IDX = #{organizationIdx}
                                        </otherwise>
                                    </choose>)
+         ORDER BY T1.POSITION_IDX ASC
     </select>
 
 
