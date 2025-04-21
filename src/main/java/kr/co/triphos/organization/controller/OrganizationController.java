@@ -49,8 +49,10 @@ public class OrganizationController {
 			log.error(ex);
 			responseDTO.setMsg(ex.getMessage());
 			return ResponseEntity.internalServerError().body(responseDTO);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
 		}
 	}
 
@@ -74,8 +76,10 @@ public class OrganizationController {
 			log.error(ex);
 			responseDTO.setMsg(ex.getMessage());
 			return ResponseEntity.internalServerError().body(responseDTO);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
 		}
 	}
 }

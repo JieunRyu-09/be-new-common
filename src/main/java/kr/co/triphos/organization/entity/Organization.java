@@ -39,7 +39,7 @@ public class Organization {
 	@Column(name = "DEPTH_5")
 	private Integer depth5;
 	private int		level;
-	private String 	organizationNm;
+	private String 	organizationName;
 	private String 	useYn;
 	private String 	insId;
 	private LocalDateTime insDt;

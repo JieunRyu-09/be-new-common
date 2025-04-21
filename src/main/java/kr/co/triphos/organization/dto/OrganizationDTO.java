@@ -24,7 +24,7 @@ public class OrganizationDTO {
 
 	public OrganizationDTO(Organization entity) {
 		this.organizationIdx	= entity.getOrganizationIdx();
-		this.organizationName 	= entity.getOrganizationNm();
+		this.organizationName 	= entity.getOrganizationName();
 		this.level 				= entity.getLevel();
 		this.selfKey 			= buildKey(entity.getDepth1(), entity.getDepth2(), entity.getDepth3(), entity.getDepth4(), entity.getDepth5());
 		this.parentKey 			= buildParentKey(entity);
