@@ -17,7 +17,7 @@
 <h2>🧪 STOMP WebSocket 테스트 페이지</h2>
 
 <label>🔗 WebSocket 주소</label>
-<input type="text" id="wsUrl" value="ws://localhost:8081/ws?token=">
+<input type="text" id="wsUrl" value="ws://localhost:8081/ws">
 
 <label>🔐 Authorization (예: Bearer eyJ...)</label>
 <input type="text" id="authHeader" value="Bearer ">
@@ -78,18 +78,17 @@
 		const token = document.getElementById("authHeader").value;
 
 		const socket = new WebSocket(wsUrl);
-		const client = Stomp.over(socket);
+		client = Stomp.over(socket);
 
-		// 'Authorization' 헤더를 두 번째 인수로 전달
-		const connectHeaders = {
-			Authorization: `Bearer ${token}`  // JWT 토큰을 Authorization 헤더에 추가
-		};
-
-		client.connect(connectHeaders, function (frame) {
-			console.log("✅ Connected: " + frame);
-		}, function (error) {
-			console.log("❌ Connection error: " + error);
-		});
+		client.connect(
+			{ Authorization: token },
+			function (frame) {
+				log("✅ Connected: " + frame);
+			},
+			function (error) {
+				log("❌ Connection error: " + error);
+			}
+		);
 	}
 
 
@@ -112,15 +111,25 @@
 	function unsubscribe(channelNumber) {
 		const subscription = subscriptions[channelNumber];
 		const token = document.getElementById("authHeader").value;
+		const destination = document.getElementById(`subscribeDest${channelNumber}`).value;
 
-		if (subscription) {
-			subscription.unsubscribe({ Authorization: token });
-			log(`🔕 채널 ${channelNumber} 구독 해제`);
-			delete subscriptions[channelNumber];
-		} else {
+		if (!subscription) {
 			log(`⚠️ 채널 ${channelNumber}는 현재 구독 중이 아닙니다.`);
+			return;
 		}
+
+		// headers 인자에 Authorization과 x-destination을 같이 보냄
+		subscription.unsubscribe({
+			headers: {
+				Authorization: token,
+				'x-destination': destination
+			}
+		});
+
+		log(`🔕 채널 ${channelNumber} 구독 해제: ${destination}`);
+		delete subscriptions[channelNumber];
 	}
+
 
 	function send() {
 		const destination = document.getElementById("sendDest").value;

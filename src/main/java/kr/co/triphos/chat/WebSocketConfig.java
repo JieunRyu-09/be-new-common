@@ -36,8 +36,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 		// WebSocket 엔드포인트 설정 (프론트엔드에서 연결할 주소)
 		registry
 				.addEndpoint("/ws")
-				.addInterceptors(customHandshakeInterceptor) // ✅ 인터셉터 등록
-				.setHandshakeHandler(new CustomHandshakeHandler()) // 🔸 여기!
+				//.addInterceptors(customHandshakeInterceptor) // ✅ 인터셉터 등록
+				//.setHandshakeHandler(new CustomHandshakeHandler()) // 🔸 여기!
 				.setAllowedOrigins("*");
 	}
 
