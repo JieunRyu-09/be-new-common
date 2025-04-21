@@ -77,4 +77,38 @@
                                 )
     </select>
 
+    <select id="getOrganizationMember" parameterType="hashMap" resultType="hashMap">
+         /*
+            getOrganizationMember
+            조직의 사용자 조회
+         */
+         SELECT T1.MEMBER_ID            AS memberId
+                , T1.MEMBER_NM          AS memberName
+                , T3.ORGANIZATION_NAME  AS organizationName
+                , T2.POSITION_NAME      AS positionName
+                , IF(T4.ROOM_IDX IS NOT NULL, 'Y', 'N') AS invited
+           FROM mm_member_info                  T1
+                LEFT  JOIN sy_position_info     T2   ON T1.POSITION_IDX     = T2.POSITION_IDX
+                INNER JOIN sy_organization_info T3   ON T1.ORGANIZATION_IDX = T3.ORGANIZATION_IDX
+                LEFT  JOIN ch_chat_room_member  T4   ON T1.MEMBER_ID        = T4.MEMBER_ID
+                                                <if test="roomIdx != null and roomIdx != ''">
+                                                    AND T4.ROOM_IDX         = #{roomIdx}
+                                                </if>
+          WHERE T1.DEL_YN != 'Y'
+            AND T3.ORGANIZATION_IDX IN (SELECT ORGANIZATION_IDX
+                                          FROM sy_organization_info
+                                         WHERE USE_YN = 'Y'
+                                   <choose>
+                                       <when test='includeAllYn == "Y"'>
+                                           AND ORGANIZATION_KEY LIKE CONCAT((SELECT ORGANIZATION_KEY
+                                                                               FROM sy_organization_info
+                                                                              WHERE ORGANIZATION_IDX = #{organizationIdx}
+                                                                            ),'%')
+                                       </when>
+                                       <otherwise>
+                                           AND ORGANIZATION_IDX = #{organizationIdx}
+                                       </otherwise>
+                                   </choose>)
+    </select>
+
 </mapper>

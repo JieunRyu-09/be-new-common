@@ -373,4 +373,8 @@ public class ChatService {
         fileData.put("fileSize", fileSize);
         return fileData;
     }
+
+    public List<HashMap<String, Object>> getInvitableOrganizationMember (int organizationIdx, String includeAllYn, String roomIdx) throws Exception {
+        return chatDAO.getInvitableOrganizationMember(organizationIdx, includeAllYn, roomIdx);
+    }
 }

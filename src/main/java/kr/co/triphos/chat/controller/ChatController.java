@@ -143,6 +143,32 @@ public class ChatController {
 		}
 	}
 
+	@GetMapping(value={"/chat-rooms/{roomIdx}/org-invitable", "/chat-rooms/org-invitable"})
+	@Tag(name = "사용자")
+	@Operation(summary = "조직도를 통해 채팅방에 초대가능한 사용자 조회", description = "이미 초대되어 있는 사람도 조회.<br>이미 초대된 사람의 경우 invited = 'Y'로 반환")
+	public ResponseEntity<?> getOrganizationMember (@Parameter(description = "조직도 IDX") @RequestParam int organizationIdx,
+													@Parameter(description = "하위 조직 멤버 포함여부") @RequestParam(required = false) String includeAllYn,
+													@Parameter(description = "Room Idx") @PathVariable(required = false) String roomIdx) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			if (!"Y".equals(includeAllYn)) includeAllYn = "N";
+
+			List<HashMap<String, Object>> memberList = chatService.getInvitableOrganizationMember(organizationIdx, includeAllYn, roomIdx);
+
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg("조직의 사용자 조회");
+			responseDTO.addData("memberList", memberList);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (RuntimeException ex) {
+			log.error(ex);
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.internalServerError().body(responseDTO);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@GetMapping(value={"/chat-rooms/{roomIdx}/invitable", "/chat-rooms/invitable"})
 	@Tag(name = "사용자")
 	@Operation(
