@@ -1,10 +1,8 @@
 package kr.co.triphos.organization.entity;
 
 import kr.co.triphos.member.dto.MemberDTO;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import kr.co.triphos.organization.dto.OrganizationDTO;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.*;
@@ -38,6 +36,7 @@ public class Organization {
 	private Integer depth4;
 	@Column(name = "DEPTH_5")
 	private Integer depth5;
+	private String	organizationKey;
 	private int		level;
 	private String 	organizationName;
 	private String 	useYn;
@@ -45,4 +44,21 @@ public class Organization {
 	private LocalDateTime insDt;
 	private String 	updId;
 	private LocalDateTime updDt;
+
+
+	public static Organization createEntityByDTO(OrganizationDTO dto) {
+		return Organization.builder()
+				.depth1(dto.getDepth1())
+				.depth2(dto.getDepth2())
+				.depth3(dto.getDepth3())
+				.depth4(dto.getDepth4())
+				.depth5(dto.getDepth5())
+				.organizationKey(dto.getOrganizationKey())
+				.level(dto.getLevel())
+				.organizationName(dto.getOrganizationName())
+				.useYn("Y")
+				.insId(dto.getInsId())
+				.insDt(LocalDateTime.now())
+				.build();
+	}
 }

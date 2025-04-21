@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
 	List<Organization> findByUseYn(String useYn, Sort sort);
 
+	Organization findByOrganizationKey(String organizationKey);
+
 }

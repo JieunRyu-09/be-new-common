@@ -33,5 +33,29 @@
          ORDER BY T1.POSITION_IDX ASC
     </select>
 
+    <select id="getPreviousDepthValue" parameterType="hashMap" resultType="int">
+         /*
+            getPreviousDepthValue
+            조직생성 시 현재까지 생성된 조직중 동레벨의 가장 큰 depth value 조회
+         */
+         SELECT IFNULL(SUBSTRING_INDEX(REVERSE(MAX(ORGANIZATION_KEY)), '-', 1), 1) AS last_part
+           FROM sy_organization_info
+          WHERE LEVEL = #{level}
+        <if test="depth1 != null">
+            AND DEPTH_1 = #{depth1}
+        </if>
+        <if test="depth2 != null">
+            AND DEPTH_2 = #{depth2}
+        </if>
+        <if test="depth3 != null">
+            AND DEPTH_3 = #{depth3}
+        </if>
+        <if test="depth4 != null">
+            AND DEPTH_4 = #{depth4}
+        </if>
+        <if test="depth5 != null">
+            AND DEPTH_5 = #{depth5}
+        </if>
+    </select>
 
 </mapper>

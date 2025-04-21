@@ -3,6 +3,7 @@ package kr.co.triphos.organization.dao;
 import kr.co.triphos.chat.dto.ChatMessageDTO;
 import kr.co.triphos.chat.dto.ChatRoomInfoDTO;
 import kr.co.triphos.manage.dao.AbstractDAO;
+import kr.co.triphos.organization.dto.OrganizationDTO;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +22,11 @@ public class OrganizationDAO extends AbstractDAO {
 		dto.put("organizationIdx", organizationIdx);
 		dto.put("includeAllYn", includeAllYn);
 		return selectList(_queryNamespace + "getOrganizationMember", dto);
+	}
+
+	/** 조직생성 시 현재까지 생성된 조직중 동레벨의 가장 큰 depth value 조회 */
+	public int getPreviousDepthValue(OrganizationDTO dto) throws Exception {
+		return selectOne(_queryNamespace + "getPreviousDepthValue", dto);
 	}
 
 }

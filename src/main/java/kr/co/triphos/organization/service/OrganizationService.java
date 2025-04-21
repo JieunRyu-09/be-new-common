@@ -9,6 +9,7 @@ import kr.co.triphos.member.repository.MemberRepository;
 import kr.co.triphos.member.repository.MenuMemberAuthRepository;
 import kr.co.triphos.organization.dao.OrganizationDAO;
 import kr.co.triphos.organization.dto.OrganizationDTO;
+import kr.co.triphos.organization.dto.OrganizationInfoDTO;
 import kr.co.triphos.organization.entity.Organization;
 import kr.co.triphos.organization.repository.OrganizationRepository;
 import kr.co.triphos.organization.repository.PositionRepository;
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,25 +39,25 @@ public class OrganizationService {
 
 	private final OrganizationDAO organizationDAO;
 
-	public List<OrganizationDTO> getOrganization() throws Exception{
+	public List<OrganizationInfoDTO> getOrganization() throws Exception{
 		List<Organization> entities = organizationRepository.findByUseYn("Y", Sort.by("level", "depth1", "depth2", "depth3", "depth4", "depth5"));
-		List<OrganizationDTO> dtos = entities.stream()
-				.map(OrganizationDTO::new)
+		List<OrganizationInfoDTO> dtos = entities.stream()
+				.map(OrganizationInfoDTO::new)
 				.collect(Collectors.toList());
 
 		// selfKey 기준으로 Map 구성
-		Map<String, OrganizationDTO> dtoMap = dtos.stream()
-				.collect(Collectors.toMap(OrganizationDTO::getSelfKey, Function.identity()));
+		Map<String, OrganizationInfoDTO> dtoMap = dtos.stream()
+				.collect(Collectors.toMap(OrganizationInfoDTO::getSelfKey, Function.identity()));
 
-		List<OrganizationDTO> roots = new ArrayList<>();
+		List<OrganizationInfoDTO> roots = new ArrayList<>();
 
-		for (OrganizationDTO dto : dtos) {
+		for (OrganizationInfoDTO dto : dtos) {
 			if (dto.getParentKey() == null) {
 				// 최상위 조직이면 root에 추가
 				roots.add(dto);
 			} else {
 				// 부모가 있으면 children에 추가
-				OrganizationDTO parent = dtoMap.get(dto.getParentKey());
+				OrganizationInfoDTO parent = dtoMap.get(dto.getParentKey());
 				if (parent != null) {
 					parent.getChildren().add(dto);
 				}
@@ -69,6 +71,30 @@ public class OrganizationService {
 		return organizationDAO.getOrganizationMember(organizationIdx, includeAllYn);
 	}
 
+	@Transactional
+	public void createOrganization (OrganizationDTO organizationDTO) throws Exception {
+		Integer depth1 = organizationDTO.getDepth1();
+		Integer depth2 = organizationDTO.getDepth2();
+		Integer depth3 = organizationDTO.getDepth3();
+		Integer depth4 = organizationDTO.getDepth4();
+		Integer depth5 = organizationDTO.getDepth5();
+		int level = organizationDTO.getLevel();
+
+		int newValue = organizationDAO.getPreviousDepthValue(organizationDTO) + 1;
+
+		String organizationKey = organizationDTO.getOrganizationKey() + "-" + newValue;
+		organizationDTO.setOrganizationKey(organizationKey);
+
+		if (depth1 == null) organizationDTO.setDepth1(newValue);
+		else if (depth2 == null) organizationDTO.setDepth2(newValue);
+		else if (depth3 == null) organizationDTO.setDepth3(newValue);
+		else if (depth4 == null) organizationDTO.setDepth4(newValue);
+		else if (depth5 == null) organizationDTO.setDepth5(newValue);
+
+
+		Organization organization = Organization.createEntityByDTO(organizationDTO);
+		organizationRepository.save(organization);
+	}
 
 
 
