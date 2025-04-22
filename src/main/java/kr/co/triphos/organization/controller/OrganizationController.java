@@ -1,5 +1,6 @@
 package kr.co.triphos.organization.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,11 +39,11 @@ public class OrganizationController {
 
 	@GetMapping("")
 	@Tag(name = "조직도")
-	@Operation(summary = "조직도 정보 조회", description = "")
-	public ResponseEntity<?> getOrganization () {
+	@Operation(summary = "조직도 정보 조회", description = "findAllYn이 Y면 미사용 조직도 포함하여 반환.<br> N이면 사용중인 조직만")
+	public ResponseEntity<?> getOrganization (@Parameter(description = "미사용 조직 포함여부") @RequestParam String findAllYn) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			List<OrganizationInfoDTO> organization = organizationService.getOrganization();
+			List<OrganizationInfoDTO> organization = organizationService.getOrganization(findAllYn);
 
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg("조직도 조회");
@@ -183,14 +184,13 @@ public class OrganizationController {
 
 	@GetMapping("/members")
 	@Tag(name = "사용자")
-	@Operation(summary = "조직도의 사용자 정보 조회", description = "")
+	@Operation(summary = "조직도의 사용자 정보 조회", description = "findAllYn이 Y면 미사용중인 사용자도 포함하여 반환.<br> N이면 사용중인 사용자만")
 	public ResponseEntity<?> getOrganizationMember (@Parameter(description = "조직도 IDX") @RequestParam int organizationIdx,
-											  	    @Parameter(description = "하위 조직 멤버 포함여부") @RequestParam(required = false) String includeAllYn) {
+											  	    @Parameter(description = "하위 조직 멤버 포함여부") @RequestParam(required = false) String includeAllYn,
+													@Parameter(description = "미사용 사용자 포함여부") @RequestParam String findAllYn) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			if (!"Y".equals(includeAllYn)) includeAllYn = "N";
-
-			List<HashMap<String, Object>> memberList = organizationService.getOrganizationMember(organizationIdx, includeAllYn);
+			List<Map<String, Object>> memberList = organizationService.getOrganizationMember(organizationIdx, includeAllYn, findAllYn);
 
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg("조직의 사용자 조회");

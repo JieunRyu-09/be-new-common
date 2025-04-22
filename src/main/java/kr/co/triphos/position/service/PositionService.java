@@ -123,7 +123,7 @@ public class PositionService {
 
 		memberInfoList.forEach(member -> {
 			Organization organization = organizationList.stream()
-					.filter(org -> org.getOrganizationIdx() == 5)
+					.filter(org -> Objects.equals(org.getOrganizationIdx(), member.getOrganizationIdx()))
 					.findFirst().orElse(null);
 
 			Map<String, Object> dto = new HashMap<>();

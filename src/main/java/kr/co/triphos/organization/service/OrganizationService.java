@@ -1,10 +1,14 @@
 package kr.co.triphos.organization.service;
 
+import kr.co.triphos.member.entity.Member;
+import kr.co.triphos.member.repository.MemberRepository;
 import kr.co.triphos.organization.dao.OrganizationDAO;
 import kr.co.triphos.organization.dto.OrganizationDTO;
 import kr.co.triphos.organization.dto.OrganizationInfoDTO;
 import kr.co.triphos.organization.entity.Organization;
 import kr.co.triphos.organization.repository.OrganizationRepository;
+import kr.co.triphos.position.entity.Position;
+import kr.co.triphos.position.repository.PositionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Sort;
@@ -20,11 +24,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j2
 public class OrganizationService {
+	private final MemberRepository memberRepository;
+	private final PositionRepository positionRepository;
 	private final OrganizationRepository organizationRepository;
 	private final OrganizationDAO organizationDAO;
 
-	public List<OrganizationInfoDTO> getOrganization() throws Exception{
-		List<Organization> entities = organizationRepository.findByUseYn("Y", Sort.by("level", "depth1", "depth2", "depth3", "depth4", "depth5"));
+	public List<OrganizationInfoDTO> getOrganization(String findAllYn) throws Exception{
+		List<Organization> entities = new ArrayList<>();
+		if (findAllYn.equals("Y")) {
+			entities = organizationRepository.findAll(Sort.by("level", "depth1", "depth2", "depth3", "depth4", "depth5"));
+		}
+		else {
+			entities = organizationRepository.findByUseYn("Y", Sort.by("level", "depth1", "depth2", "depth3", "depth4", "depth5"));
+		}
 		List<OrganizationInfoDTO> dtos = entities.stream()
 				.map(OrganizationInfoDTO::new)
 				.collect(Collectors.toList());
@@ -143,8 +155,36 @@ public class OrganizationService {
 		return returnData;
 	}
 
-	public List<HashMap<String, Object>> getOrganizationMember (int organizationIdx, String includeAllYn) throws Exception {
-		return organizationDAO.getOrganizationMember(organizationIdx, includeAllYn);
+	public List<Map<String, Object>> getOrganizationMember (int organizationIdx, String includeAllYn, String findAllYn) throws Exception {
+		Organization organization = organizationRepository.findByOrganizationIdx(organizationIdx)
+				.orElseThrow(() -> new RuntimeException("잘못된 조직 정보입니다."));
+		List<Position> positionList = positionRepository.findAll();
+		List<Member> memberList = new ArrayList<>();
+		List<Map<String, Object>> returnData = new ArrayList<>();
+
+		if (findAllYn.equals("Y")) {
+			memberList = memberRepository.findByOrganizationIdx(organizationIdx);
+		}
+		else {
+			memberList = memberRepository.findByOrganizationIdxAndDelYn(organizationIdx, "N");
+		}
+
+		memberList.forEach(member -> {
+			String positionName = positionList.stream()
+					.filter(pos -> pos.getPositionIdx() == member.getPositionIdx())
+					.findFirst().map(Position::getPositionName).orElse(null);
+
+			Map<String, Object> dto = new HashMap<>();
+			dto.put("memberId", member.getMemberId());
+			dto.put("memberNm", member.getMemberNm());
+			dto.put("organizationName", organization.getOrganizationName());
+			dto.put("positionIdx", member.getPositionIdx());
+			dto.put("positionName", positionName);
+
+			returnData.add(dto);
+		});
+
+		return returnData;
 	}
 
 

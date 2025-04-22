@@ -24,4 +24,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	List<Member> findByPositionIdxAndDelYn(int positionIdx, String delYn);
 
 	List<Member> findByPositionIdx(int positionIdx);
+
+	List<Member> findByOrganizationIdxAndDelYn(int organizationIdx, String delYn);
+
+	List<Member> findByOrganizationIdx(int organizationIdx);
 }
