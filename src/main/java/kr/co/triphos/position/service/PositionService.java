@@ -8,7 +8,6 @@ import kr.co.triphos.organization.dto.OrganizationInfoDTO;
 import kr.co.triphos.organization.entity.Organization;
 import kr.co.triphos.organization.repository.OrganizationRepository;
 import kr.co.triphos.organization.service.OrganizationService;
-import kr.co.triphos.position.dao.PositionDAO;
 import kr.co.triphos.position.dto.PositionDTO;
 import kr.co.triphos.position.dto.PositionInfoDTO;
 import kr.co.triphos.position.entity.Position;
@@ -31,9 +30,6 @@ public class PositionService {
 	private final MemberRepository memberRepository;
 	private final PositionRepository positionRepository;
 	private final OrganizationRepository organizationRepository;
-
-	private final PositionDAO positionDAO;
-	private PositionDTO positionDTO;
 
 	public List<PositionInfoDTO> getPosition(String findAllYn) throws Exception {
 		List<PositionInfoDTO> positionInfoDTOList = new ArrayList<>();
