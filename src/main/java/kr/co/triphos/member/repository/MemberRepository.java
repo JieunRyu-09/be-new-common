@@ -20,4 +20,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	List<Member> findByDelYn(String delYn);
 
 	List<Member> findByDelYnOrderByMemberNmAsc(String delYn);
+
+	List<Member> findByPositionIdxAndDelYn(int positionIdx, String delYn);
+
+	List<Member> findByPositionIdx(int positionIdx);
 }

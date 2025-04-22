@@ -1,4 +1,4 @@
-package kr.co.triphos.organization.entity;
+package kr.co.triphos.position.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,24 +6,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
-@Entity(name = "Position")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Log4j2
-@Table(name = "sy_position_info")
-public class Position {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer	positionId;
+public class PositionDTO {
+	private Integer	positionIdx;
 	private String	positionName;
 	private String  useYn;
 	private String 	insId;
 	private LocalDateTime insDt;
 	private String 	updId;
 	private LocalDateTime updDt;
+
+	private List<Integer> deleteIdxList;
 }

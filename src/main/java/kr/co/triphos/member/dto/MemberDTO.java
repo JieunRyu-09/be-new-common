@@ -18,6 +18,12 @@ public class MemberDTO {
 	@Schema(description = "사용자 이름")
 	private String 	memberNm;
 
+	@Schema(description = "사용자 조직")
+	private Integer organizationIdx;
+
+	@Schema(description = "사용자 직급")
+	private Integer positionIdx;
+
 	@NotBlank(message = "비밀번호를 입력하세요.")
 	@Schema(description = "사용자 PW")
 	private String 	memberPw;

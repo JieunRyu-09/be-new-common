@@ -1,52 +1,48 @@
-package kr.co.triphos.organization.controller;
+package kr.co.triphos.position.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.triphos.common.dto.ExcelDTO;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
-import kr.co.triphos.member.dto.MemberDTO;
-import kr.co.triphos.member.dto.MenuMemberAuthDTO;
-import kr.co.triphos.member.service.AuthService;
-import kr.co.triphos.member.service.MemberService;
 import kr.co.triphos.organization.dto.OrganizationDTO;
 import kr.co.triphos.organization.dto.OrganizationInfoDTO;
 import kr.co.triphos.organization.service.OrganizationService;
+import kr.co.triphos.position.dto.PositionDTO;
+import kr.co.triphos.position.dto.PositionInfoDTO;
+import kr.co.triphos.position.service.PositionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/v1/organizations")
+@RequestMapping("/v1/positions")
 @RequiredArgsConstructor
 @Log4j2
-public class OrganizationController {
+public class PositionController {
 	private final AuthenticationFacadeService authFacadeService;
-	private final OrganizationService organizationService;
+	private final PositionService positionService;
 
 	@GetMapping("")
-	@Tag(name = "조직도")
-	@Operation(summary = "조직도 정보 조회", description = "")
-	public ResponseEntity<?> getOrganization () {
+	@Tag(name = "직급")
+	@Operation(summary = "직급 정보 조회", description = "findAllYn이 Y면 미사용 직급도 포함하여 반환.<br> N이면 사용중인 직급만")
+	public ResponseEntity<?> getPosition (@Parameter(description = "미사용 직급 포함여부") @RequestParam String findAllYn) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			List<OrganizationInfoDTO> organization = organizationService.getOrganization();
+			List<PositionInfoDTO> positionList = positionService.getPosition(findAllYn);
 
 			responseDTO.setSuccess(true);
-			responseDTO.setMsg("조직도 조회");
-			responseDTO.addData("organization", organization);
+			responseDTO.setMsg("직급 조회");
+			responseDTO.addData("positionList", positionList);
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (RuntimeException ex) {
@@ -61,27 +57,26 @@ public class OrganizationController {
 	}
 
 	@PostMapping("")
-	@Tag(name = "조직도")
+	@Tag(name = "직급")
 	@Operation(
-			summary = "조직 정보 생성",
-			description = "1-1-1와같은 값으로 입력.<br>" +
-					"결과는 1-1-1-n으로 생성됨",
+			summary = "직급 정보 생성",
+			description = "",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
 					content = @Content(
 							schema = @Schema(hidden = true),
-							examples = @ExampleObject(name = "조직 생성 예시", ref = "#/components/examples/organization.post")
+							examples = @ExampleObject(name = "직급 생성 예시", ref = "#/components/examples/position.post")
 					)
 			)
 	)
-	public ResponseEntity<?> createOrganization (@Parameter(description = "조직 정보") @RequestBody OrganizationDTO organizationDTO) {
+	public ResponseEntity<?> createPosition (@Parameter(description = "직급 정보") @RequestBody PositionDTO positionDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			String memberId = authFacadeService.getMemberId();
-			organizationDTO.setInsId(memberId);
-			organizationService.createOrganization(organizationDTO);
+			positionDTO.setInsId(memberId);
+			positionService.createPosition(positionDTO);
 
 			responseDTO.setSuccess(true);
-			responseDTO.setMsg("조직 생성 성공");
+			responseDTO.setMsg("직급 생성 성공");
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (RuntimeException ex) {
@@ -96,30 +91,27 @@ public class OrganizationController {
 	}
 
 	@PutMapping("")
-	@Tag(name = "조직도")
+	@Tag(name = "직급")
 	@Operation(
-			summary = "조직 정보 수정",
-			description = "변경할 조직 명, 조직 위치정보 입력.<br>" +
-					"입력한 depth의 하위 조직으로 이동.<br>" +
-					"예) 1-1-1을 입력한경우 1-1-1-n으로 이동됨.<br>" +
-					"조직명만 변경할 경우 idx와 조직명만 입력",
+			summary = "직급 정보 수정",
+			description = "미사용 처리 시 해당 직급의 사용자 여부 판단",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
 					content = @Content(
 							schema = @Schema(hidden = true),
-							examples = @ExampleObject(name = "조직 수정 예시", ref = "#/components/examples/organization.put")
+							examples = @ExampleObject(name = "직급 수정 예시", ref = "#/components/examples/position.put")
 					)
 			)
 	)
-	public ResponseEntity<?> updateOrganization (@Parameter(description = "조직 정보") @RequestBody OrganizationDTO organizationDTO) {
+	public ResponseEntity<?> updatePosition (@Parameter(description = "직급 정보") @RequestBody PositionDTO positionDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			String memberId = authFacadeService.getMemberId();
-			organizationDTO.setUpdId(memberId);
+			positionDTO.setUpdId(memberId);
 
-			organizationService.updateOrganization(organizationDTO);
+			positionService.updatePosition(positionDTO);
 
 			responseDTO.setSuccess(true);
-			responseDTO.setMsg("조직정보 변경 성공");
+			responseDTO.setMsg("직급정보 변경 성공");
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (RuntimeException ex) {
@@ -133,36 +125,36 @@ public class OrganizationController {
 		}
 	}
 
+	@Hidden
 	@DeleteMapping("")
-	@Tag(name = "조직도")
+	@Tag(name = "직급")
 	@Operation(
-			summary = "조직 미사용처리",
-			description = "미사용 처리할 조직의 idx 배열로 입력<br>" +
-					"하위조직을 포함하여 사용자가 있는지 확인.<br>" +
+			summary = "직급 미사용처리",
+			description = "미사용 처리할 직급의 idx 배열로 입력" +
 					"사용자가 있는 경우 미사용처리 안함, responseDTO에 <br>" +
-					"미사용 처리 못한 조직의 idx 및 조직명 반환 ",
+					"미사용 처리 못한 직급의 idx 및 직급명 반환 ",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
 					content = @Content(
 							schema = @Schema(hidden = true),
-							examples = @ExampleObject(name = "조직 삭제 예시", ref = "#/components/examples/organization.delete")
+							examples = @ExampleObject(name = "직급 삭제 예시", ref = "#/components/examples/position.delete")
 					)
 			)
 	)
-	public ResponseEntity<?> deleteOrganization (@Parameter(description = "조직 정보") @RequestBody OrganizationDTO organizationDTO) {
+	public ResponseEntity<?> deletePosition (@Parameter(description = "직급 정보") @RequestBody PositionDTO positionDTO) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			if (organizationDTO.getDeleteIdxList().isEmpty()) {
-				throw new RuntimeException("미사용 처리할 조직정보가 없습니다.");
+			if (positionDTO.getDeleteIdxList().isEmpty()) {
+				throw new RuntimeException("미사용 처리할 직급정보가 없습니다.");
 			}
 
 			String memberId = authFacadeService.getMemberId();
-			organizationDTO.setUpdId(memberId);
+			positionDTO.setUpdId(memberId);
 
-			Map<String, Object> returnData = organizationService.deleteOrganization(organizationDTO);
+			Map<String, Object> returnData = positionService.deletePosition(positionDTO);
 			List<Integer> undeletedIdxList = (List<Integer>) returnData.get("undeletedIdxList");
 			List<String> undeletedNameList = (List<String>) returnData.get("undeletedNameList");
 
-			String msg = undeletedIdxList.isEmpty() ? "조직 미사용처리 완료." : "하위 조직을 포함하여 구성원이 있는 조직을 제외하고 미사용 처리 완료.";
+			String msg = undeletedIdxList.isEmpty() ? "직급 미사용처리 완료." : "사용자가 존재하는 직급을 제외한 나머지 직급 미사용처리 완료.";
 			responseDTO.addData("undeletedIdxList", undeletedIdxList);
 			responseDTO.addData("undeletedNameList", undeletedNameList);
 
@@ -183,17 +175,15 @@ public class OrganizationController {
 
 	@GetMapping("/members")
 	@Tag(name = "사용자")
-	@Operation(summary = "조직도의 사용자 정보 조회", description = "")
-	public ResponseEntity<?> getOrganizationMember (@Parameter(description = "조직도 IDX") @RequestParam int organizationIdx,
-											  	    @Parameter(description = "하위 조직 멤버 포함여부") @RequestParam(required = false) String includeAllYn) {
+	@Operation(summary = "직급의 사용자 정보 조회", description = "findAllYn이 Y면 미사용 사용자도 포함하여 반환.<br> N이면 사용중인 사용자만")
+	public ResponseEntity<?> getPositionMember (@Parameter(description = "직급 IDX") @RequestParam int positionIdx,
+												@Parameter(description = "미사용 사용자 포함여부") @RequestParam String findAllYn) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			if (!"Y".equals(includeAllYn)) includeAllYn = "N";
-
-			List<HashMap<String, Object>> memberList = organizationService.getOrganizationMember(organizationIdx, includeAllYn);
+			List<Map<String, Object>> memberList = positionService.getPositionMember(positionIdx, findAllYn);
 
 			responseDTO.setSuccess(true);
-			responseDTO.setMsg("조직의 사용자 조회");
+			responseDTO.setMsg("직급의 사용자 조회");
 			responseDTO.addData("memberList", memberList);
 			return ResponseEntity.ok().body(responseDTO);
 		}

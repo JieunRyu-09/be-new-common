@@ -1,0 +1,13 @@
+{
+  "post": {
+      "positionName": "새로운 직급"
+  },
+  "put": {
+    "positionIdx" : 1,
+    "useYn" : "Y",
+    "positionName": "대표이사(수정됨)"
+  },
+  "delete": {
+    "deleteIdxList" : [1, 2]
+  }
+}

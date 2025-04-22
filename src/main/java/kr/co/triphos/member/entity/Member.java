@@ -31,6 +31,8 @@ public class Member {
 
 	@NotNull
 	private String 	memberNm;
+	private Integer organizationIdx;
+	private Integer positionIdx;
 	@NotNull
 	private String 	memberPw;
 	@NotNull

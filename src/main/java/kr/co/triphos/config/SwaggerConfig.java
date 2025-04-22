@@ -61,7 +61,10 @@ public class SwaggerConfig {
 	public GroupedOpenApi chatGroup() {return createGroup("006","6. 채팅", true, new String[]{"/v1/chat/**"});}
 
 	@Bean
-	public GroupedOpenApi chatOrganization() {return createGroup("007","7. 조직도", true, new String[]{"/v1/organizations/**"});}
+	public GroupedOpenApi organizationGroup() {return createGroup("007","7. 조직도", true, new String[]{"/v1/organizations/**"});}
+
+	@Bean
+	public GroupedOpenApi positionGroup() {return createGroup("008","8. 직급", true, new String[]{"/v1/positions/**"});}
 
 
 	@Bean
