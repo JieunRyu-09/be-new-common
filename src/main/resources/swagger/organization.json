@@ -3,10 +3,12 @@
       "organizationId":  "1-1-1",
       "organizationName": "조직명"
   },
-
   "put": {
     "organizationIdx" : 18,
     "organizationId":  "1-1-1",
     "organizationName": "조직위치 및 이름 변경됨"
+  },
+  "delete": {
+    "deleteIdxList" : [26,27]
   }
 }

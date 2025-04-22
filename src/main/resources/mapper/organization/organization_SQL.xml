@@ -58,4 +58,26 @@
         </if>
     </select>
 
+    <update id="deleteOrganization" parameterType="hashMap">
+         /*
+            deleteOrganization
+            조직 미사용처리
+         */
+         UPDATE sy_organization_info
+            SET USE_YN = 'N',
+                UPD_ID  = #{updId},
+                UPD_DT  = NOW()
+          WHERE ORGANIZATION_IDX IN
+        <foreach collection="deleteIdxList" item="deleteIdx" open="(" separator="," close=")">
+            #{deleteIdx}
+        </foreach>
+    </update>
+
+    <select id="checkOrganizationMember" parameterType="hashMap" resultType="String">
+         /*
+            checkOrganizationMember
+            조직 미사용 처리 전 해당 조직의 사용자 조회
+         */
+         SELECT
+    </select>
 </mapper>

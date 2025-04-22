@@ -23,8 +23,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/organizations")
@@ -118,6 +120,53 @@ public class OrganizationController {
 
 			responseDTO.setSuccess(true);
 			responseDTO.setMsg("조직정보 변경 성공");
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		catch (RuntimeException ex) {
+			log.error(ex);
+			responseDTO.setMsg(ex.getMessage());
+			return ResponseEntity.status(400).body(responseDTO);
+		} catch (Exception ex) {
+			log.error(ex);
+			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
+			return ResponseEntity.internalServerError().body(responseDTO);
+		}
+	}
+
+	@DeleteMapping("")
+	@Tag(name = "조직도")
+	@Operation(
+			summary = "조직 미사용처리",
+			description = "미사용 처리할 조직의 idx 배열로 입력<br> +" +
+					"하위조직을 포함하여 사용자가 있는지 확인.<br>+" +
+					"사용자가 있는 경우 미사용처리 안함, 반환하는 ",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(
+							schema = @Schema(hidden = true),
+							examples = @ExampleObject(name = "조직 생성 예시", ref = "#/components/examples/organization.delete")
+					)
+			)
+	)
+	public ResponseEntity<?> deleteOrganization (@Parameter(description = "조직 정보") @RequestBody OrganizationDTO organizationDTO) {
+		ResponseDTO responseDTO = new ResponseDTO();
+		try {
+			if (organizationDTO.getDeleteIdxList().isEmpty()) {
+				throw new RuntimeException("미사용 처리할 조직정보가 없습니다.");
+			}
+
+			String memberId = authFacadeService.getMemberId();
+			organizationDTO.setUpdId(memberId);
+
+			Map<String, Object> returnData = organizationService.deleteOrganization(organizationDTO);
+			List<Integer> undeletedIdxList = (List<Integer>) returnData.get("undeletedIdxList");
+			List<String> undeletedNameList = (List<String>) returnData.get("undeletedNameList");
+
+			String msg = undeletedIdxList.isEmpty() ? "조직 미사용처리 완료." : "하위 조직을 포함하여 구성원이 있는 조직을 제외하고 미사용 처리 완료.";
+			responseDTO.addData("undeletedIdxList", undeletedIdxList);
+			responseDTO.addData("undeletedNameList", undeletedNameList);
+
+			responseDTO.setSuccess(true);
+			responseDTO.setMsg(msg);
 			return ResponseEntity.ok().body(responseDTO);
 		}
 		catch (RuntimeException ex) {

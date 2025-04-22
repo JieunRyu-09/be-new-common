@@ -115,9 +115,46 @@ public class OrganizationService {
 		dtoId += "-" + newDepth;
 		organizationDTO.updateDepthById(dtoId);
 
-
+		// 저장
 		organization.updateEntityByDTO(organizationDTO);
 		organizationRepository.save(organization);
+	}
+
+	@Transactional
+	public Map<String, Object> deleteOrganization (OrganizationDTO organizationDTO) throws Exception {
+		List<Integer> deletedIdxList = new ArrayList<>();
+		List<Integer> undeletedIdxList = new ArrayList<>();
+		List<String> undeletedNameList = new ArrayList<>();
+
+		// idx로 하위조직 포함 사용자 있는지 확인
+		organizationDTO.getDeleteIdxList().forEach(deleteIdx -> {
+			try {
+				int orgMemberCount = organizationDAO.getOrganizationMember(deleteIdx, "Y").size();
+				if (orgMemberCount > 0) {
+					Organization organization = organizationRepository.findByOrganizationIdx(deleteIdx)
+							.orElseThrow(() -> new RuntimeException("잘못된 조직정보입니다."));
+					undeletedIdxList.add(deleteIdx);
+					undeletedNameList.add(organization.getOrganizationName());
+				}
+				else {
+					deletedIdxList.add(deleteIdx);
+				}
+			}
+			catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		});
+		// 하위조직 포함 사용자 없는 idx만 미사용처리
+		// 사용자 있는 idx는 클라이언트에 반환처리
+		if (!deletedIdxList.isEmpty()) {
+			organizationDTO.setDeleteIdxList(deletedIdxList);
+			organizationDAO.deleteOrganization(organizationDTO);
+		}
+
+		Map<String, Object> returnData = new HashMap<>();
+		returnData.put("undeletedIdxList", undeletedIdxList);
+		returnData.put("undeletedNameList", undeletedNameList);
+		return returnData;
 	}
 
 	public List<HashMap<String, Object>> getOrganizationMember (int organizationIdx, String includeAllYn) throws Exception {

@@ -29,4 +29,8 @@ public class OrganizationDAO extends AbstractDAO {
 		return selectOne(_queryNamespace + "getPreviousDepthValue", dto);
 	}
 
+	public void deleteOrganization(OrganizationDTO dto) throws Exception {
+		update(_queryNamespace + "deleteOrganization", dto);
+	}
+
 }

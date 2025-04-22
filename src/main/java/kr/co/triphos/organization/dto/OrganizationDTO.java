@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -29,6 +30,7 @@ public class OrganizationDTO {
 	private LocalDateTime insDt;
 	private String 	updId;
 	private LocalDateTime updDt;
+	private List<Integer> deleteIdxList;
 
 	/** 초기에 ID가 미확정된 경우 */
 	public void setDepthById(String organizationId) {
