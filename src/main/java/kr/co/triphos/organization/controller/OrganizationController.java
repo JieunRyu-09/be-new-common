@@ -137,9 +137,10 @@ public class OrganizationController {
 	@Tag(name = "조직도")
 	@Operation(
 			summary = "조직 미사용처리",
-			description = "미사용 처리할 조직의 idx 배열로 입력<br> +" +
-					"하위조직을 포함하여 사용자가 있는지 확인.<br>+" +
-					"사용자가 있는 경우 미사용처리 안함, 반환하는 ",
+			description = "미사용 처리할 조직의 idx 배열로 입력<br>" +
+					"하위조직을 포함하여 사용자가 있는지 확인.<br>" +
+					"사용자가 있는 경우 미사용처리 안함, responseDTO에 <br>" +
+					"미사용 처리 못한 조직의 idx 및 조직명 반환 ",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
 					content = @Content(
 							schema = @Schema(hidden = true),
