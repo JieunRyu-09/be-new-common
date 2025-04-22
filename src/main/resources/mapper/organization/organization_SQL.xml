@@ -21,7 +21,7 @@
                                         WHERE USE_YN = 'Y'
                                    <choose>
                                        <when test='includeAllYn == "Y"'>
-                                           AND ORGANIZATION_KEY LIKE CONCAT((SELECT ORGANIZATION_KEY
+                                           AND ORGANIZATION_ID LIKE CONCAT((SELECT ORGANIZATION_ID
                                                                                FROM sy_organization_info
                                                                               WHERE ORGANIZATION_IDX = #{organizationIdx}
                                                                             ),'%')
@@ -38,7 +38,7 @@
             getPreviousDepthValue
             조직생성 시 현재까지 생성된 조직중 동레벨의 가장 큰 depth value 조회
          */
-         SELECT IFNULL(SUBSTRING_INDEX(REVERSE(MAX(ORGANIZATION_KEY)), '-', 1), 1) AS last_part
+         SELECT IFNULL(SUBSTRING_INDEX(REVERSE(MAX(ORGANIZATION_ID)), '-', 1) + 1, 1) AS last_part
            FROM sy_organization_info
           WHERE LEVEL = #{level}
         <if test="depth1 != null">

@@ -23,10 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -67,35 +65,64 @@ public class OrganizationService {
 		return roots;
 	}
 
-	public List<HashMap<String, Object>> getOrganizationMember (int organizationIdx, String includeAllYn) throws Exception {
-		return organizationDAO.getOrganizationMember(organizationIdx, includeAllYn);
-	}
-
 	@Transactional
 	public void createOrganization (OrganizationDTO organizationDTO) throws Exception {
-		Integer depth1 = organizationDTO.getDepth1();
-		Integer depth2 = organizationDTO.getDepth2();
-		Integer depth3 = organizationDTO.getDepth3();
-		Integer depth4 = organizationDTO.getDepth4();
-		Integer depth5 = organizationDTO.getDepth5();
-		int level = organizationDTO.getLevel();
+		// dto 초기설정
+		organizationDTO.setDepthById(organizationDTO.getOrganizationId());
 
-		int newValue = organizationDAO.getPreviousDepthValue(organizationDTO) + 1;
+		// 신규 깊이값 조회 및 설정
+		int newDepth = organizationDAO.getPreviousDepthValue(organizationDTO);
 
-		String organizationKey = organizationDTO.getOrganizationKey() + "-" + newValue;
-		organizationDTO.setOrganizationKey(organizationKey);
+		// 1-1-1-1와 같은 ID값 생성 및 설정
+		String organizationId = organizationDTO.getOrganizationId() + "-" + newDepth;
+		organizationDTO.updateDepthById(organizationId);
 
-		if (depth1 == null) organizationDTO.setDepth1(newValue);
-		else if (depth2 == null) organizationDTO.setDepth2(newValue);
-		else if (depth3 == null) organizationDTO.setDepth3(newValue);
-		else if (depth4 == null) organizationDTO.setDepth4(newValue);
-		else if (depth5 == null) organizationDTO.setDepth5(newValue);
-
-
+		// entity 저장
 		Organization organization = Organization.createEntityByDTO(organizationDTO);
 		organizationRepository.save(organization);
 	}
 
+	@Transactional
+	public void updateOrganization (OrganizationDTO organizationDTO) throws Exception {
+		LocalDateTime nowDate = LocalDateTime.now();
+		Organization organization = organizationRepository.findByOrganizationIdx(organizationDTO.getOrganizationIdx())
+				.orElseThrow(() -> new RuntimeException("잘못된 조직정보입니다."));
+		organization.setUpdId(organizationDTO.getUpdId());
+		organization.setUpdDt(nowDate);
+
+		String dtoId = organizationDTO.getOrganizationId();
+		boolean isSameName = Objects.equals(organizationDTO.getOrganizationName(), organization.getOrganizationName());
+		boolean isSameId = organizationDTO.getOrganizationId().equals(organization.getOrganizationId());
+
+		// 이름만 변경할려고 했다면
+		if ((dtoId == null || dtoId == "")) {
+			if (isSameName) {
+				throw new RuntimeException("변경사항이 없습니다.");
+			}
+			else {
+				organization.setOrganizationName(organizationDTO.getOrganizationName());
+				organizationRepository.save(organization);
+				return;
+			}
+		}
+		if (isSameId) {
+			throw new RuntimeException("스스로를 하위 조직으로 설정하실 수 없습니다.");
+		}
+
+		// 신규 깊이값 생성 및 설정
+		organizationDTO.setDepthById(dtoId);
+		int newDepth = organizationDAO.getPreviousDepthValue(organizationDTO);
+		dtoId += "-" + newDepth;
+		organizationDTO.updateDepthById(dtoId);
+
+
+		organization.updateEntityByDTO(organizationDTO);
+		organizationRepository.save(organization);
+	}
+
+	public List<HashMap<String, Object>> getOrganizationMember (int organizationIdx, String includeAllYn) throws Exception {
+		return organizationDAO.getOrganizationMember(organizationIdx, includeAllYn);
+	}
 
 
 }

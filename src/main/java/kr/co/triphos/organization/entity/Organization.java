@@ -1,18 +1,11 @@
 package kr.co.triphos.organization.entity;
 
-import kr.co.triphos.member.dto.MemberDTO;
 import kr.co.triphos.organization.dto.OrganizationDTO;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-
-import static java.lang.reflect.Modifier.FINAL;
-import static java.lang.reflect.Modifier.STATIC;
 
 @Data
 @Entity(name = "Organization")
@@ -36,7 +29,7 @@ public class Organization {
 	private Integer depth4;
 	@Column(name = "DEPTH_5")
 	private Integer depth5;
-	private String	organizationKey;
+	private String	organizationId;
 	private int		level;
 	private String 	organizationName;
 	private String 	useYn;
@@ -53,12 +46,25 @@ public class Organization {
 				.depth3(dto.getDepth3())
 				.depth4(dto.getDepth4())
 				.depth5(dto.getDepth5())
-				.organizationKey(dto.getOrganizationKey())
+				.organizationId(dto.getOrganizationId())
 				.level(dto.getLevel())
 				.organizationName(dto.getOrganizationName())
 				.useYn("Y")
 				.insId(dto.getInsId())
 				.insDt(LocalDateTime.now())
 				.build();
+	}
+
+	public void updateEntityByDTO(OrganizationDTO dto) {
+		this.depth1 = dto.getDepth1();
+		this.depth2 = dto.getDepth2();
+		this.depth3 = dto.getDepth3();
+		this.depth4 = dto.getDepth4();
+		this.depth5 = dto.getDepth5();
+		this.organizationId = dto.getOrganizationId();
+		this.level = dto.getLevel();
+		this.organizationName = dto.getOrganizationName();
+		this.updId = dto.getUpdId();
+		this.updDt = LocalDateTime.now();
 	}
 }
