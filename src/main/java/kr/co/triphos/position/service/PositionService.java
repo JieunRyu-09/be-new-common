@@ -39,7 +39,7 @@ public class PositionService {
 			positionList = positionRepository.findAll();
 		}
 		else {
-			positionList = positionRepository.findByUseYn("N");
+			positionList = positionRepository.findByUseYn("Y");
 		}
 		positionList.forEach(position -> {
 			PositionInfoDTO positionInfoDTO = new PositionInfoDTO();
