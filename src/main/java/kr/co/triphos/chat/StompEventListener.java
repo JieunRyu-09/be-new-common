@@ -84,7 +84,7 @@ public class StompEventListener {
 		log.info("AUTH_HEADER :: " + authHeader);
 		log.info("DESTINATION :: " + destination);
 
-		String regex = "^" + Pattern.quote(sendMsgUrl) + "(/\\d+)?$";
+		String regex = "^" + Pattern.quote(sendMsgUrl) + "(\\d+)?$";
 		if (destination.matches(regex)) {
 			try {
 				String[] parts = destination.split("/");
