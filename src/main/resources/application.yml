@@ -59,5 +59,6 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
 chat:
-  unread-chat-room: "/queue/unread"
+  unread-chat-room: "/user/queue/unread"
   send-msg: "/topic/chat/"
+  watching: ":chatRoom" #memberId:chatRoom 형태

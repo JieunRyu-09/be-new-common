@@ -16,6 +16,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
@@ -39,44 +40,43 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 	}
 
 	@Override
-	// TODO scardy 보안로직 추가 필요
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
+		// 헤더정보 확인
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-
-		// jwt Token 존재여부 검사
 		String authHeader = accessor.getFirstNativeHeader("Authorization");
-
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			return message;
+			throw new WebSocketAuthException("헤더정보가 없습니다.");
 		}
 
+		// 토큰 확인
 		String token = authHeader.substring(7);
-		Authentication auth = authService.getAuthenticationByToken(token);
-		String memberId = authService.getMemberIdByToken(token);
+		if (token.isEmpty()) {
+			throw new WebSocketAuthException("토큰정보가 없습니다.");
+		}
 
+		// 정보확인
+		Authentication auth = null;
+		String memberId = null;
+		try {
+			authService.checkToken(token);
+			auth = authService.getAuthenticationByToken(token);
+			memberId = authService.getMemberIdByToken(token);
+		}
+		catch (Exception ex) {
+			throw new WebSocketAuthException(ex.getMessage());
+		}
 
 
 		Authentication authentication = authService.getAuthenticationByToken(token);
-
-		// Principal 설정 (이후 Controller에서 사용 가능)
 		accessor.setUser(authentication);
 
-		if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-			try {
-				accessor.setUser(authentication);
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-				Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
-				if (sessionAttributes != null) {
-					sessionAttributes.put("auth", authentication);
-				}
-				accessor.setUser(new StompPrincipal(memberId));
-			} catch (Exception e) {
-				log.error("❌ STOMP 인증 실패 :: {}", e.getMessage());
-				throw new IllegalArgumentException("CONNECT 실패: 인증 불가");
-			}
-		}
-
 		return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
+	}
+
+	public class WebSocketAuthException extends RuntimeException {
+		public WebSocketAuthException(String message) {
+			super(message);
+		}
 	}
 
 	private void sendErrorToClient(String sessionId, String msg, int errorCode) {

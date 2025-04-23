@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +44,9 @@ public class ChatWebSocketService {
 
     @Value("${chat.send-msg}")
     String SEND_MSG_URL;
+
+    @Value("${chat.watching}")
+    String WATCHING_URL;
 
     @Transactional
     public void receiveMessage(String memberId, int roomIdx, ChatMessageDTO chatMessageDTO) throws Exception{
@@ -218,7 +223,41 @@ public class ChatWebSocketService {
     }
 
     public void sendToUser(String memberId, String destination, Object object) {
-        messagingTemplate.convertAndSendToUser(memberId, destination, object);
+        String redisId = getConnectRedisId(memberId);
+        destination = destination.substring("/user/".length());
+        String sessionId = redisService.getData(redisId);
+        if (sessionId != null) {
+            messagingTemplate.convertAndSendToUser(sessionId, destination, object, createHeaders(sessionId));
+        }
+    }
+
+    private MessageHeaders createHeaders(String sessionId) {
+        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create();
+        headerAccessor.setSessionId(sessionId);
+        headerAccessor.setLeaveMutable(true);
+        return headerAccessor.getMessageHeaders();
+    }
+
+
+    // 최초 연결시
+    public String getConnectRedisId(String memberId) {
+        return "chat:" + memberId + ":connect:session";
+    }
+
+    // subscribe 할 때 마다 변경
+    // 현재 보고있는 채팅방
+    public String getWatchingRoomRedisId(String memberId) {
+        return memberId + WATCHING_URL;
+    }
+
+    // 방의 불러온 메세지 idx
+    public String getWatchingRoomMsgRedisId(String memberId, String roomIdx) {
+        return "chat:" + memberId+ ":roomIdx:" + roomIdx + ":msg_idx";
+    }
+
+    // 채팅방 목록 정보용
+    public String getUnreadChatRoomRedisId(String memberId) {
+        return "chat:" + memberId + ":subscribe:unread-chatroom:" + UNREAD_CHAT_ROOM_URL;
     }
 
 }

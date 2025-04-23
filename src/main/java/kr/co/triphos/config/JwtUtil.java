@@ -6,8 +6,15 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import kr.co.triphos.common.service.RedisService;
+import kr.co.triphos.member.dto.CustomUserDetails;
+import kr.co.triphos.member.service.CustomUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -17,9 +24,11 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @Lazy
+@RequiredArgsConstructor
 public class JwtUtil {
     @Value("${jwt.secret}")
     private String SECRET_KEY;      // at least 32 characters long
@@ -34,6 +43,8 @@ public class JwtUtil {
     private final String HEADER_STRING = "Authorization";
     private final String TOKEN_PREFIX = "Bearer ";
 
+    private final RedisService redisService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @PostConstruct
     public void init() {
@@ -93,6 +104,24 @@ public class JwtUtil {
         catch (JwtException e) {
             return false;
         }
+    }
+
+    public boolean checkToken(String token) throws Exception {
+        String username = extractMemberId(token);
+        // redis의 토큰정보와 비교
+        // 중복로그인 방지.
+        Map<Object, Object> redisTokenMap = redisService.getMapData(username);
+        if (redisTokenMap.isEmpty()) throw new RuntimeException("로그인 정보가 만료되었습니다.");
+        String redisAccessToken = redisTokenMap.get("accessToken").toString();
+        if (!token.equals(redisAccessToken)) throw new RuntimeException("다른곳에서 로그인하여 로그인정보가 만료되었습니다.");
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
+        return true;
     }
 
     public String extractMemberId(String token) {

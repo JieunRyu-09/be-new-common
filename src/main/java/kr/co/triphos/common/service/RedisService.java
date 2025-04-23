@@ -1,6 +1,8 @@
 package kr.co.triphos.common.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.stereotype.Service;
@@ -9,13 +11,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class RedisService {
 	private final RedisTemplate<String, String> redisTemplate;
-
-	@Autowired
-	public RedisService(RedisTemplate<String, String> redisTemplate) {
-		this.redisTemplate = redisTemplate;
-	}
 
 	public void saveMapData(String key, Map<String, String> mapData) {
 		redisTemplate.opsForHash().putAll(key, mapData);

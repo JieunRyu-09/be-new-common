@@ -35,7 +35,6 @@ import java.util.Map;
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final RedisService redisService;
-    private final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -56,7 +55,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
         try {
-            boolean result = checkToken(token);
+            boolean result = jwtUtil.checkToken(token);
 
             if (result) {
                 chain.doFilter(request, response);
@@ -88,23 +87,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     }
 
-    public boolean checkToken(String token) throws Exception {
-        String username = jwtUtil.extractMemberId(token);
-        // redis의 토큰정보와 비교
-        // 중복로그인 방지.
-        Map<Object, Object> redisTokenMap = redisService.getMapData(username);
-        if (redisTokenMap.isEmpty()) throw new RuntimeException("로그인 정보가 만료되었습니다.");
-        String redisAccessToken = redisTokenMap.get("accessToken").toString();
-        if (!token.equals(redisAccessToken)) throw new RuntimeException("다른곳에서 로그인하여 로그인정보가 만료되었습니다.");
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            CustomUserDetails customUserDetails = userDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-        }
-        return true;
-    }
     private void sendErrorResponse(HttpServletResponse response, int status, String message) throws IOException {
         ResponseDTO responseDTO = new ResponseDTO();
         responseDTO.setMsg(message);
