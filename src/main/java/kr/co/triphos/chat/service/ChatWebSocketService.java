@@ -248,7 +248,7 @@ public class ChatWebSocketService {
 
     // 방의 불러온 메세지 idx
     public String getWatchingRoomMsgRedisId(String memberId, String roomIdx) {
-        return "chat:" + memberId+ ":roomIdx:" + roomIdx + ":msg_idx";
+        return "chat:" + memberId+ ":roomIdx:" + roomIdx + ":msg-idx";
     }
 
     // 채팅방 목록 정보용

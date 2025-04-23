@@ -124,14 +124,14 @@ public class StompEventListener {
 		log.info("-------------DISSUBSCRIBE------------------------");
 		log.info("AUTH_HEADER :: " + authHeader);
 		log.info("DESTINATION :: " + destination);
-		String regex = "^" + Pattern.quote(sendMsgUrl) + "(/\\d+)?$";
+		String regex = "^" + Pattern.quote(sendMsgUrl) + "(\\d+)?$";
 		if (destination.matches(regex)) {
 			String[] parts = destination.split("/");
 			String roomIdx = parts[parts.length - 1];
 
 			String roomRedisId = chatWebSocketService.getWatchingRoomRedisId(memberId);
 			String msgRedisId = chatWebSocketService.getWatchingRoomMsgRedisId(memberId, roomIdx);
-
+			log.info("MSGREDISID :: " + msgRedisId);
 			redisService.delData(roomRedisId);
 			redisService.delData(msgRedisId);
 			log.info("ROOM_IDX :: " + roomIdx);
