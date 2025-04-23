@@ -47,7 +47,15 @@ public class StompEventListener {
 
 		String redisId = chatWebSocketService.getConnectRedisId(memberId);
 		redisService.delData(redisId);
+		/** 사용자 정보로 세션ID조회 */
 		redisService.saveData(redisId, sessionId);
+		/**
+		 * 세션ID로 사용자 정보 조회
+		 * 강제종료 등 handleSessionDisconnect 발생 시
+		 * 세션ID로 사용자 정보 조회 후
+		 * 해당 사용자와 관련된 redis데이터 제거 진행
+		 * */
+		redisService.saveData(sessionId, memberId);
 
 		log.info("-------------CONNECT------------------------");
 		log.info("SESSION_ID :: " + sessionId);
@@ -55,10 +63,6 @@ public class StompEventListener {
 		log.info("TOKEN ::" + token);
 		log.info("MEMBER_ID ::" + memberId);
 		log.info("-----------------------------------------------");
-		/*
-			/user/queue/unread 이 경로도 원래는 구독을 해야했나
-
-		 */
 	}
 
 	@EventListener
@@ -144,16 +148,22 @@ public class StompEventListener {
 
 	@EventListener
 	public void handleSessionDisconnect(SessionDisconnectEvent event) {
-		String sessionId = event.getSessionId(); // ✅ 여기서 sessionId 확인 가능
-		System.out.println("WebSocket 세션 종료됨: " + sessionId);
+		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+		String sessionId = accessor.getSessionId();
+		String memberId = redisService.getData(sessionId);
 
-		// Redis에서 sessionId -> userId 매핑 제거
-		/*String userId = redisTemplate.opsForValue().get("ws:session:" + sessionId);
+		String sessionRedisId = chatWebSocketService.getConnectRedisId(memberId);
+		String roomRedisId = chatWebSocketService.getWatchingRoomRedisId(memberId);
+		String msgRedisId = chatWebSocketService.getWatchingRoomMsgRedisId(memberId, roomRedisId);
 
-		if (userId != null) {
-			redisTemplate.delete("ws:session:" + sessionId);
-			redisTemplate.delete("ws:user:" + userId);
-			System.out.println("Redis 세션 정리 완료: " + userId);
-		}*/
+		String roomIdx = redisService.getData(roomRedisId);
+		redisService.delData(sessionRedisId);
+		redisService.delData(roomRedisId);
+		redisService.delData(msgRedisId);
+
+		log.info("-------------CONNECT------------------------");
+		log.info("SESSION_ID :: " + sessionId);
+		log.info("MEMBER_ID ::" + memberId);
+		log.info("-----------------------------------------------");
 	}
 }

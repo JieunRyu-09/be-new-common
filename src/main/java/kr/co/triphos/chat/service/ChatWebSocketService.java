@@ -161,10 +161,6 @@ public class ChatWebSocketService {
         // 추후 안읽은 메세지수 업데이트할 사람 목록
         List<ChatRoomMember> updateChatRoomMemberList = new ArrayList<>();
 
-        /**
-         * scardy
-         * 대규모 B2C로 개발될 경우, 채팅방 채널을 
-         */
         chatRoomMemberList.forEach(chatRoomMember -> {
             // redis에서 사용자의 구독중인 roomIdx 조회
             String memberId = chatRoomMember.getPk().getMemberId();
