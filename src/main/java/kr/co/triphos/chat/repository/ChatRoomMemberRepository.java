@@ -12,4 +12,6 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
 	List<ChatRoomMember> findByPkRoomIdxAndDelYn(Integer roomIdx, String delYn);
 
 	ChatRoomMember findByPk(ChatRoomMemberPK pk);
+
+	ChatRoomMember findByPkAndDelYn(ChatRoomMemberPK pk, String delYn);
 }

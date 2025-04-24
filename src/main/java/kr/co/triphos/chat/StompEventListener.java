@@ -1,5 +1,6 @@
 package kr.co.triphos.chat;
 
+import kr.co.triphos.chat.service.ChatService;
 import kr.co.triphos.chat.service.ChatWebSocketService;
 import kr.co.triphos.common.service.RedisService;
 import kr.co.triphos.member.service.AuthService;
@@ -8,6 +9,8 @@ import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHandlingException;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -71,9 +74,6 @@ public class StompEventListener {
 		String destination = accessor.getDestination();
 		String authHeader = accessor.getFirstNativeHeader("Authorization");
 		assert authHeader != null;
-		if (destination == null) {
-			throw new RuntimeException("구독경로가 없습니다.");
-		}
 
 		String token = authHeader.substring(7);
 		String memberId = authService.getMemberIdByToken(token);
@@ -113,9 +113,11 @@ public class StompEventListener {
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
 		String authHeader = accessor.getFirstNativeHeader("Authorization");
 		String destination = accessor.getFirstNativeHeader("x-destination");
+
+		// preSend에서 검사
 		assert authHeader != null;
 		if (destination == null || destination.isEmpty()) {
-			throw new RuntimeException("구독해제 경로가 없습니다.");
+			throw new MessageHandlingException(event.getMessage(), "구독해제 경로가 없습니다.");
 		}
 
 		String token = authHeader.substring(7);

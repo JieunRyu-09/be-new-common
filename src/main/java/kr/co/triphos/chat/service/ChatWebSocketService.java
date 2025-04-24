@@ -214,6 +214,12 @@ public class ChatWebSocketService {
         sendToUser(memberId, UNREAD_CHAT_ROOM_URL, chatRoomInfoDTO);
     }
 
+    public boolean checkMemberRoom(String memberId, String roomIdx) throws Exception {
+        ChatRoomMemberPK pk = new ChatRoomMemberPK(Integer.parseInt(roomIdx),memberId);
+        ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByPkAndDelYn(pk, "N");
+        return chatRoomMember != null;
+    }
+
     public void sendToChannel(String destination, Object object) {
         messagingTemplate.convertAndSend(destination, object);
     }
@@ -233,7 +239,6 @@ public class ChatWebSocketService {
         headerAccessor.setLeaveMutable(true);
         return headerAccessor.getMessageHeaders();
     }
-
 
     // 최초 연결시
     public String getConnectRedisId(String memberId) {

@@ -8,6 +8,7 @@ import kr.co.triphos.chat.dto.ChatRoomMemberDTO;
 import kr.co.triphos.chat.entity.ChatFileInfo;
 import kr.co.triphos.chat.entity.ChatRoom;
 import kr.co.triphos.chat.entity.ChatRoomMember;
+import kr.co.triphos.chat.entity.pk.ChatRoomMemberPK;
 import kr.co.triphos.chat.repository.ChatFileInfoRepository;
 import kr.co.triphos.chat.repository.ChatRoomMemberRepository;
 import kr.co.triphos.chat.repository.ChatRoomRepository;
@@ -21,6 +22,7 @@ import lombok.extern.log4j.Log4j2;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

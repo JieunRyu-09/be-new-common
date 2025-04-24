@@ -53,8 +53,6 @@
 
 <hr>
 
-<!-- ... 생략 ... -->
-
 <h3>📥 수신 메시지 및 로그</h3>
 <div id="logs"></div>
 <button onclick="clearLogs()">🧹 로그 지우기</button>
@@ -84,6 +82,7 @@
 			{ Authorization: token },
 			function (frame) {
 				log("✅ Connected: " + frame);
+				subscribeErrorMessages(); // 에러 메시지 구독
 			},
 			function (error) {
 				log("❌ Connection error: " + error);
@@ -143,6 +142,22 @@
 		);
 		log("📤 보냄: " + body);
 	}
+
+	function subscribeErrorMessages() {
+		const token = document.getElementById("authHeader").value;
+
+		const errorSubscription = client.subscribe(
+			'/user/queue/errors',
+			function (message) {
+				log(`❗ 에러 발생: ${message.body}`);
+			},
+			{ Authorization: token }
+		);
+
+		subscriptions['error'] = errorSubscription;
+		log('🔔 에러 메시지 구독 시작');
+	}
 </script>
 
-<!-- ... 아래 HTML 마감 태그 유지 ... -->
+</body>
+</html>

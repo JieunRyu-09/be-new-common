@@ -1,6 +1,7 @@
 package kr.co.triphos.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.triphos.chat.service.ChatService;
 import kr.co.triphos.chat.service.ChatWebSocketService;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.service.RedisService;
@@ -8,9 +9,11 @@ import kr.co.triphos.member.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandlingException;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
@@ -24,14 +27,18 @@ import org.springframework.web.socket.WebSocketSession;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Component
 @RequiredArgsConstructor
 @Log4j2
 public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
+	@Value("${chat.send-msg}")
+	private String sendMsgUrl;
+	@Value("${chat.unread-chat-room}")
+	private String unreadChatRoomUrl;
+
 	private final AuthService authService;
-	private final ObjectMapper objectMapper;
-	private final RedisService redisService;
 	private ChatWebSocketService chatWebSocketService;
 
 	@Autowired
@@ -44,14 +51,16 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 		// 헤더정보 확인
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 		String authHeader = accessor.getFirstNativeHeader("Authorization");
+		String destination = accessor.getDestination();
+
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			throw new WebSocketAuthException("헤더정보가 없습니다.");
+			throw new MessageHandlingException(message, "헤더정보가 없습니다.");
 		}
 
 		// 토큰 확인
 		String token = authHeader.substring(7);
 		if (token.isEmpty()) {
-			throw new WebSocketAuthException("토큰정보가 없습니다.");
+			throw new MessageHandlingException(message, "토큰정보가 없습니다.");
 		}
 
 		// 정보확인
@@ -59,39 +68,55 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 		String memberId = null;
 		try {
 			authService.checkToken(token);
-			auth = authService.getAuthenticationByToken(token);
+			Authentication authentication = authService.getAuthenticationByToken(token);
+			accessor.setUser(authentication);
 			memberId = authService.getMemberIdByToken(token);
 		}
 		catch (Exception ex) {
-			throw new WebSocketAuthException(ex.getMessage());
+			log.error(ex);
+			throw new MessageHandlingException(message, "서버에 문제가 발생하였습니다.");
 		}
 
 
-		Authentication authentication = authService.getAuthenticationByToken(token);
-		accessor.setUser(authentication);
+		if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
+			try {
+				checkSubscribeAuth(destination, memberId);
+			}
+			catch (RuntimeException ex) {
+				log.error(ex);
+				throw new MessageHandlingException(message, ex.getMessage());
+			}
+			catch (Exception ex) {
+				log.error(ex);
+				throw new MessageHandlingException(message, "서버에 문제가 발생하였습니다.");
+			}
+		}
+
+
 
 		return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
 	}
 
-	public class WebSocketAuthException extends RuntimeException {
-		public WebSocketAuthException(String message) {
-			super(message);
+	private void checkSubscribeAuth(String destination, String memberId) throws Exception{
+		String regex = "^" + Pattern.quote(sendMsgUrl) + "(\\d+)?$";
+
+		if (destination.isEmpty()) {
+			throw new RuntimeException("구독경로가 없습니다.");
 		}
-	}
+		else if (destination.matches(regex)) {
+			String[] parts = destination.split("/");
+			String roomIdx = parts[parts.length - 1];
+			// 구독하려는 방의 멤버인지 확인
+			boolean isMember = chatWebSocketService.checkMemberRoom(memberId, roomIdx);
+			if (!isMember) {
+				throw new RuntimeException("존재하지 않는 채팅방입니다.");
+			}
+		}
+		else if (destination.matches(unreadChatRoomUrl)){
 
-	private void sendErrorToClient(String sessionId, String msg, int errorCode) {
-		StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.MESSAGE);
-		accessor.setSessionId(sessionId);
-		accessor.setLeaveMutable(true);
-		accessor.setHeader("errorCode", errorCode);
-
-		ResponseDTO dto = new ResponseDTO(false, msg);
-		try {
-			String json = objectMapper.writeValueAsString(dto);
-			Message<byte[]> message = MessageBuilder.createMessage(json.getBytes(StandardCharsets.UTF_8), accessor.getMessageHeaders());
-			//messagingTemplate.send("/error-virtual", message); // destination은 의미 없음, 직접 세션에 푸시됨
-		} catch (Exception e) {
-			log.error("에러 전송 실패", e);
+		}
+		else {
+			throw new RuntimeException("잘못된 구독경로입니다.");
 		}
 	}
 }
