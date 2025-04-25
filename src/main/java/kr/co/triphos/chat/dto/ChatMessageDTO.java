@@ -21,6 +21,7 @@ public class ChatMessageDTO {
 	private String memberNm;
 	private String content;
 	private MessageType type = MessageType.TEXT;
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime sendTime;
 	private String bundleYn = "N";
 

@@ -1,5 +1,6 @@
 package kr.co.triphos.chat.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.type.Alias;
@@ -18,6 +19,7 @@ public class ChatRoomInfoDTO {
 	private int 	memberCnt;
 	private String 	lastChatMsg;
 	private int 	unreadMessageCount;
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime 	lastChatDt;
 
 	@Builder(builderClassName = "createChatRoomInfo", builderMethodName = "createChatRoomInfo")
