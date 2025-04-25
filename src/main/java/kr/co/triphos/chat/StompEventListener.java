@@ -59,13 +59,6 @@ public class StompEventListener {
 		 * 해당 사용자와 관련된 redis데이터 제거 진행
 		 * */
 		redisService.saveData(sessionId, memberId);
-
-		log.info("-------------CONNECT------------------------");
-		log.info("SESSION_ID :: " + sessionId);
-		log.info("AUTH_HEADER :: " + authHeader);
-		log.info("TOKEN ::" + token);
-		log.info("MEMBER_ID ::" + memberId);
-		log.info("-----------------------------------------------");
 	}
 
 	@EventListener
@@ -79,11 +72,6 @@ public class StompEventListener {
 		String memberId = authService.getMemberIdByToken(token);
 		String sessionId = accessor.getSessionId();
 
-		log.info("-------------SUBSCRIBE------------------------");
-		log.info("SESSION_ID :: " + sessionId);
-		log.info("AUTH_HEADER :: " + authHeader);
-		log.info("DESTINATION :: " + destination);
-
 		String regex = "^" + Pattern.quote(sendMsgUrl) + "(\\d+)?$";
 		if (destination.matches(regex)) {
 			try {
@@ -92,7 +80,6 @@ public class StompEventListener {
 				String redisId = chatWebSocketService.getWatchingRoomRedisId(memberId);
 				redisService.saveData(redisId, roomIdx);
 				chatWebSocketService.setUnreadCount(memberId, Integer.parseInt(roomIdx));
-				log.info("ROOM_IDX :: " + roomIdx);
 			}
 			catch (Exception ex) {
 				log.error(ex);
@@ -102,10 +89,6 @@ public class StompEventListener {
 			String redisId = chatWebSocketService.getUnreadChatRoomRedisId(memberId);
 			redisService.saveData(redisId, unreadChatRoomUrl);
 		}
-
-		log.info("TOKEN ::" + token);
-		log.info("MEMBER_ID ::" + memberId);
-		log.info("-----------------------------------------------");
 	}
 
 	@EventListener
@@ -123,9 +106,6 @@ public class StompEventListener {
 		String token = authHeader.substring(7);
 		String memberId = authService.getMemberIdByToken(token);
 
-		log.info("-------------DISSUBSCRIBE------------------------");
-		log.info("AUTH_HEADER :: " + authHeader);
-		log.info("DESTINATION :: " + destination);
 		String regex = "^" + Pattern.quote(sendMsgUrl) + "(\\d+)?$";
 		if (destination.matches(regex)) {
 			String[] parts = destination.split("/");
@@ -133,19 +113,13 @@ public class StompEventListener {
 
 			String roomRedisId = chatWebSocketService.getWatchingRoomRedisId(memberId);
 			String msgRedisId = chatWebSocketService.getWatchingRoomMsgRedisId(memberId, roomIdx);
-			log.info("MSGREDISID :: " + msgRedisId);
 			redisService.delData(roomRedisId);
 			redisService.delData(msgRedisId);
-			log.info("ROOM_IDX :: " + roomIdx);
 		}
 		else if (destination.matches(unreadChatRoomUrl)){
 			String redisId = chatWebSocketService.getUnreadChatRoomRedisId(memberId);
 			redisService.delData(redisId);
 		}
-
-		log.info("TOKEN ::" + token);
-		log.info("MEMBER_ID ::" + memberId);
-		log.info("-----------------------------------------------");
 	}
 
 	@EventListener
@@ -162,10 +136,5 @@ public class StompEventListener {
 		redisService.delData(sessionRedisId);
 		redisService.delData(roomRedisId);
 		redisService.delData(msgRedisId);
-
-		log.info("-------------CONNECT------------------------");
-		log.info("SESSION_ID :: " + sessionId);
-		log.info("MEMBER_ID ::" + memberId);
-		log.info("-----------------------------------------------");
 	}
 }
