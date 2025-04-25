@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
+import javax.security.auth.message.AuthException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Map;
@@ -65,6 +66,7 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 			throw new MessageHandlingException(message, "토큰정보가 없습니다.");
 		}
 
+
 		// 정보확인
 		Authentication auth = null;
 		String memberId = null;
@@ -75,8 +77,7 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 			memberId = authService.getMemberIdByToken(token);
 		}
 		catch (Exception ex) {
-			log.error(ex);
-			throw new MessageHandlingException(message, "서버에 문제가 발생하였습니다.");
+			throw new MessageHandlingException(message, "로그인이 만료되었습니다.");
 		}
 
 
@@ -84,13 +85,15 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 			try {
 				checkSubscribeAuth(destination, memberId);
 			}
+			catch (AuthException ex) {
+				chatWebSocketService.sendErrorToUser(memberId, 403, ex.getMessage());
+			}
 			catch (RuntimeException ex) {
-				log.error(ex);
-				throw new MessageHandlingException(message, ex.getMessage());
+				chatWebSocketService.sendErrorToUser(memberId, 404, ex.getMessage());
 			}
 			catch (Exception ex) {
 				log.error(ex);
-				throw new MessageHandlingException(message, "서버에 문제가 발생하였습니다.");
+				chatWebSocketService.sendErrorToUser(memberId, 500, "서버에 문제가 발생하였습니다.");
 			}
 		}
 
@@ -111,7 +114,7 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 			// 구독하려는 방의 멤버인지 확인
 			boolean isMember = chatWebSocketService.checkMemberRoom(memberId, roomIdx);
 			if (!isMember) {
-				throw new RuntimeException("존재하지 않는 채팅방입니다.");
+				throw new AuthException("초대받지 않은 채팅방입니다.");
 			}
 		}
 		else if (destination.matches(unreadChatRoomUrl) || destination.matches(errorMsgUrl)){

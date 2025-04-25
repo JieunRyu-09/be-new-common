@@ -21,6 +21,10 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import javax.naming.AuthenticationException;
+import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 @Component
@@ -52,6 +56,18 @@ public class StompEventListener {
 		redisService.delData(redisId);
 		/** 사용자 정보로 세션ID조회 */
 		redisService.saveData(redisId, sessionId);
+
+		Date tokenTime = authService.getTokenExpireTime(token);
+		long now = System.currentTimeMillis();                  // 현재 시간 (밀리초 단위)
+		long expireTime = tokenTime.getTime();                  // 만료 시간 (밀리초 단위)
+		long diffMillis = expireTime - now;                     // 남은 시간 (밀리초)
+
+
+		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		scheduler.schedule(() -> {
+			chatWebSocketService.sendErrorToUser(memberId, 401, "로그인이 만료되었습니다.");
+			// 여기에 원하는 동작을 작성
+		}, diffMillis, TimeUnit.MILLISECONDS);
 		/**
 		 * 세션ID로 사용자 정보 조회
 		 * 강제종료 등 handleSessionDisconnect 발생 시
