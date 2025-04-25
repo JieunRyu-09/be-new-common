@@ -34,6 +34,12 @@
         <button onclick="unsubscribe(1)">Unsubscribe 1</button>
     </div>
     <div class="subscription"  style="flex: 1">
+        <label>📬 Subscribe 채널 2 (예: 에러 수신, /user/queue/error)</label>
+        <input type="text" id="subscribeDest2" value="/user/queue/error">
+        <button onclick="subscribe(2)">Subscribe 2</button>
+        <button onclick="unsubscribe(2)">Unsubscribe 2</button>
+    </div>
+    <div class="subscription"  style="flex: 1">
         <label>📬 Subscribe 채널 4 (예: 채팅방 목록 수신, /user/queue/unread)</label>
         <input type="text" id="subscribeDest4" value="/user/queue/unread">
         <button onclick="subscribe(4)">Subscribe 4</button>

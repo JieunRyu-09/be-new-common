@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.triphos.chat.service.ChatWebSocketService;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.dto.WebhookDTO;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
@@ -39,6 +40,7 @@ public class AuthController {
 	private final MemberService memberService;
 	private final RedisService redisService;
 	private final AuthenticationFacadeService authenticationFacadeService;
+	private final ChatWebSocketService chatWebSocketService;
 
 	@Value("${token.time}")
 	private long tokenTime;
@@ -51,6 +53,9 @@ public class AuthController {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
+			// redis 정보 저장 전 웹소켓 세션 제거
+			chatWebSocketService.sendErrorToUser(id, 401, "다른곳에서 로그인하였습니다.");
+
 			// 로그인 로직 및 토큰 발행
 			HashMap<String, String> accessTokenMap = authService.login(id, password);
 			List<HashMap<String, Object>> menuList = authService.getMemberMenuList(id);
@@ -65,6 +70,7 @@ public class AuthController {
 			responseDTO.addData("menuList", menuList);
 			responseDTO.setMsg("로그인에 성공하였습니다");
 			responseDTO.setSuccess(true);
+
 			// redis에 정보 저장
 			HashMap<String, String> tokenMap = new HashMap<>();
 			tokenMap.put("accessToken", accessToken);

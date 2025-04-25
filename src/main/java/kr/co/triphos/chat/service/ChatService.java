@@ -185,9 +185,7 @@ public class ChatService {
         int pageSize = 20;
 
         String redisId = chatWebSocketService.getWatchingRoomMsgRedisId(memberId, String.valueOf(roomIdx));
-        log.info("redisId :: " + redisId);
         String redisValue = redisService.getData(redisId);
-        log.info("redisValue :: " + redisValue);
         Integer startIdx = redisValue == null ? null : Integer.parseInt(redisValue);
 
         List<ChatMessageDTO> chatMessageDTOList = chatDAO.getChatMessages(roomIdx, startIdx, pageSize);
@@ -196,7 +194,6 @@ public class ChatService {
 
         if (readIdx != null) {
             redisService.saveData(redisId, readIdx);
-            log.info("readIdx :: " + readIdx);
         }
 
         return chatMessageDTOList;

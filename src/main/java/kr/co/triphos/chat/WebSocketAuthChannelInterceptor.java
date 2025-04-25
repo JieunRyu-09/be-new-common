@@ -37,6 +37,8 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 	private String sendMsgUrl;
 	@Value("${chat.unread-chat-room}")
 	private String unreadChatRoomUrl;
+	@Value("${chat.error-msg}")
+	private String errorMsgUrl;
 
 	private final AuthService authService;
 	private ChatWebSocketService chatWebSocketService;
@@ -112,7 +114,7 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 				throw new RuntimeException("존재하지 않는 채팅방입니다.");
 			}
 		}
-		else if (destination.matches(unreadChatRoomUrl)){
+		else if (destination.matches(unreadChatRoomUrl) || destination.matches(errorMsgUrl)){
 
 		}
 		else {

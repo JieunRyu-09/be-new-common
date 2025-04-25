@@ -42,6 +42,9 @@ public class ChatWebSocketService {
     @Value("${chat.unread-chat-room}")
     String UNREAD_CHAT_ROOM_URL;
 
+    @Value("${chat.error-msg}")
+    String ERROR_MSG_URL;
+
     @Value("${chat.send-msg}")
     String SEND_MSG_URL;
 
@@ -230,6 +233,18 @@ public class ChatWebSocketService {
         String sessionId = redisService.getData(redisId);
         if (sessionId != null) {
             messagingTemplate.convertAndSendToUser(sessionId, destination, object, createHeaders(sessionId));
+        }
+    }
+
+    public void sendErrorToUser(String memberId, int errorCode, String msg) {
+        String redisId = getConnectRedisId(memberId);
+        String destination = ERROR_MSG_URL.substring("/user/".length());
+        String sessionId = redisService.getData(redisId);
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("errorCode", errorCode);
+        errorResponse.put("errorMessage", msg);
+        if (sessionId != null) {
+            messagingTemplate.convertAndSendToUser(sessionId, destination, errorResponse, createHeaders(sessionId));
         }
     }
 
