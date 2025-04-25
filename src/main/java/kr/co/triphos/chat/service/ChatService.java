@@ -181,20 +181,19 @@ public class ChatService {
 		return chatDAO.getChatRoomList(memberId);
     }
 
-    public List<ChatMessageDTO> getChatMessages(int roomIdx, String memberId) throws Exception {
-        int pageSize = 20;
+    public List<ChatMessageDTO> getChatMessages(int roomIdx, String memberId, int cursor, int limit) throws Exception {
 
-        String redisId = chatWebSocketService.getWatchingRoomMsgRedisId(memberId, String.valueOf(roomIdx));
+        /*String redisId = chatWebSocketService.getWatchingRoomMsgRedisId(memberId, String.valueOf(roomIdx));
         String redisValue = redisService.getData(redisId);
-        Integer startIdx = redisValue == null ? null : Integer.parseInt(redisValue);
+        Integer startIdx = redisValue == null ? null : Integer.parseInt(redisValue);*/
 
-        List<ChatMessageDTO> chatMessageDTOList = chatDAO.getChatMessages(roomIdx, startIdx, pageSize);
-        String readIdx = chatMessageDTOList.size() == 0 ? redisValue : String.valueOf(chatMessageDTOList.get(0).getMsgIdx());
-        redisService.delData(redisId);
+        List<ChatMessageDTO> chatMessageDTOList = chatDAO.getChatMessages(roomIdx, cursor, limit);
+        //String readIdx = chatMessageDTOList.size() == 0 ? redisValue : String.valueOf(chatMessageDTOList.get(0).getMsgIdx());
+        //redisService.delData(redisId);
 
-        if (readIdx != null) {
-            redisService.saveData(redisId, readIdx);
-        }
+        //if (readIdx != null) {
+            //redisService.saveData(redisId, readIdx);
+        //}
 
         return chatMessageDTOList;
     }
