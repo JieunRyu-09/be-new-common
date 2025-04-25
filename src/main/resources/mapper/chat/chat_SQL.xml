@@ -39,11 +39,11 @@
                         mm_member_info      T2
                   WHERE T1.MEMBER_ID    = T2.MEMBER_ID
                     AND T1.ROOM_IDX     = #{roomIdx}
-        <if test="startIdx != null and startIdx != ''">
-                    AND MSG_IDX &lt; #{startIdx}
+        <if test="cursor != null and cursor != ''">
+                    AND MSG_IDX &lt; #{cursor}
         </if>
                   ORDER BY MSG_IDX DESC
-                  LIMIT #{pageSize}
+                  LIMIT #{limit}
                 ) R1
          ORDER BY R1.MSG_IDX ASC
     </select>

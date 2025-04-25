@@ -229,8 +229,8 @@ public class ChatController {
 			description = "현재 사용자가 참가해있는 채팅방 목록을 조회."
 	)
 	public ResponseEntity<?> getChatMessages(@PathVariable int roomIdx,
-											 @Parameter(description = "이전까지 조회한 msg idx") @RequestParam int cursor,
-											 @Parameter(description = "조회할 메세지 수") @RequestParam int limit) {
+											 @Parameter(description = "이전까지 조회한 msg idx") @RequestParam(required = false) Integer cursor,
+											 @Parameter(description = "조회할 메세지 수") @RequestParam(required = false) Integer limit) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			String memberId = authenticationFacadeService.getMemberId();

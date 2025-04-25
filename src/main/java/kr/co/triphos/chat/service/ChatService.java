@@ -181,7 +181,7 @@ public class ChatService {
 		return chatDAO.getChatRoomList(memberId);
     }
 
-    public List<ChatMessageDTO> getChatMessages(int roomIdx, String memberId, int cursor, int limit) throws Exception {
+    public List<ChatMessageDTO> getChatMessages(int roomIdx, String memberId, Integer cursor, Integer limit) throws Exception {
 
         /*String redisId = chatWebSocketService.getWatchingRoomMsgRedisId(memberId, String.valueOf(roomIdx));
         String redisValue = redisService.getData(redisId);

@@ -21,11 +21,14 @@ public class ChatDAO extends AbstractDAO {
 	}
 
 	/** 채팅방 채팅내역 조회 */
-	public List<ChatMessageDTO> getChatMessages(int roomIdx, Integer startIdx, int pageSize) throws Exception {
+	public List<ChatMessageDTO> getChatMessages(int roomIdx, Integer cursor, Integer limit) throws Exception {
+		if (limit == null || limit <= 0) limit = 20;
+		else if (limit > 100) limit = 100;
+
 		Map<String, Object> dto = new HashMap<>();
 		dto.put("roomIdx", roomIdx);
-		dto.put("startIdx", startIdx);
-		dto.put("pageSize", pageSize);
+		dto.put("cursor", cursor);
+		dto.put("limit", limit);
 		return selectList(_queryNamespace + "getChatMessages", dto);
 	}
 
