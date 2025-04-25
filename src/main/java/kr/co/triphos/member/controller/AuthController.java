@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -190,7 +191,17 @@ public class AuthController {
 		ResponseDTO responseDTO = new ResponseDTO();
 
 		try {
-			HashMap<String, String> newAccessTokenMap = authService.refreshAccessToken(dto.getRefreshToken());
+			String oldMemberId = authService.getMemberIdByToken(dto.getRefreshToken());
+			Map<Object, Object> oldTokenMap = redisService.getMapData(oldMemberId);
+			String beforeRefreshToken = oldTokenMap.get("refreshToken").toString();
+			String nowRefreshToken = dto.getRefreshToken();
+			if (!beforeRefreshToken.equals(nowRefreshToken)) {
+				responseDTO.setMsg("토큰이 만료되었습니다.");
+				return ResponseEntity.status(401).body(responseDTO);
+			}
+
+
+			HashMap<String, String> newAccessTokenMap = authService.refreshAccessToken(nowRefreshToken);
 			String newAccessToken 	= newAccessTokenMap.get("accessToken");
 			String newRefreshToken 	= authService.getRefreshToken(newAccessToken);
 			String expiresIn 		= newAccessTokenMap.get("expirationDate");

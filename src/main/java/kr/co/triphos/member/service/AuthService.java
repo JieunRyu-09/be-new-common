@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -116,6 +117,10 @@ public class AuthService {
         });
 
         return resultList;
+    }
+
+    public Date getTokenExpireTime (String token) throws Exception{
+        return jwtUtil.getTokenExpireTime(token);
     }
 
 }

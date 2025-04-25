@@ -136,6 +136,8 @@ public class JwtUtil {
         return getClaims(token).getExpiration().before(new Date());
     }
 
+    public Date getTokenExpireTime(String token) {return getClaims(token).getExpiration();}
+
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
