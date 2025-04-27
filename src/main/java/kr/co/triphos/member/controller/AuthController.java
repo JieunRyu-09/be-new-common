@@ -54,7 +54,7 @@ public class AuthController {
 
 		try {
 			// redis 정보 저장 전 웹소켓 세션 제거
-			chatWebSocketService.sendErrorToUser(id, 401, "다른곳에서 로그인하였습니다.");
+			chatWebSocketService.sendErrorToUser(id, 1, "다른곳에서 로그인하였습니다.");
 
 			// 로그인 로직 및 토큰 발행
 			HashMap<String, String> accessTokenMap = authService.login(id, password);

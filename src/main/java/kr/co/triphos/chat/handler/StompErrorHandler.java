@@ -1,4 +1,4 @@
-package kr.co.triphos.chat;
+package kr.co.triphos.chat.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

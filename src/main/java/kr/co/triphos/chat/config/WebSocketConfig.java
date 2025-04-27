@@ -1,21 +1,19 @@
-package kr.co.triphos.chat;
+package kr.co.triphos.chat.config;
 
+import kr.co.triphos.chat.interceptor.WebSocketAuthChannelInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.server.HandshakeHandler;
 
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	private final WebSocketAuthChannelInterceptor stompInterceptor;
-	private final CustomHandshakeInterceptor customHandshakeInterceptor;
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -36,8 +34,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 		// WebSocket 엔드포인트 설정 (프론트엔드에서 연결할 주소)
 		registry
 				.addEndpoint("/ws")
-				//.addInterceptors(customHandshakeInterceptor) // ✅ 인터셉터 등록
-				//.setHandshakeHandler(new CustomHandshakeHandler()) // 🔸 여기!
 				.setAllowedOrigins("*");
 	}
 

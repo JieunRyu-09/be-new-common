@@ -1,4 +1,4 @@
-package kr.co.triphos.chat;
+package kr.co.triphos.chat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

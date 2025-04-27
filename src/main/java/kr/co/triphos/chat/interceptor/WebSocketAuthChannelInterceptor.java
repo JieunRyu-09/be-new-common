@@ -1,4 +1,4 @@
-package kr.co.triphos.chat;
+package kr.co.triphos.chat.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.triphos.chat.service.ChatService;
@@ -86,14 +86,14 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 				checkSubscribeAuth(destination, memberId);
 			}
 			catch (AuthException ex) {
-				chatWebSocketService.sendErrorToUser(memberId, 403, ex.getMessage());
+				chatWebSocketService.sendErrorToUser(memberId, 3, ex.getMessage());
 			}
 			catch (RuntimeException ex) {
-				chatWebSocketService.sendErrorToUser(memberId, 404, ex.getMessage());
+				chatWebSocketService.sendErrorToUser(memberId, 4, ex.getMessage());
 			}
 			catch (Exception ex) {
 				log.error(ex);
-				chatWebSocketService.sendErrorToUser(memberId, 500, "서버에 문제가 발생하였습니다.");
+				chatWebSocketService.sendErrorToUser(memberId, 5, "서버에 문제가 발생하였습니다.");
 			}
 		}
 

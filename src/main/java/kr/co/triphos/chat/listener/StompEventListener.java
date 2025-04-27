@@ -1,4 +1,4 @@
-package kr.co.triphos.chat;
+package kr.co.triphos.chat.listener;
 
 import kr.co.triphos.chat.service.ChatService;
 import kr.co.triphos.chat.service.ChatWebSocketService;
@@ -65,8 +65,7 @@ public class StompEventListener {
 
 		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.schedule(() -> {
-			chatWebSocketService.sendErrorToUser(memberId, 401, "로그인이 만료되었습니다.");
-			// 여기에 원하는 동작을 작성
+			chatWebSocketService.sendErrorToUser(memberId, 402, "로그인이 만료되었습니다.");
 		}, diffMillis, TimeUnit.MILLISECONDS);
 		/**
 		 * 세션ID로 사용자 정보 조회
