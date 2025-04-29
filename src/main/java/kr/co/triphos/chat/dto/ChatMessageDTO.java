@@ -20,9 +20,11 @@ public class ChatMessageDTO {
 	private String memberId;
 	private String memberNm;
 	private String content;
+	@Builder.Default
 	private MessageType type = MessageType.TEXT;
 	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime sendTime;
+	@Builder.Default
 	private String bundleYn = "N";
 
 	public enum MessageType {

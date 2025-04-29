@@ -36,7 +36,7 @@ public class AnalyzedWebhookDTO {
                 return String.format("%s님이 [%s] 저장소에 새로운 릴리즈를 발행했습니다.\n(%s)", creator, targetName, targetUrl);
             case FORK:
                 return String.format("%s님이 [%s] 저장소를 포크했습니다.\n(%s)", creator, targetName, targetUrl);
-            case COMMIT:
+            case PUSH:
                 return String.format("%s님이 [%s] 저장소에 커밋을 푸시했습니다.\n(%s)", creator, targetName, targetUrl);
             case DELETE:
                 return String.format("%s님이 [%s] 브랜치나 태그를 삭제했습니다.\n(%s)", creator, targetName, targetUrl);
