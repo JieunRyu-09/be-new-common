@@ -25,5 +25,22 @@ public class ResponseDTO {
 		this.data.put(key, value);
 	}
 
+	// Map을 한번에 저장
+	public void addData(Map<String, Object> data) {this.data.putAll(data);}
+
 	public void deleteData() {this.data = null;}
+
+	// ResponseDTO 생성
+	public static ResponseDTO create(String message) {
+		return create(message, null);
+	}
+
+	// ResponseDTO 생성
+	public static ResponseDTO create(String message, Map<String, Object> data) {
+		ResponseDTO dto = new ResponseDTO();
+		dto.setSuccess(false);
+		dto.setMsg(message);
+		if(dto != null) dto.addData(data);
+		return dto;
+	}
 }

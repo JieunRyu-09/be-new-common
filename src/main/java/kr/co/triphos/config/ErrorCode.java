@@ -11,7 +11,8 @@ public enum ErrorCode {
 	PAYMENT_REQUIRED(402, "결제가 필요합니다."),
 	FORBIDDEN(403, "접근이 금지되었습니다."),
 	NOT_FOUND(404, "요청한 리소스를 찾을 수 없습니다."),
-	INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다.");
+	INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다."),
+	WEBHOOK_PLATFORM_NOT_SUPPORTED(400, "지원하지 않는 웹훅 플랫폼입니다.");
 
 	private final int code;
 	private final String message;

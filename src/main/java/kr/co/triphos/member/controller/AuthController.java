@@ -5,14 +5,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.triphos.chat.service.ChatWebSocketService;
 import kr.co.triphos.common.dto.ResponseDTO;
-import kr.co.triphos.common.dto.WebhookDTO;
+import kr.co.triphos.common.dto.GitTeaWebhookDTO;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.common.service.RedisService;
-import kr.co.triphos.config.JwtUtil;
+import kr.co.triphos.common.service.WebhookService;
+import kr.co.triphos.common.service.factory.WebhookServiceFactory;
+import kr.co.triphos.manage.enums.WebhookPlatformType;
 import kr.co.triphos.member.dto.MemberDTO;
 import kr.co.triphos.member.dto.TokenDTO;
 import kr.co.triphos.member.service.AuthService;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @RestController
@@ -41,6 +43,7 @@ public class AuthController {
 	private final RedisService redisService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 	private final ChatWebSocketService chatWebSocketService;
+	private final WebhookServiceFactory webhookServiceFactory;
 
 	@Value("${token.time}")
 	private long tokenTime;
@@ -251,17 +254,19 @@ public class AuthController {
 					)
 			)
 	)
-	public ResponseEntity<?> webhookTest(@RequestBody WebhookDTO webhookDTO) {
-		ResponseDTO responseDTO = new ResponseDTO();
-		try {
-			log.info("WEB HOOK 도착함");
-			log.info(webhookDTO);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		catch (Exception ex) {
-			log.error(ex);
-			responseDTO.setMsg("서버에 문제가 발생하였습니다.");
-			return ResponseEntity.internalServerError().body(responseDTO);
-		}
+	public ResponseEntity<?> webhookTest(
+		@RequestBody GitTeaWebhookDTO gitTeaWebhookDTO,
+		@RequestParam String platformType
+	) {
+		WebhookPlatformType webhookPlatformType = WebhookPlatformType.fromPlatformType(platformType)
+				.orElseThrow(UnsupportedOperationException::new);
+		WebhookService service = webhookServiceFactory.getService(webhookPlatformType);
+
+		service.analyzeEvent(gitTeaWebhookDTO);
+
+		log.info("WEB HOOK 도착함");
+		log.info(gitTeaWebhookDTO);
+		return ResponseEntity.ok().body(ResponseDTO.create("성공적으로 처리했습니다."));
 	}
+
 }
