@@ -1,10 +1,9 @@
 package kr.co.triphos.chat.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
-import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data

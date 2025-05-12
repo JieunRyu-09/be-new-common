@@ -1,14 +1,11 @@
 package kr.co.triphos.member.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.log4j.Log4j2;
-
-import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor

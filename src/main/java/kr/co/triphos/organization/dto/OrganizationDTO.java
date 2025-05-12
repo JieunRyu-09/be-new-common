@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 

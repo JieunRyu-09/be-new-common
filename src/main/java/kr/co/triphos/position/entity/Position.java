@@ -1,5 +1,6 @@
 package kr.co.triphos.position.entity;
 
+import jakarta.persistence.*;
 import kr.co.triphos.position.dto.PositionDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data

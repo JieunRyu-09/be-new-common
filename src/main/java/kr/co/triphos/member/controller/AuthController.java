@@ -43,7 +43,6 @@ public class AuthController {
 	private final RedisService redisService;
 	private final AuthenticationFacadeService authenticationFacadeService;
 	private final ChatWebSocketService chatWebSocketService;
-	private final WebhookServiceFactory webhookServiceFactory;
 
 	@Value("${token.time}")
 	private long tokenTime;
@@ -240,33 +239,6 @@ public class AuthController {
 		catch (Exception ex) {
 			return ResponseEntity.status(401).body(ex.getMessage());
 		}
-	}
-
-	@PostMapping("/web-hook")
-	@Tag(name = "채팅")
-	@Operation(
-			summary = "채팅방 생성",
-			description = "채팅방을 생성합니다.",
-			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-					content = @Content(
-							schema = @Schema(hidden = true),
-							examples = @ExampleObject(name = "채팅방 생성 예시", ref = "#/components/examples/chat.post.chat-rooms")
-					)
-			)
-	)
-	public ResponseEntity<?> webhookTest(
-		@RequestBody GitTeaWebhookDTO gitTeaWebhookDTO,
-		@RequestParam String platformType
-	) {
-		WebhookPlatformType webhookPlatformType = WebhookPlatformType.fromPlatformType(platformType)
-				.orElseThrow(UnsupportedOperationException::new);
-		WebhookService service = webhookServiceFactory.getService(webhookPlatformType);
-
-		service.analyzeEvent(gitTeaWebhookDTO);
-
-		log.info("WEB HOOK 도착함");
-		log.info(gitTeaWebhookDTO);
-		return ResponseEntity.ok().body(ResponseDTO.create("성공적으로 처리했습니다."));
 	}
 
 }

@@ -1,16 +1,10 @@
 package kr.co.triphos.chat.interceptor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.triphos.chat.service.ChatService;
+import jakarta.security.auth.message.AuthException;
 import kr.co.triphos.chat.service.ChatWebSocketService;
-import kr.co.triphos.common.dto.ResponseDTO;
-import kr.co.triphos.common.service.RedisService;
 import kr.co.triphos.member.service.AuthService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandlingException;
@@ -19,33 +13,35 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
 
-import javax.security.auth.message.AuthException;
-import java.nio.charset.StandardCharsets;
-import java.security.Principal;
-import java.util.Map;
 import java.util.regex.Pattern;
 
-@Component
-@RequiredArgsConstructor
 @Log4j2
+@Component
 public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
-	@Value("${chat.send-msg}")
-	private String sendMsgUrl;
-	@Value("${chat.unread-chat-room}")
-	private String unreadChatRoomUrl;
-	@Value("${chat.error-msg}")
-	private String errorMsgUrl;
+
+	private final String sendMsgUrl;
+
+	private final String unreadChatRoomUrl;
+
+	private final String errorMsgUrl;
 
 	private final AuthService authService;
-	private ChatWebSocketService chatWebSocketService;
 
-	@Autowired
-	public void setChatWebSocketService(@Lazy ChatWebSocketService chatWebSocketService) {
+	private final ChatWebSocketService chatWebSocketService;
+
+	public WebSocketAuthChannelInterceptor(
+			@Value("${chat.send-msg}") String sendMsgUrl,
+			@Value("${chat.unread-chat-room}") String unreadChatRoomUrl,
+			@Value("${chat.error-msg}") String errorMsgUrl,
+			AuthService authService,
+			ChatWebSocketService chatWebSocketService
+	) {
+		this.sendMsgUrl = sendMsgUrl;
+		this.unreadChatRoomUrl = unreadChatRoomUrl;
+		this.errorMsgUrl = errorMsgUrl;
+		this.authService = authService;
 		this.chatWebSocketService = chatWebSocketService;
 	}
 

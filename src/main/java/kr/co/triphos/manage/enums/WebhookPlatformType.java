@@ -12,16 +12,16 @@ import java.util.Optional;
 public enum WebhookPlatformType {
 
     // 깃티
-    GIT_TEA("GT"),
-
-    // 곡스
-    GOGS("G"),
+    GIT_TEA("GITTEA"),
 
     // 깃허브
-    GIT_HUB("GH"),
+    GIT_HUB("GITHUB"),
 
     // 깃랩
-    GIT_LAB("GL");
+    GIT_LAB("GITLAB"),
+
+    // 곡스
+    GOGS("GOGS");
 
     private final String platformType;
 

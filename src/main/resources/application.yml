@@ -23,6 +23,8 @@ spring:
         format_sql: true
         highlight_sql: true # ANSI 코드에 색을 나타낸다
         dialect: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
   graphql:
     cors:
       allowed-origins: "*"

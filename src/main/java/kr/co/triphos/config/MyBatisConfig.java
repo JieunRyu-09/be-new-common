@@ -1,6 +1,7 @@
 package kr.co.triphos.config;
 
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -13,7 +14,10 @@ import javax.sql.DataSource;
 
 
 @Configuration
-@MapperScan(basePackages = "kr.co.triphos")
+@MapperScan(
+        basePackages = "kr.co.triphos",
+        annotationClass = Mapper.class
+)
 public class MyBatisConfig {
 
     @Bean(name = "sqlSession")

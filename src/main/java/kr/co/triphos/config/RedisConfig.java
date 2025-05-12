@@ -14,14 +14,22 @@ import java.time.Duration;
 
 @Configuration
 public class RedisConfig {
-	@Value("${spring.redis.host}")
-	private String redisHost;
 
-	@Value("${spring.redis.port}")
-	private int redisPort;
+	private final String redisHost;
 
-	@Value("${spring.redis.password}")
-	private String redisPassword;
+	private final int redisPort;
+
+	private final String redisPassword;
+
+	public RedisConfig(
+			@Value("${spring.redis.host}") String redisHost,
+			@Value("${spring.redis.port}") Integer redisPort,
+			@Value("${spring.redis.password}") String redisPassword
+	) {
+		this.redisHost = redisHost;
+		this.redisPort = redisPort;
+		this.redisPassword = redisPassword;
+	}
 
 	@Bean
 	public JedisConnectionFactory jedisConnectionFactory() {

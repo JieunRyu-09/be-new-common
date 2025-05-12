@@ -1,5 +1,6 @@
 package kr.co.triphos.member.service;
 
+import jakarta.transaction.Transactional;
 import kr.co.triphos.common.entity.MenuInfo;
 import kr.co.triphos.common.repository.MenuInfoRepository;
 import kr.co.triphos.member.dto.MemberDTO;
@@ -13,7 +14,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

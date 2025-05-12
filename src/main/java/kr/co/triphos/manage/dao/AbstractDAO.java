@@ -1,10 +1,10 @@
 package kr.co.triphos.manage.dao;
 
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 @Log4j2

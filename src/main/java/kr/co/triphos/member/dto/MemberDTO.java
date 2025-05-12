@@ -1,10 +1,9 @@
 package kr.co.triphos.member.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import kr.co.triphos.member.entity.Member;
 import lombok.*;
-
-import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor

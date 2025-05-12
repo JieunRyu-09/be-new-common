@@ -1,5 +1,6 @@
 package kr.co.triphos.chat.service;
 
+import jakarta.transaction.Transactional;
 import kr.co.triphos.chat.dao.ChatDAO;
 import kr.co.triphos.chat.dto.ChatMessageDTO;
 import kr.co.triphos.chat.dto.ChatRoomDTO;
@@ -8,25 +9,20 @@ import kr.co.triphos.chat.dto.ChatRoomMemberDTO;
 import kr.co.triphos.chat.entity.ChatFileInfo;
 import kr.co.triphos.chat.entity.ChatRoom;
 import kr.co.triphos.chat.entity.ChatRoomMember;
-import kr.co.triphos.chat.entity.pk.ChatRoomMemberPK;
 import kr.co.triphos.chat.repository.ChatFileInfoRepository;
 import kr.co.triphos.chat.repository.ChatRoomMemberRepository;
 import kr.co.triphos.chat.repository.ChatRoomRepository;
-import kr.co.triphos.common.entity.FileInfo;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.common.service.RedisService;
 import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -38,27 +34,53 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@Service
-@RequiredArgsConstructor
 @Log4j2
+@Service
 public class ChatService {
-    @Value("${chat.upload-dir}")
-    private String rootPath;
 
-    @Value("${chat.send-msg}")
-    String SEND_MSG_URL;
+    private final String rootPath;
+
+    private final String SEND_MSG_URL;
 
     private final ChatDAO chatDAO;
 
     private final MemberRepository memberRepository;
+
     private final ChatRoomRepository chatRoomRepository;
+
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+
     private final ChatFileInfoRepository chatFileInfoRepository;
 
     private final ChatWebSocketService chatWebSocketService;
+
     private final AuthenticationFacadeService authenticationFacadeService;
 
     private final RedisService redisService;
+
+    public ChatService(
+            @Value("${chat.upload-dir}") String rootPath,
+            @Value("${chat.send-msg}") String senMsgUrl,
+            ChatDAO chatDAO,
+            MemberRepository memberRepository,
+            ChatRoomRepository chatRoomRepository,
+            ChatRoomMemberRepository chatRoomMemberRepository,
+            ChatFileInfoRepository chatFileInfoRepository,
+            ChatWebSocketService chatWebSocketService,
+            AuthenticationFacadeService authenticationFacadeService,
+            RedisService redisService
+    ) {
+        this.rootPath = rootPath;
+        this.SEND_MSG_URL = senMsgUrl;
+        this.chatDAO = chatDAO;
+        this.memberRepository = memberRepository;
+        this.chatRoomRepository = chatRoomRepository;
+        this.chatRoomMemberRepository = chatRoomMemberRepository;
+        this.chatFileInfoRepository = chatFileInfoRepository;
+        this.chatWebSocketService = chatWebSocketService;
+        this.authenticationFacadeService = authenticationFacadeService;
+        this.redisService = redisService;
+    }
 
     public List<ChatRoomInfoDTO> getCommonChatRooms(String memberId, List<String> memberIdList) throws Exception {
         List<ChatRoomInfoDTO> chatRoomInfoDTOList = chatDAO.getCommonChatRooms(memberId, memberIdList);

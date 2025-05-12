@@ -25,6 +25,7 @@ public class GitTeaWebhookServiceImpl implements WebhookService {
     private final ChatService chatService;
 
     // ChatRoomDTO 생성
+/*
     private ChatRoomDTO createChatRoomDTO(String title) {
         return ChatRoomDTO.builder()
                 .title(title)
@@ -32,6 +33,7 @@ public class GitTeaWebhookServiceImpl implements WebhookService {
                 .memberCnt(2)
                 .build();
     }
+*/
 
     @Override
     public void analyzeEvent(GitTeaWebhookDTO gitTeaWebhookDTO) {
@@ -40,7 +42,9 @@ public class GitTeaWebhookServiceImpl implements WebhookService {
 
     @Override
     public void createChatRooms(List<String> memberIds) {
-
+        // 1. 채팅방을 생성할 일이 없네 X
+        // 2. 특정 채팅방에 바로 메세지를 보내는데, 다만 깃 봇이 없을 경우 초대를 하고 메세지를 발송하는거
+        // 3. 깃봇은 채팅방에 있는 사용자가 초대해야함. 만약 채팅방에 깃봇이 없다면 그냥 메세지 발송 안함
     }
 
     @Override

@@ -1,11 +1,10 @@
 package kr.co.triphos.common.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.triphos.common.entity.ExcelInfo;
+import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 
-import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.List;
 

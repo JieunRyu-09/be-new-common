@@ -1,19 +1,17 @@
 package kr.co.triphos.common.service;
 
 
+import jakarta.transaction.Transactional;
 import kr.co.triphos.common.dto.ExcelDTO;
 import kr.co.triphos.common.dto.ExcelDataDTO;
-import kr.co.triphos.common.dto.ExcelInfoDTO;
 import kr.co.triphos.common.entity.ExcelData;
 import kr.co.triphos.common.entity.ExcelInfo;
-import kr.co.triphos.common.entity.pk.ExcelDataPK;
 import kr.co.triphos.common.repository.ExcelDataRepository;
 import kr.co.triphos.common.repository.ExcelInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;

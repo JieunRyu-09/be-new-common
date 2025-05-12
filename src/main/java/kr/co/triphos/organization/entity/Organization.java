@@ -1,10 +1,13 @@
 package kr.co.triphos.organization.entity;
 
+import jakarta.persistence.*;
 import kr.co.triphos.organization.dto.OrganizationDTO;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data

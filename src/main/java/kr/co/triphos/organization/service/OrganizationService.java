@@ -1,5 +1,6 @@
 package kr.co.triphos.organization.service;
 
+import jakarta.transaction.Transactional;
 import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
 import kr.co.triphos.organization.dao.OrganizationDAO;
@@ -14,7 +15,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;

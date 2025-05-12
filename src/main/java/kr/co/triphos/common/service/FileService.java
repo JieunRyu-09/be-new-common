@@ -1,16 +1,16 @@
 package kr.co.triphos.common.service;
 
 
+import jakarta.transaction.Transactional;
 import kr.co.triphos.common.entity.FileInfo;
 import kr.co.triphos.common.repository.FileInfoRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

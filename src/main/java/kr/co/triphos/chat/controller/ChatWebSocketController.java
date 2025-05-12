@@ -38,7 +38,7 @@ public class ChatWebSocketController {
 			log.info("CUSTOMUSER :: " + (CustomUserDetails) ((Authentication) principal).getPrincipal());
 			log.error(ex.getMessage());
 		}
-		System.out.println("📩 받은 메시지: " + chatMessageDTO.getContent());
+		/*System.out.println("📩 받은 메시지: " + chatMessageDTO.getContent());*/
 		return chatMessageDTO;
 	}
 

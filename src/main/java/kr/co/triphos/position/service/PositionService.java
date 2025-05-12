@@ -1,27 +1,20 @@
 package kr.co.triphos.position.service;
 
+import jakarta.transaction.Transactional;
 import kr.co.triphos.member.entity.Member;
 import kr.co.triphos.member.repository.MemberRepository;
-import kr.co.triphos.organization.dao.OrganizationDAO;
-import kr.co.triphos.organization.dto.OrganizationDTO;
-import kr.co.triphos.organization.dto.OrganizationInfoDTO;
 import kr.co.triphos.organization.entity.Organization;
 import kr.co.triphos.organization.repository.OrganizationRepository;
-import kr.co.triphos.organization.service.OrganizationService;
 import kr.co.triphos.position.dto.PositionDTO;
 import kr.co.triphos.position.dto.PositionInfoDTO;
 import kr.co.triphos.position.entity.Position;
 import kr.co.triphos.position.repository.PositionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

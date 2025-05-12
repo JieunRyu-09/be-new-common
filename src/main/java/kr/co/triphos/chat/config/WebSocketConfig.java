@@ -2,7 +2,10 @@ package kr.co.triphos.chat.config;
 
 import kr.co.triphos.chat.interceptor.WebSocketAuthChannelInterceptor;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -11,9 +14,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
 	private final WebSocketAuthChannelInterceptor stompInterceptor;
+
+	public WebSocketConfig(@Lazy WebSocketAuthChannelInterceptor stompInterceptor) {
+		this.stompInterceptor = stompInterceptor;
+	}
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
