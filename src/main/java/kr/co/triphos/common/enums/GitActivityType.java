@@ -1,7 +1,7 @@
 package kr.co.triphos.common.enums;
 
 import kr.co.triphos.common.dto.WebhookDTO;
-import kr.co.triphos.manage.enums.WebhookPlatformType;
+import kr.co.triphos.organization.enums.WebhookPlatformType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

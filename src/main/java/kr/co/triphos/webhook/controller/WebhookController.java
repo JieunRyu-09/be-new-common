@@ -9,7 +9,7 @@ import kr.co.triphos.common.dto.GitTeaWebhookDTO;
 import kr.co.triphos.common.dto.ResponseDTO;
 import kr.co.triphos.common.service.WebhookService;
 import kr.co.triphos.common.service.factory.WebhookServiceFactory;
-import kr.co.triphos.manage.enums.WebhookPlatformType;
+import kr.co.triphos.organization.enums.WebhookPlatformType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;

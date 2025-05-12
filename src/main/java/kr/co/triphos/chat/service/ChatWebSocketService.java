@@ -28,30 +28,57 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
-@RequiredArgsConstructor
 @Log4j2
+@Service
 public class ChatWebSocketService {
+
     private final ChatDAO chatDAO;
+
     private final SimpMessagingTemplate messagingTemplate;
+
     private final MemberRepository memberRepository;
+
     private final ChatRoomRepository chatRoomRepository;
+
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+
     private final ChatRoomMsgRepository chatRoomMsgRepository;
 
     private final RedisService redisService;
-    
-    @Value("${chat.unread-chat-room}")
-    String UNREAD_CHAT_ROOM_URL;
 
-    @Value("${chat.error-msg}")
-    String ERROR_MSG_URL;
+    private final String UNREAD_CHAT_ROOM_URL;
 
-    @Value("${chat.send-msg}")
-    String SEND_MSG_URL;
+    private final String ERROR_MSG_URL;
 
-    @Value("${chat.watching}")
-    String WATCHING_URL;
+    private final String SEND_MSG_URL;
+
+    private final String WATCHING_URL;
+
+    public ChatWebSocketService(
+        ChatDAO chatDAO,
+        SimpMessagingTemplate messagingTemplate,
+        MemberRepository memberRepository,
+        ChatRoomRepository chatRoomRepository,
+        ChatRoomMemberRepository chatRoomMemberRepository,
+        ChatRoomMsgRepository chatRoomMsgRepository,
+        RedisService redisService,
+        @Value("${chat.unread-chat-room}") String unReadChatRoomUrl,
+        @Value("${chat.error-msg}") String errorMsgUrl,
+        @Value("${chat.send-msg}") String sendMsgUrl,
+        @Value("${chat.watching}") String watchingUrl
+    ) {
+        this.chatDAO = chatDAO;
+        this.messagingTemplate = messagingTemplate;
+        this.memberRepository = memberRepository;
+        this.chatRoomRepository = chatRoomRepository;
+        this.chatRoomMemberRepository = chatRoomMemberRepository;
+        this.chatRoomMsgRepository = chatRoomMsgRepository;
+        this.redisService = redisService;
+        UNREAD_CHAT_ROOM_URL = unReadChatRoomUrl;
+        ERROR_MSG_URL = errorMsgUrl;
+        SEND_MSG_URL = sendMsgUrl;
+        WATCHING_URL = watchingUrl;
+    }
 
     @Transactional
     public void receiveMessage(String memberId, int roomIdx, ChatMessageDTO chatMessageDTO) throws Exception{

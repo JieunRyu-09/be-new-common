@@ -5,7 +5,7 @@ import kr.co.triphos.common.service.impl.GitHubWebhookServiceImpl;
 import kr.co.triphos.common.service.impl.GitLabWebhookServiceImpl;
 import kr.co.triphos.common.service.impl.GitTeaWebhookServiceImpl;
 import kr.co.triphos.common.service.impl.GogsWebhookServiceImpl;
-import kr.co.triphos.manage.enums.WebhookPlatformType;
+import kr.co.triphos.organization.enums.WebhookPlatformType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

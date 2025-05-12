@@ -8,12 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.triphos.chat.service.ChatWebSocketService;
 import kr.co.triphos.common.dto.ResponseDTO;
-import kr.co.triphos.common.dto.GitTeaWebhookDTO;
 import kr.co.triphos.common.service.AuthenticationFacadeService;
 import kr.co.triphos.common.service.RedisService;
-import kr.co.triphos.common.service.WebhookService;
-import kr.co.triphos.common.service.factory.WebhookServiceFactory;
-import kr.co.triphos.manage.enums.WebhookPlatformType;
 import kr.co.triphos.member.dto.MemberDTO;
 import kr.co.triphos.member.dto.TokenDTO;
 import kr.co.triphos.member.service.AuthService;
@@ -29,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 
 @RestController

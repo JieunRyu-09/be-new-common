@@ -1,4 +1,4 @@
-package kr.co.triphos.manage.enums;
+package kr.co.triphos.organization.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

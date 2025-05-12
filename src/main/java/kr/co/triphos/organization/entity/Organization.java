@@ -11,11 +11,11 @@ import lombok.extern.log4j.Log4j2;
 import java.time.LocalDateTime;
 
 @Data
-@Entity(name = "Organization")
+@Log4j2
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Log4j2
+@Entity(name = "Organization")
 @Table(name = "sy_organization_info")
 public class Organization {
 	@Id
